@@ -1,0 +1,15 @@
+server:
+  port: 8181
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5434/ticket_terminal
+    username: admin
+    password: pass
+  liquibase:
+    change-log: classpath:db-changelog/db.changelog-master.yml
+application:
+  allowed-origins:
+    - http://localhost:*

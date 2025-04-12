@@ -1,0 +1,986 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-users
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: users
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: full_name
+                  type: varchar(100)
+              - column:
+                  name: phone
+                  type: varchar(20)
+              - column:
+                  name: email
+                  type: varchar(100)
+                  constraints:
+                    unique: true
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: now()
+  - changeSet:
+      id: 002-create-services
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: services
+      changes:
+        - createTable:
+            tableName: services
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: service_name
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar
+              - column:
+                  name: cost
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: active_kind_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_need_visit_date
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: is_need_visit_time
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: dt_begin
+                  type: timestamp
+              - column:
+                  name: dt_end
+                  type: timestamp
+              - column:
+                  name: pro_culture_identifier
+                  type: integer
+              - column:
+                  name: is_pro_culture_checked
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: is_disable_edit_visit_object
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_disable_edit_visitor
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_visit_object_use_for_cost
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_category_visitor_use_for_cost
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_visitor_count_use_for_cost
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_use_one_category
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 003-create-visit-objects
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: visit_objects
+      changes:
+        - createTable:
+            tableName: visit_objects
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: visit_object_name
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_required
+                  type: boolean
+                  defaultValueBoolean: false
+  - changeSet:
+      id: 004-create-category-visitors
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: category_visitors
+      changes:
+        - createTable:
+            tableName: category_visitors
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: category_name
+                  type: varchar
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 005-create-orders
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: orders
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: order_barcode
+                  type: varchar
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: order_state_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: integer
+              - column:
+                  name: visitor_name1
+                  type: varchar
+              - column:
+                  name: visitor_name2
+                  type: varchar
+              - column:
+                  name: visitor_name3
+                  type: varchar
+              - column:
+                  name: visitor_phone
+                  type: varchar
+              - column:
+                  name: visitor_mail
+                  type: varchar
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: is_simple_mode
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_site_id
+                  type: varchar
+              - column:
+                  name: visitor_site_id
+                  type: varchar
+              - column:
+                  name: visitor_address
+                  type: varchar
+              - column:
+                  name: visitor_document_name
+                  type: varchar
+              - column:
+                  name: visitor_document_serial
+                  type: varchar
+              - column:
+                  name: visitor_document_number
+                  type: varchar
+              - column:
+                  name: comment
+                  type: varchar
+              - column:
+                  name: dt_drop
+                  type: timestamp
+              - column:
+                  name: cost
+                  type: integer
+                  defaultValueNumeric: 0
+  - changeSet:
+      id: 006-create-order-services
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: order_services
+      changes:
+        - createTable:
+            tableName: order_services
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: order_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: service_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cost
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dt_visit
+                  type: timestamp
+              - column:
+                  name: service_state_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: service_count
+                  type: integer
+                  defaultValueNumeric: 1
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dt_drop
+                  type: timestamp
+              - column:
+                  name: pro_culture_guid
+                  type: varchar
+  - changeSet:
+      id: 007-create-action-logs
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: action_logs
+      changes:
+        - createTable:
+            tableName: action_logs
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action_type
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: actor_name
+                  type: varchar(255)
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: action_logs
+            constraintName: fk_action_logs_users
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 008-create-excursion-log
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: excursion_log
+      changes:
+        - createTable:
+            tableName: excursion_log
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: excursion_log_internet_number
+                  type: bigint
+              - column:
+                  name: org_name
+                  type: varchar
+              - column:
+                  name: contact_person_name
+                  type: varchar
+              - column:
+                  name: contact_person_phone
+                  type: varchar
+              - column:
+                  name: contact_person_mail
+                  type: varchar
+              - column:
+                  name: service_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dt_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: varchar
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - addForeignKeyConstraint:
+            baseColumnNames: service_id
+            baseTableName: excursion_log
+            constraintName: fk_excursion_log_service
+            referencedColumnNames: id
+            referencedTableName: services
+  - changeSet:
+      id: 009-create-excursion-log-visit-object
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: excursion_log_visit_object
+      changes:
+        - createTable:
+            tableName: excursion_log_visit_object
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: excursion_log_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: visit_object_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: excursion_log_id
+            baseTableName: excursion_log_visit_object
+            constraintName: fk_excursion_log_vo_log
+            referencedColumnNames: id
+            referencedTableName: excursion_log
+        - addForeignKeyConstraint:
+            baseColumnNames: visit_object_id
+            baseTableName: excursion_log_visit_object
+            constraintName: fk_excursion_log_vo_obj
+            referencedColumnNames: id
+            referencedTableName: visit_objects
+  - changeSet:
+      id: 010-create-excursion-log-visitor
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: excursion_log_visitor
+      changes:
+        - createTable:
+            tableName: excursion_log_visitor
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: excursion_log_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_visitor_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: visitor_count
+                  type: integer
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: excursion_log_id
+            baseTableName: excursion_log_visitor
+            constraintName: fk_excursion_log_visitor_log
+            referencedColumnNames: id
+            referencedTableName: excursion_log
+        - addForeignKeyConstraint:
+            baseColumnNames: category_visitor_id
+            baseTableName: excursion_log_visitor
+            constraintName: fk_excursion_log_visitor_cat
+            referencedColumnNames: id
+            referencedTableName: category_visitors
+  - changeSet:
+      id: 011-create-order-service-visit-object
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: order_service_visit_object
+      changes:
+        - createTable:
+            tableName: order_service_visit_object
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: order_service_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: visit_object_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: order_service_visit_object
+            baseColumnNames: order_service_id
+            referencedTableName: order_services
+            referencedColumnNames: id
+            constraintName: fk_order_service_visit_object_os
+        - addForeignKeyConstraint:
+            baseTableName: order_service_visit_object
+            baseColumnNames: visit_object_id
+            referencedTableName: visit_objects
+            referencedColumnNames: id
+            constraintName: fk_order_service_visit_object_vo
+  - changeSet:
+      id: 012-create-order-service-visitor
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: order_service_visitor
+      changes:
+        - createTable:
+            tableName: order_service_visitor
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: order_service_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_visitor_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: visitor_count
+                  type: integer
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: order_service_visitor
+            baseColumnNames: order_service_id
+            referencedTableName: order_services
+            referencedColumnNames: id
+            constraintName: fk_order_service_visitor_os
+        - addForeignKeyConstraint:
+            baseTableName: order_service_visitor
+            baseColumnNames: category_visitor_id
+            referencedTableName: category_visitors
+            referencedColumnNames: id
+            constraintName: fk_order_service_visitor_cv
+  - changeSet:
+      id: 013-create-payments
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: payments
+      changes:
+        - createTable:
+            tableName: payments
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: order_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: payment_type
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: transaction_id
+                  type: varchar
+                  constraints:
+                    unique: true
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+  - changeSet:
+      id: 014-create-prices
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: prices
+      changes:
+        - createTable:
+            tableName: prices
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: service_id
+                  type: integer
+              - column:
+                  name: visit_object_id
+                  type: integer
+              - column:
+                  name: category_visitor_id
+                  type: integer
+              - column:
+                  name: cost
+                  type: integer
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: prices
+            baseColumnNames: service_id
+            referencedTableName: services
+            referencedColumnNames: id
+            constraintName: fk_prices_services
+        - addForeignKeyConstraint:
+            baseTableName: prices
+            baseColumnNames: visit_object_id
+            referencedTableName: visit_objects
+            referencedColumnNames: id
+            constraintName: fk_prices_visit_objects
+        - addForeignKeyConstraint:
+            baseTableName: prices
+            baseColumnNames: category_visitor_id
+            referencedTableName: category_visitors
+            referencedColumnNames: id
+            constraintName: fk_prices_category_visitors
+  - changeSet:
+      id: 015-create-pro-culture-links
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: pro_culture_links
+      changes:
+        - createTable:
+            tableName: pro_culture_links
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: order_service_id
+                  type: bigint
+              - column:
+                  name: order_id
+                  type: bigint
+              - column:
+                  name: seat_id
+                  type: bigint
+              - column:
+                  name: pro_culture_guid
+                  type: varchar
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 016-create-requisite-info
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: requisite_info
+      changes:
+        - createTable:
+            tableName: requisite_info
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: city
+                  type: varchar
+              - column:
+                  name: address
+                  type: varchar
+              - column:
+                  name: phone1
+                  type: varchar
+              - column:
+                  name: fax
+                  type: varchar
+              - column:
+                  name: dt_begin
+                  type: time
+              - column:
+                  name: dt_end
+                  type: time
+  - changeSet:
+      id: 017-create-seance-grid
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: seance_grid
+      changes:
+        - createTable:
+            tableName: seance_grid
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: dt_begin
+                  type: time
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dt_end
+                  type: time
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 018-create-sold-services
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: sold_services
+      changes:
+        - createTable:
+            tableName: sold_services
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: order_service_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: barcode
+                  type: varchar
+              - column:
+                  name: service_state_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: payment_kind_id
+                  type: integer
+              - column:
+                  name: dt_active
+                  type: timestamp
+  - changeSet:
+      id: 019-create-system-info
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: system_info
+      changes:
+        - createTable:
+            tableName: system_info
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: version
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: major
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: minor
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: release
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: build
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dt_licence_finish
+                  type: timestamp
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 020-create-org
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: org
+      changes:
+        - createTable:
+            tableName: org
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: city
+                  type: varchar
+              - column:
+                  name: address
+                  type: varchar
+              - column:
+                  name: phone1
+                  type: varchar
+              - column:
+                  name: phone2
+                  type: varchar
+              - column:
+                  name: fax
+                  type: varchar
+              - column:
+                  name: dt_begin
+                  type: varchar
+              - column:
+                  name: dt_end
+                  type: varchar
+  - changeSet:
+      id: 021-create-gate-info
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: gate_info
+      changes:
+        - createTable:
+            tableName: gate_info
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: version
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: major
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: minor
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: release
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: build
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dt_licence_finish
+                  type: timestamp
+                  constraints:
+                    nullable: false
