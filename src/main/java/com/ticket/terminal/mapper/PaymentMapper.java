@@ -1,6 +1,5 @@
 package com.ticket.terminal.mapper;
 
-
 import com.ticket.terminal.dto.PaymentDto;
 import com.ticket.terminal.entity.PaymentEntity;
 import org.mapstruct.Mapper;

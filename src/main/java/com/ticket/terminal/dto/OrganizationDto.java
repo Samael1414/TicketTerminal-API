@@ -1,12 +1,10 @@
 package com.ticket.terminal.dto;
 
-
 import lombok.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class OrganizationDto {
 
     private String name;

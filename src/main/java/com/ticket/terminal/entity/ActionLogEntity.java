@@ -1,16 +1,17 @@
 package com.ticket.terminal.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
 @Table(name = "action_logs")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ActionLogEntity {
 
     @Id

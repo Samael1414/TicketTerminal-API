@@ -4,7 +4,6 @@ import com.ticket.terminal.dto.PriceDto;
 import com.ticket.terminal.entity.PriceEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
 import java.util.List;
 
 @Mapper(componentModel = "spring")

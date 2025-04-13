@@ -3,12 +3,18 @@ package com.ticket.terminal.service;
 import com.ticket.terminal.dto.SoldOrderRequestDto;
 import com.ticket.terminal.dto.SoldOrderResponseDto;
 import com.ticket.terminal.dto.SoldServiceDto;
+import com.ticket.terminal.entity.ActionLogEntity;
 import com.ticket.terminal.entity.SoldServiceEntity;
+import com.ticket.terminal.entity.UsersEntity;
 import com.ticket.terminal.mapper.SoldServiceMapper;
 import com.ticket.terminal.repository.OrderRepository;
 import com.ticket.terminal.repository.SoldServiceRepository;
+import com.ticket.terminal.repository.UserRepository;
 import com.ticket.terminal.util.BarcodeGeneratorUtil;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +35,8 @@ public class SoldOrderService {
     private final SoldServiceRepository soldServiceRepository;
     private final SoldServiceMapper soldServiceMapper;
     private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+    private final ActionLogService actionLogService;
 
 
     @Transactional
@@ -48,7 +56,7 @@ public class SoldOrderService {
 
     private SoldOrderResponseDto confirmOrderPayment(SoldOrderRequestDto dto) {
         if (dto.getOrderId() == null || dto.getService().isEmpty()) {
-            throw new IllegalArgumentException("The list of services must not be empty");
+            throw new IllegalArgumentException("Список услуг не должен быть пустым");
         }
 
         List<Long> orderServiceIds = dto.getService().stream().map(SoldServiceDto::getOrderServiceId).toList();
@@ -68,6 +76,16 @@ public class SoldOrderService {
 
         orderRepository.updateOrderState(dto.getOrderId(), STATUS_PAID);
 
+        UsersEntity currentUser = getCurrentUser();
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("PAY_ORDER")
+                .description(String.format("Оплачен заказ № %s с %d услугами",
+                        dto.getOrderId(), soldServices.size()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
+
         return SoldOrderResponseDto.builder().orderId(dto.getOrderId()).orderStateId(STATUS_PAID) // оплачено
                 .orderBarcode(BarcodeGeneratorUtil.generateSoldServiceBarcode(dto.getOrderId()))
                 .service(soldServices.stream()
@@ -78,5 +96,12 @@ public class SoldOrderService {
 
     private LocalDateTime getEndOfDay() {
         return LocalDateTime.now().withHour(23).withMinute(59).withSecond(59);
+    }
+
+    private UsersEntity getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        return userRepository.findByUserNameIgnoreCase(username)
+                .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
 }

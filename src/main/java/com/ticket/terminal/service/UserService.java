@@ -1,8 +1,8 @@
 package com.ticket.terminal.service;
 
-import com.ticket.terminal.dto.ActionLogDto;
 import com.ticket.terminal.dto.UsersCreateDto;
 import com.ticket.terminal.dto.UsersResponseDto;
+import com.ticket.terminal.entity.ActionLogEntity;
 import com.ticket.terminal.entity.UsersEntity;
 import com.ticket.terminal.mapper.UsersMapper;
 import com.ticket.terminal.repository.UserRepository;
@@ -12,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,15 +29,16 @@ public class UserService {
         entity.setPassword(passwordEncoder.encode(dto.getPassword()));
         entity.setCreatedAt(LocalDateTime.now());
         UsersEntity saved = userRepository.save(entity);
-        UsersEntity currentUser = getCurrentUser();
 
-        actionLogService.save(new ActionLogDto(
-                currentUser.getId().intValue(),
-                "CREATE_USER",
-                  String.format("Cоздан пользователь: %s", saved.getUserName()),
-                LocalDateTime.now(),
-                currentUser.getUserName()
-        ));
+        UsersEntity currentUser = getCurrentUser();
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("CREATE_USER")
+                .description(String.format("Cоздан пользователь: %s", saved.getUserName()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
+
 
         return usersMapper.toDto(saved);
     }
@@ -52,49 +52,46 @@ public class UserService {
     public UsersResponseDto findById(Long id) {
         return userRepository.findById(id)
                 .map(usersMapper::toDto)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 
     }
 
     public void deleteById(Long id) {
         UsersEntity user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
         userRepository.deleteById(id);
 
         UsersEntity currentUser = getCurrentUser();
-
-        actionLogService.save(new ActionLogDto(
-                currentUser.getId().intValue(),
-                "DELETE_USER",
-                String.format("Удален пользователь: %s", user.getUserName()),
-                LocalDateTime.now(),
-                currentUser.getUserName()
-        ));
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("DELETE_USER")
+                .description(String.format("Удален пользователь: %s", user.getUserName()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
     }
 
     public UsersResponseDto update(Long id, UsersCreateDto dto) {
-        UsersEntity entity = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        UsersEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 
-        entity.setUserName(dto.getUserName());
-        entity.setFullName(dto.getFullName());
-        entity.setPhone(dto.getPhone());
-        entity.setEmail(dto.getEmail());
-        entity.setRole(dto.getRole());
-        entity.setPassword(passwordEncoder.encode(dto.getPassword()));
-        entity.setCreatedAt(entity.getCreatedAt());
+        user.setUserName(dto.getUserName());
+        user.setFullName(dto.getFullName());
+        user.setPhone(dto.getPhone());
+        user.setEmail(dto.getEmail());
+        user.setRole(dto.getRole());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setCreatedAt(user.getCreatedAt());
+        UsersEntity updated = userRepository.save(user);
 
-        UsersEntity updated = userRepository.save(entity);
         UsersEntity currentUser = getCurrentUser();
-
-        actionLogService.save(new ActionLogDto(
-                currentUser.getId().intValue(),
-                "UPDATE_USER",
-                String.format("Обновлён пользователь: %s", updated.getUserName()),
-                LocalDateTime.now(),
-                currentUser.getUserName()
-        ));
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("UPDATE_USER")
+                .description(String.format("Обновлён пользователь: %s", updated.getUserName()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
 
         return usersMapper.toDto(updated);
     }
@@ -103,7 +100,7 @@ public class UserService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         return userRepository.findByUserNameIgnoreCase(username)
-                .orElseThrow(() -> new EntityNotFoundException("Current user not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
 
 }

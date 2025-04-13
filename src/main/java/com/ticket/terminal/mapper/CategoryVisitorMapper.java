@@ -1,11 +1,9 @@
 package com.ticket.terminal.mapper;
 
-
 import com.ticket.terminal.dto.CategoryVisitorDto;
 import com.ticket.terminal.entity.CategoryVisitorEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
 import java.util.List;
 
 @Mapper(componentModel = "spring")

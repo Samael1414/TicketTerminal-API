@@ -1,6 +1,5 @@
 package com.ticket.terminal.mapper;
 
-
 import com.ticket.terminal.dto.*;
 import com.ticket.terminal.entity.OrderEntity;
 import com.ticket.terminal.util.BarcodeGeneratorUtil;
@@ -8,7 +7,6 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
 import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring", uses = {OrderServiceMapper.class})

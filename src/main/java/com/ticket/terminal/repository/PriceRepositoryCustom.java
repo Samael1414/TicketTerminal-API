@@ -1,8 +1,6 @@
 package com.ticket.terminal.repository;
 
-
 import com.ticket.terminal.entity.PriceEntity;
-
 import java.util.Optional;
 
 public interface PriceRepositoryCustom {

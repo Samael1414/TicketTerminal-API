@@ -1,6 +1,5 @@
 package com.ticket.terminal.service;
 
-
 import com.ticket.terminal.dto.*;
 import com.ticket.terminal.entity.SeanceGridEntity;
 import com.ticket.terminal.entity.ServiceEntity;
@@ -8,7 +7,6 @@ import com.ticket.terminal.mapper.*;
 import com.ticket.terminal.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service

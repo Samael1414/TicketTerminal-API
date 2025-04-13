@@ -6,16 +6,12 @@ DTO для передачи GUID от PRO Культуры
 
 POST /REST/SetPROCultureGUID
  */
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class PROCultureGUIDDto {
 
     private List<PROCultureGUIDEntryDto> seat;

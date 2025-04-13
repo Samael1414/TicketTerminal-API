@@ -1,6 +1,5 @@
 package com.ticket.terminal.controller;
 
-
 import com.ticket.terminal.dto.EditableServiceDto;
 import com.ticket.terminal.dto.SimpleServiceResponseDto;
 import com.ticket.terminal.service.ServiceService;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 
 @RestController

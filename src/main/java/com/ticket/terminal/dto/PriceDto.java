@@ -1,19 +1,14 @@
 package com.ticket.terminal.dto;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /*
 DTO для цен (PriceDto)
 GET /REST/Service/Editable
  */
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class PriceDto {
 
     private Integer visitObjectId;

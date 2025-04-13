@@ -1,19 +1,13 @@
 package com.ticket.terminal.dto;
-
 /*
 POST /REST/Order/Cost
  */
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class CostCalculationDto {
 
     private Long serviceId;

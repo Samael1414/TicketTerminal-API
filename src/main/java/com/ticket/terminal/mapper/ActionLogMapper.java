@@ -1,6 +1,5 @@
 package com.ticket.terminal.mapper;
 
-
 import com.ticket.terminal.dto.ActionLogDto;
 import com.ticket.terminal.entity.ActionLogEntity;
 import com.ticket.terminal.util.ActionLogFactory;

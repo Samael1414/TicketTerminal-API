@@ -1,6 +1,5 @@
 package com.ticket.terminal.mapper;
 
-
 import com.ticket.terminal.dto.SeanceGridDto;
 import com.ticket.terminal.entity.SeanceGridEntity;
 import org.mapstruct.Mapper;

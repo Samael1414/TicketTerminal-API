@@ -1,20 +1,15 @@
 package com.ticket.terminal.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.time.OffsetDateTime;
-
 /*
 Получение информации о версии шлюза
 ---
 ## GET /REST/Version
  */
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class GateInfoDto {
 
     private String name;

@@ -1,5 +1,4 @@
 package com.ticket.terminal.dto;
-
 /*
 DTO для возврата оплаты
 Эндпоинт:
@@ -7,16 +6,12 @@ DTO для возврата оплаты
 POST /REST/Order/Refund (Полный и частичный возврат)
  */
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class OrderRefundDto {
 
     private Long orderId;

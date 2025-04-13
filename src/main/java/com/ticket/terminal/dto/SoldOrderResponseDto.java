@@ -1,14 +1,13 @@
 package com.ticket.terminal.dto;
 
 import lombok.*;
-
 import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SoldOrderResponseDto {
 
     private Long orderId;

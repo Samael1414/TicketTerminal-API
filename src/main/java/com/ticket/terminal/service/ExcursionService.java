@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -92,12 +91,11 @@ public class ExcursionService {
                 .collect(Collectors.toList());
 
         // Формируем итоговый объект ответа
-        ExcursionListResponseDto response = new ExcursionListResponseDto();
-        response.setService(excursionDto);
-        response.setVisitObject(visitObjectDtos);
-        response.setCategoryVisitor(categoryVisitorDtos);
-
-        return response;
+        return ExcursionListResponseDto.builder()
+                .service(excursionDto)
+                .visitObject(visitObjectDtos)
+                .categoryVisitor(categoryVisitorDtos)
+                .build();
     }
 
     @Transactional
@@ -109,7 +107,7 @@ public class ExcursionService {
         // Подтягиваем serviceEntity из таблицы 'services'
         ServiceEntity serviceEntity = serviceRepository.findById(requestDto.getServiceId())
                 .orElseThrow(() -> new EntityNotFoundException
-                        (String.format("Service not found: %s", requestDto.getServiceId())));
+                        (String.format("Service не найдено: %s", requestDto.getServiceId())));
         excursionLog.setService(serviceEntity);
 
         //  Сохраняем excursionLog (пока без visitor/object)
@@ -121,41 +119,38 @@ public class ExcursionService {
                 // Найти categoryVisitorEntity
                 CategoryVisitorEntity catEntity = categoryVisitorRepository.findById(visitorDto.getCategoryVisitorId())
                         .orElseThrow(() -> new EntityNotFoundException
-                                (String.format("CategoryVisitor not found: %s", visitorDto.getCategoryVisitorId())));
+                                (String.format("CategoryVisitor не найдено: %s", visitorDto.getCategoryVisitorId())));
 
-                // Создать ExcursionLogVisitorEntity
-                ExcursionLogVisitorEntity elv = new ExcursionLogVisitorEntity();
-                elv.setExcursionLog(savedLog);
-                elv.setCategoryVisitor(catEntity);
-                elv.setVisitorCount(visitorDto.getVisitorCount());
-
-                excursionLogVisitorRepository.save(elv);
+                excursionLogVisitorRepository.save(ExcursionLogVisitorEntity.builder()
+                        .excursionLog(savedLog)
+                        .categoryVisitor(catEntity)
+                        .visitorCount(visitorDto.getVisitorCount())
+                        .build());
             }
         }
 
         // Обрабатываем visitObject[]: создаём записи в excursion_log_visit_object
         if (requestDto.getVisitObject() != null) {
-            for (Long voId : requestDto.getVisitObject()) {
-                VisitObjectEntity voEntity = visitObjectRepository.findById(voId)
+            for (Long visit : requestDto.getVisitObject()) {
+                VisitObjectEntity visitObjectEntity = visitObjectRepository.findById(visit)
                         .orElseThrow(() -> new EntityNotFoundException
-                                (String.format("VisitObject not found: %s", voId)));
+                                (String.format("VisitObject не найдено: %s", visit)));
 
                 ExcursionLogVisitObjectEntity objectEntity = new ExcursionLogVisitObjectEntity();
                 objectEntity.setExcursionLog(savedLog);
-                objectEntity.setVisitObject(voEntity);
+                objectEntity.setVisitObject(visitObjectEntity);
 
                 excursionLogVisitObjectRepository.save(objectEntity);
             }
         }
         UsersEntity currentUser = getCurrentUser();
-        actionLogService.save(new ActionLogDto(
-                currentUser.getId().intValue(),
-                "CREATE_EXCURSION",
-                String.format("Создана экскурсия: %s", serviceEntity.getServiceName()),
-                LocalDateTime.now(),
-                currentUser.getUserName()
-        ));
-
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("CREATE_EXCURSION")
+                .description(String.format("Создана экскурсия: %s", serviceEntity.getServiceName()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
         // Формируем ответ
         return excursionMapper.toDto(savedLog);
 
@@ -165,7 +160,7 @@ public class ExcursionService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         return userRepository.findByUserNameIgnoreCase(username)
-                .orElseThrow(() -> new EntityNotFoundException("Current user not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
 
 }

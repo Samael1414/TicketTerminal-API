@@ -5,19 +5,14 @@ package com.ticket.terminal.dto;
 ---
 ## GET /REST/Service/Simple
  */
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class SimpleServiceDto {
 
     private String serviceName;
@@ -25,14 +20,14 @@ public class SimpleServiceDto {
     private String comment;
     private Integer cost;
     private Integer activeKindId;
-    private boolean isNeedVisitDate;
+    private Boolean isNeedVisitDate;
     private Integer proCultureIdentifier;
-    private boolean isNeedVisitTime;
+    private Boolean isNeedVisitTime;
     private List<Integer> paymentKindIds;
     private List<OffsetDateTime> dates;
     private LocalTime dtBegin;
     private LocalTime dtEnd;
-    private boolean isProCultureChecked;
+    private Boolean isProCultureChecked;
     private List<SeanceGridDto> seanceGrid;
     private Integer activeDays;
 

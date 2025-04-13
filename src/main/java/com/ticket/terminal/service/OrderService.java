@@ -1,6 +1,5 @@
 package com.ticket.terminal.service;
 
-
 import com.ticket.terminal.dto.*;
 import com.ticket.terminal.entity.*;
 import com.ticket.terminal.enums.ServiceState;
@@ -13,10 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +34,7 @@ public class OrderService {
 
     public OrderDto getOrderById(Long orderId) {
         OrderEntity entity = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new RuntimeException("Заказ не найден"));
         return orderMapper.toDto(entity);
     }
 
@@ -60,13 +57,13 @@ public class OrderService {
         OrderEntity savedOrder = orderRepository.save(orderEntity);
 
         UsersEntity currentUser = getCurrentUser();
-        actionLogService.save(new ActionLogDto(
-                currentUser.getId().intValue(),
-                "CREATE_ORDER",
-                String.format("Создан заказ № %s", savedOrder.getId()),
-                LocalDateTime.now(),
-                currentUser.getUserName()
-        ));
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("CREATE_ORDER")
+                .description(String.format("Создан заказ № %s", savedOrder.getId()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
         return orderMapper.toResponseDto(savedOrder);
     }
 
@@ -75,7 +72,7 @@ public class OrderService {
                 .map(serviceDto -> {
                     ServiceEntity service = serviceRepository.findById(serviceDto.getServiceId())
                             .orElseThrow(() -> new EntityNotFoundException
-                                    (String.format("Service not found: %s", serviceDto.getServiceId())));
+                                    (String.format("Service не найден: %s", serviceDto.getServiceId())));
 
                     Integer cost = serviceDto.getServiceCost() != null ? serviceDto.getServiceCost() : 0;
                     OrderServiceEntity orderService = orderServiceMapper.toEntity(serviceDto);
@@ -113,7 +110,7 @@ public class OrderService {
                 for (Long voId : editableDto.getVisitObjectId()) {
                     VisitObjectEntity visitObject = visitObjectRepository.findById(voId)
                             .orElseThrow(() -> new EntityNotFoundException
-                                    (String.format("VisitObject not found: %s", voId)));
+                                    (String.format("VisitObject не найден: %s", voId)));
 
                     OrderServiceVisitObjectEntity orderServiceVisitObjectEntity = new OrderServiceVisitObjectEntity();
                     orderServiceVisitObjectEntity.setOrderService(orderServiceEntity);
@@ -127,7 +124,7 @@ public class OrderService {
                 for (CategoryVisitorCountDto catDto : editableDto.getCategoryVisitor()) {
                     CategoryVisitorEntity catEntity = categoryVisitorRepository.findById(catDto.getCategoryVisitorId())
                             .orElseThrow(() -> new EntityNotFoundException
-                                    (String.format("CategoryVisitor not found: %s", catDto.getCategoryVisitorId())));
+                                    (String.format("CategoryVisitor не найден: %s", catDto.getCategoryVisitorId())));
 
                     OrderServiceVisitorEntity osvVisitor = new OrderServiceVisitorEntity();
                     osvVisitor.setOrderService(orderServiceEntity);
@@ -138,14 +135,13 @@ public class OrderService {
             }
         }
         UsersEntity currentUser = getCurrentUser();
-        actionLogService.save(new ActionLogDto(
-                currentUser.getId().intValue(),
-                "CREATE_EDITABLE_ORDER",
-                String.format("Создан изменяемый заказ № %s", savedOrder.getId()),
-                LocalDateTime.now(),
-                currentUser.getUserName()
-        ));
-
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("CREATE_EDITABLE_ORDER")
+                .description(String.format("Создан изменяемый заказ № %s", savedOrder.getId()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
         //  Формируем и возвращаем ответ
         return orderMapper.toResponseDto(savedOrder);
     }
@@ -155,7 +151,7 @@ public class OrderService {
                 .map(editableDto -> {
                     ServiceEntity service = serviceRepository.findById(editableDto.getServiceId())
                             .orElseThrow(() -> new EntityNotFoundException
-                                    (String.format("Service not found: %s", editableDto.getServiceId())));
+                                    (String.format("Service не найден: %s", editableDto.getServiceId())));
 
                     // Маппинг EditableOrderServiceDto в OrderServiceEntity
                     OrderServiceEntity orderService = orderServiceMapper.toEntity(editableDto);
@@ -177,7 +173,7 @@ public class OrderService {
 
         OrderEntity orderEntity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException
-                        (String.format("Order not found: %s", orderId)));
+                        (String.format("Заказ не найден: %s", orderId)));
 
         List<Long> serviceId = requestDto.getOrderServiceId();
 
@@ -185,11 +181,11 @@ public class OrderService {
             // полная отмена
             // удаляем все услуги из order_services для данного заказа
             List<OrderServiceEntity> allServices = orderEntity.getService();
-            List<Long> ids = allServices.stream()
+            List<Long> orderServiceIds = allServices.stream()
                     .map(OrderServiceEntity::getId)
                     .toList();
-            orderServiceVisitorRepository.deleteByOrderServiceIdIn(ids);
-            orderServiceVisitObjectRepository.deleteByOrderServiceIdIn(ids);
+            orderServiceVisitorRepository.deleteByOrderServiceIdIn(orderServiceIds);
+            orderServiceVisitObjectRepository.deleteByOrderServiceIdIn(orderServiceIds);
             orderServiceRepository.deleteAll(allServices);
             orderEntity.getService().clear();
         } else {
@@ -202,14 +198,14 @@ public class OrderService {
             if (toRemove.isEmpty()) {
                 // ни одна услуга не совпала с тем, что прислали
                 //можно бросить исключение
-                throw new IllegalStateException("No matching services found for partial cancel");
+                throw new IllegalStateException("Не найдено соответствующих услуг для частичной отмены");
             }
 
-            List<Long> ids = toRemove.stream()
+            List<Long> orderServiceIds = toRemove.stream()
                     .map(OrderServiceEntity::getId)
                     .toList();
-            orderServiceVisitorRepository.deleteByOrderServiceIdIn(ids);
-            orderServiceVisitObjectRepository.deleteByOrderServiceIdIn(ids);
+            orderServiceVisitorRepository.deleteByOrderServiceIdIn(orderServiceIds);
+            orderServiceVisitObjectRepository.deleteByOrderServiceIdIn(orderServiceIds);
             orderServiceRepository.deleteAll(toRemove);
             orderEntity.getService().removeAll(toRemove);
         }
@@ -218,13 +214,13 @@ public class OrderService {
         orderRepository.save(orderEntity);
 
         UsersEntity currentUser = getCurrentUser();
-        actionLogService.save(new ActionLogDto(
-                currentUser.getId().intValue(),
-                "CANCEL_ORDER",
-                String.format("Отменён заказ № %s", orderId),
-                LocalDateTime.now(),
-                currentUser.getUserName()
-        ));
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("CANCEL_ORDER")
+                .description(String.format("Отменён заказ № %s", orderId))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
 
         return orderMapper.toDto(orderEntity);
 
@@ -237,7 +233,7 @@ public class OrderService {
         // Получаем заказ по ID
         OrderEntity order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException
-                        (String.format("Order not found: %s", orderId)));
+                        (String.format("Заказ не найден: %s", orderId)));
 
         List<Long> serviceIdsToRefund;
 
@@ -262,13 +258,13 @@ public class OrderService {
                     .allMatch(existingIds::contains);
             if (!valid) {
                 throw new IllegalArgumentException
-                        (String.format("Some services do not belong to order: %s", orderId));
+                        (String.format("Некоторые услуги не относятся к заказу: %s", orderId));
             }
         }
 
         // Если список на возврат пуст - ошибка
         if (serviceIdsToRefund.isEmpty()) {
-            throw new IllegalStateException("No services found for refund");
+            throw new IllegalStateException("Не найдено ни одной услуги для возврата");
         }
 
         // Обновляем состояние проданных услуг
@@ -282,13 +278,13 @@ public class OrderService {
         orderRepository.save(order);
 
         UsersEntity currentUser = getCurrentUser();
-        actionLogService.save(new ActionLogDto(
-                currentUser.getId().intValue(),
-                "REFUND_ORDER",
-                String.format("Возврат услуг по заказу № %s", orderId),
-                LocalDateTime.now(),
-                currentUser.getUserName()
-        ));
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("REFUND_ORDER")
+                .description(String.format("Возврат услуг по заказу № %s", orderId))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
 
         // вернем заказ в текущем состоянии (уже с измененными услугами)
         return orderMapper.toDto(order);
@@ -298,7 +294,7 @@ public class OrderService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         return userRepository.findByUserNameIgnoreCase(username)
-                .orElseThrow(() -> new EntityNotFoundException("Current user not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
 
 

@@ -1,6 +1,5 @@
 package com.ticket.terminal.controller;
 
-
 import com.ticket.terminal.dto.VersionDto;
 import com.ticket.terminal.service.VersionService;
 import io.swagger.v3.oas.annotations.Operation;

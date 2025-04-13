@@ -1,10 +1,6 @@
 package com.ticket.terminal.dto;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /*
 DTO для передачи GUID от PRO Культуры
@@ -12,10 +8,9 @@ DTO для передачи GUID от PRO Культуры
 
 POST /REST/SetPROCultureGUID
  */
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class PROCultureGUIDEntryDto {
 
     private Integer orderId;

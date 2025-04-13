@@ -1,21 +1,16 @@
 package com.ticket.terminal.dto;
-
 /*
 DTO для отмены заказа
 Эндпоинт:
 
 POST /REST/Order/Cancel (Полная и частичная отмена)
  */
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class OrderCancelDto {
 
     private Long orderId;
