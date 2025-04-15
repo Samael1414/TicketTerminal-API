@@ -40,16 +40,18 @@ public class ExcursionService {
     public ExcursionListResponseDto getAllExcursions() {
         List<ServiceEntity> serviceEntities = serviceRepository.findAll();
 
+
         // Маппим каждую ServiceEntity в ExcursionDto (без вложенных списков)
         List<ExcursionDto> excursionDto = serviceEntities.stream()
                 .map(excursionMapper::toDto)
                 .toList();
-
+        //TODO: переделать все такие места где stream вызывается на объекте полученном из бд путем findAll на Try with Resources. погугли че да как
 
         // берём PriceEntity и группируем по service_id (Пример: сгруппируем все цены по service_id)
         List<PriceEntity> allPrices = priceRepository.findAll();
         Map<Long, List<PriceEntity>> priceByServiceId = allPrices.stream()
                 .collect(Collectors.groupingBy(pe -> pe.getService().getId()));
+        //TODO: переделать все такие места где stream вызывается на объекте полученном из бд путем findAll на Try with Resources. погугли че да как
 
         // Теперь пробежимся по excursionDtos и добавим им соответствующие prices
         for (ExcursionDto dto : excursionDto) {

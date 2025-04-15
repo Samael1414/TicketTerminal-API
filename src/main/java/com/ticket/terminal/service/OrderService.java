@@ -34,6 +34,7 @@ public class OrderService {
 
     public OrderDto getOrderById(Long orderId) {
         OrderEntity entity = orderRepository.findById(orderId)
+                //TODO: как минимум EntityNotFoundException а не RuntimeException а лучше свои классы с ексепшенами сделать
                 .orElseThrow(() -> new RuntimeException("Заказ не найден"));
         return orderMapper.toDto(entity);
     }

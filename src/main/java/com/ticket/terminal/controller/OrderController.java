@@ -52,6 +52,7 @@ public class OrderController {
             @RequestParam(name = "dtBegin") String dtBegin,
             @RequestParam(name = "dtEnd") String dtEnd
     ) {
+        //TODO: перенеси всю логику на уровень сервиса. Тоесть return ResponseEntity.ok(orderService.getOrderByDateRange(dtBegin, dtEnd)); а уже в сервисе парсишь из стринги в дату и время и делаешь с ними что нужно
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime begin = LocalDate.parse(dtBegin, formatter).atStartOfDay();
         LocalDateTime end = LocalDate.parse(dtEnd, formatter).plusDays(1).atStartOfDay().minusNanos(1);
@@ -71,6 +72,7 @@ public class OrderController {
     })
     @PostMapping("/Order/Create")
     public ResponseEntity<OrderCreateResponseDto> createSimpleOrder(@RequestBody SimpleOrderRequestDto requestDto) {
+        //TODO: return ResponseEntity.ok(orderService.createSimpleOrder(requestDto)); не надо создавать кучу не нужных переменных, передавай в OK сразу вызов метода сервиса. ПРОСМОТРИ ВСЕ МЕТОДЫ  КОНТРОЛЛЕРОВ НА НАЛИЧИЕ ТАКИХ МОМЕНТОВ И ПОПРАВЬ
         OrderCreateResponseDto responseDto = orderService.createSimpleOrder(requestDto);
         return ResponseEntity.ok(responseDto);
     }
