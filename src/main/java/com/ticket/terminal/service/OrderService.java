@@ -44,6 +44,9 @@ public class OrderService {
         List<OrderDto> orderDtos = orders.stream()
                 .map(orderMapper::toDto)
                 .toList();
+        //TODO: тут тоже трай виф ресурсерс
+
+        //TODO: return OrderResponseDto.builder не надо через new возвращать. для этого есть замечательный билдер
         return new OrderResponseDto(orderDtos);
     }
 
@@ -76,6 +79,7 @@ public class OrderService {
                                     (String.format("Service не найден: %s", serviceDto.getServiceId())));
 
                     Integer cost = serviceDto.getServiceCost() != null ? serviceDto.getServiceCost() : 0;
+                    //TODO: в ретёрн сразу вызов метода. не надо создавать переменную
                     OrderServiceEntity orderService = orderServiceMapper.toEntity(serviceDto);
                     orderService.setService(service);
                     orderService.setOrder(order);
@@ -97,7 +101,7 @@ public class OrderService {
         List<OrderServiceEntity> orderServiceEntities = buildEditableOrderServices(requestDto, orderEntity);
         orderEntity.setService(orderServiceEntities);
 
-        // Сохраняем заказ (cascade = ALL сохранит позиции заказа)
+        // Сохраняем заказ
         OrderEntity savedOrder = orderRepository.save(orderEntity);
 
         // Для каждой позиции заказа сохраняем дополнительные данные в промежуточные таблицы:
@@ -112,7 +116,7 @@ public class OrderService {
                     VisitObjectEntity visitObject = visitObjectRepository.findById(voId)
                             .orElseThrow(() -> new EntityNotFoundException
                                     (String.format("VisitObject не найден: %s", voId)));
-
+                    //TODO: билдер вместо new
                     OrderServiceVisitObjectEntity orderServiceVisitObjectEntity = new OrderServiceVisitObjectEntity();
                     orderServiceVisitObjectEntity.setOrderService(orderServiceEntity);
                     orderServiceVisitObjectEntity.setVisitObject(visitObject);
@@ -127,6 +131,7 @@ public class OrderService {
                             .orElseThrow(() -> new EntityNotFoundException
                                     (String.format("CategoryVisitor не найден: %s", catDto.getCategoryVisitorId())));
 
+                    //TODO: билдер вместо new
                     OrderServiceVisitorEntity osvVisitor = new OrderServiceVisitorEntity();
                     osvVisitor.setOrderService(orderServiceEntity);
                     osvVisitor.setCategoryVisitor(catEntity);
@@ -199,6 +204,7 @@ public class OrderService {
             if (toRemove.isEmpty()) {
                 // ни одна услуга не совпала с тем, что прислали
                 //можно бросить исключение
+                //TODO: свой класс ексепшен вместо IllegalStateException
                 throw new IllegalStateException("Не найдено соответствующих услуг для частичной отмены");
             }
 
@@ -251,13 +257,14 @@ public class OrderService {
                     .toList();
 
             // Валидация: проверим, что все услуги принадлежат заказу
+            //TODO: стрим
             List<Long> existingIds = orderServiceRepository.findAllByOrderId(orderId).stream()
                     .map(OrderServiceEntity::getId)
                     .toList();
 
-            boolean valid = serviceIdsToRefund.stream()
-                    .allMatch(existingIds::contains);
+            boolean valid = serviceIdsToRefund.stream().allMatch(existingIds::contains);
             if (!valid) {
+                //TODO: свой класс вместо IllegalArgumentException
                 throw new IllegalArgumentException
                         (String.format("Некоторые услуги не относятся к заказу: %s", orderId));
             }
@@ -265,6 +272,7 @@ public class OrderService {
 
         // Если список на возврат пуст - ошибка
         if (serviceIdsToRefund.isEmpty()) {
+            //TODO: свой класс вместо IllegalArgumentException
             throw new IllegalStateException("Не найдено ни одной услуги для возврата");
         }
 
