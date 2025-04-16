@@ -17,4 +17,5 @@ public interface ActionLogMapper {
     @Mapping(target = "actorName", source = "actorName")
     ActionLogEntity toEntity(ActionLogDto actionLogDto);
 
+
 }

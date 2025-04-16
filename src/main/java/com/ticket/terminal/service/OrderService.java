@@ -3,6 +3,9 @@ package com.ticket.terminal.service;
 import com.ticket.terminal.dto.*;
 import com.ticket.terminal.entity.*;
 import com.ticket.terminal.enums.ServiceState;
+import com.ticket.terminal.exception.EmptyRefundListException;
+import com.ticket.terminal.exception.InvalidRefundRequestException;
+import com.ticket.terminal.exception.PartialCancellationException;
 import com.ticket.terminal.mapper.OrderMapper;
 import com.ticket.terminal.mapper.OrderServiceMapper;
 import com.ticket.terminal.repository.*;
@@ -12,8 +15,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -34,20 +41,21 @@ public class OrderService {
 
     public OrderDto getOrderById(Long orderId) {
         OrderEntity entity = orderRepository.findById(orderId)
-                //TODO: как минимум EntityNotFoundException а не RuntimeException а лучше свои классы с ексепшенами сделать
-                .orElseThrow(() -> new RuntimeException("Заказ не найден"));
+                .orElseThrow(() -> new EntityNotFoundException("Заказ не найден"));
         return orderMapper.toDto(entity);
     }
 
-    public OrderResponseDto getOrderByDateRange(LocalDateTime dtBegin, LocalDateTime dtEnd) {
-        List<OrderEntity> orders = orderRepository.findAllByCreatedAtBetween(dtBegin, dtEnd);
-        List<OrderDto> orderDtos = orders.stream()
-                .map(orderMapper::toDto)
-                .toList();
-        //TODO: тут тоже трай виф ресурсерс
+    public OrderResponseDto getOrderByDateRange(String dtBegin, String dtEnd) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        //TODO: return OrderResponseDto.builder не надо через new возвращать. для этого есть замечательный билдер
-        return new OrderResponseDto(orderDtos);
+        LocalDateTime begin = LocalDate.parse(dtBegin, formatter).atStartOfDay();
+        LocalDateTime end = LocalDate.parse(dtEnd, formatter).plusDays(1).atStartOfDay().minusNanos(1);
+
+        List<OrderDto> orderDtos;
+        try (Stream<OrderEntity> stream = orderRepository.findAllByCreatedAtBetween(begin, end).stream()) {
+            orderDtos = stream.map(orderMapper::toDto).toList();
+        }
+        return OrderResponseDto.builder().order(orderDtos).build();
     }
 
     @Transactional
@@ -77,9 +85,7 @@ public class OrderService {
                     ServiceEntity service = serviceRepository.findById(serviceDto.getServiceId())
                             .orElseThrow(() -> new EntityNotFoundException
                                     (String.format("Service не найден: %s", serviceDto.getServiceId())));
-
                     Integer cost = serviceDto.getServiceCost() != null ? serviceDto.getServiceCost() : 0;
-                    //TODO: в ретёрн сразу вызов метода. не надо создавать переменную
                     OrderServiceEntity orderService = orderServiceMapper.toEntity(serviceDto);
                     orderService.setService(service);
                     orderService.setOrder(order);
@@ -116,10 +122,11 @@ public class OrderService {
                     VisitObjectEntity visitObject = visitObjectRepository.findById(voId)
                             .orElseThrow(() -> new EntityNotFoundException
                                     (String.format("VisitObject не найден: %s", voId)));
-                    //TODO: билдер вместо new
-                    OrderServiceVisitObjectEntity orderServiceVisitObjectEntity = new OrderServiceVisitObjectEntity();
-                    orderServiceVisitObjectEntity.setOrderService(orderServiceEntity);
-                    orderServiceVisitObjectEntity.setVisitObject(visitObject);
+                    OrderServiceVisitObjectEntity orderServiceVisitObjectEntity = OrderServiceVisitObjectEntity
+                            .builder()
+                            .orderService(orderServiceEntity)
+                            .visitObject(visitObject)
+                            .build();
                     orderServiceVisitObjectRepository.save(orderServiceVisitObjectEntity);
                 }
             }
@@ -130,12 +137,12 @@ public class OrderService {
                     CategoryVisitorEntity catEntity = categoryVisitorRepository.findById(catDto.getCategoryVisitorId())
                             .orElseThrow(() -> new EntityNotFoundException
                                     (String.format("CategoryVisitor не найден: %s", catDto.getCategoryVisitorId())));
-
-                    //TODO: билдер вместо new
-                    OrderServiceVisitorEntity osvVisitor = new OrderServiceVisitorEntity();
-                    osvVisitor.setOrderService(orderServiceEntity);
-                    osvVisitor.setCategoryVisitor(catEntity);
-                    osvVisitor.setVisitorCount(catDto.getVisitorCount());
+                    OrderServiceVisitorEntity osvVisitor = OrderServiceVisitorEntity
+                            .builder()
+                            .orderService(orderServiceEntity)
+                            .categoryVisitor(catEntity)
+                            .visitorCount(catDto.getVisitorCount())
+                            .build();
                     orderServiceVisitorRepository.save(osvVisitor);
                 }
             }
@@ -204,10 +211,8 @@ public class OrderService {
             if (toRemove.isEmpty()) {
                 // ни одна услуга не совпала с тем, что прислали
                 //можно бросить исключение
-                //TODO: свой класс ексепшен вместо IllegalStateException
-                throw new IllegalStateException("Не найдено соответствующих услуг для частичной отмены");
+                throw new PartialCancellationException("Не найдено соответствующих услуг для частичной отмены");
             }
-
             List<Long> orderServiceIds = toRemove.stream()
                     .map(OrderServiceEntity::getId)
                     .toList();
@@ -257,23 +262,21 @@ public class OrderService {
                     .toList();
 
             // Валидация: проверим, что все услуги принадлежат заказу
-            //TODO: стрим
-            List<Long> existingIds = orderServiceRepository.findAllByOrderId(orderId).stream()
-                    .map(OrderServiceEntity::getId)
-                    .toList();
+            List<Long> existingIds;
+            try (Stream<OrderServiceEntity> stream = orderServiceRepository.findAllByOrderId(orderId).stream()) {
+                existingIds = stream.map(OrderServiceEntity::getId).toList();
+            }
 
             boolean valid = serviceIdsToRefund.stream().allMatch(existingIds::contains);
             if (!valid) {
-                //TODO: свой класс вместо IllegalArgumentException
-                throw new IllegalArgumentException
+                throw new InvalidRefundRequestException
                         (String.format("Некоторые услуги не относятся к заказу: %s", orderId));
             }
         }
 
         // Если список на возврат пуст - ошибка
         if (serviceIdsToRefund.isEmpty()) {
-            //TODO: свой класс вместо IllegalArgumentException
-            throw new IllegalStateException("Не найдено ни одной услуги для возврата");
+            throw new EmptyRefundListException("Не найдено ни одной услуги для возврата");
         }
 
         // Обновляем состояние проданных услуг

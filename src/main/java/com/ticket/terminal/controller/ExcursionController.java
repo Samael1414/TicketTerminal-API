@@ -42,7 +42,6 @@ public class ExcursionController {
     })
     @PostMapping("/Excursion/Booking")
     public ResponseEntity<ExcursionResponseDto> createExcursion(@RequestBody ExcursionRequestDto dto) {
-        ExcursionResponseDto response = excursionService.createExcursion(dto);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(excursionService.createExcursion(dto));
     }
 }

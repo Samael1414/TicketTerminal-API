@@ -13,9 +13,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -38,21 +40,17 @@ public class ExcursionService {
     private final PriceMapper priceMapper;
 
     public ExcursionListResponseDto getAllExcursions() {
-        List<ServiceEntity> serviceEntities = serviceRepository.findAll();
-
-
         // Маппим каждую ServiceEntity в ExcursionDto (без вложенных списков)
-        List<ExcursionDto> excursionDto = serviceEntities.stream()
-                .map(excursionMapper::toDto)
-                .toList();
-        //TODO: переделать все такие места где stream вызывается на объекте полученном из бд путем findAll на Try with Resources. погугли че да как
+        List<ExcursionDto> excursionDto;
+        try (Stream<ServiceEntity> stream = serviceRepository.findAll().stream()) {
+            excursionDto = stream.map(excursionMapper::toDto).toList();
+        }
 
         // берём PriceEntity и группируем по service_id (Пример: сгруппируем все цены по service_id)
-        List<PriceEntity> allPrices = priceRepository.findAll();
-        Map<Long, List<PriceEntity>> priceByServiceId = allPrices.stream()
-                .collect(Collectors.groupingBy(pe -> pe.getService().getId()));
-        //TODO: переделать все такие места где stream вызывается на объекте полученном из бд путем findAll на Try with Resources. погугли че да как
-
+        Map<Long, List<PriceEntity>> priceByServiceId;
+        try (Stream<PriceEntity> stream = priceRepository.findAll().stream()) {
+            priceByServiceId = stream.collect(Collectors.groupingBy(p -> p.getService().getId()));
+        }
         // Теперь пробежимся по excursionDtos и добавим им соответствующие prices
         for (ExcursionDto dto : excursionDto) {
             Long serviceId = dto.getServiceId();
@@ -67,12 +65,12 @@ public class ExcursionService {
             // если нужно собрать "уникальные" visitObjects/categoryVisitors для каждой услуги
             // Можно, к примеру, достать из PriceEntity visitObject и categoryVisitor
             // и сформировать списки.
-            Set<VisitObjectDto> vObjects = priceEntitiesForService.stream()
+            Set<VisitObjectDto> visitObjectDto = priceEntitiesForService.stream()
                     .map(PriceEntity::getVisitObject)
                     .filter(Objects::nonNull)
                     .map(visitObjectMapper::toDto)
                     .collect(Collectors.toSet());
-            dto.setVisitObjects(new ArrayList<>(vObjects));
+            dto.setVisitObjects(new ArrayList<>(visitObjectDto));
 
             Set<CategoryVisitorDto> cVisitors = priceEntitiesForService.stream()
                     .map(PriceEntity::getCategoryVisitor)
@@ -82,15 +80,15 @@ public class ExcursionService {
             dto.setCategoryVisitors(new ArrayList<>(cVisitors));
         }
         // Загружаем "глобальные" списки VisitObject и CategoryVisitor (для верхнего уровня ответа)
-        List<VisitObjectEntity> visitObjectEntities = visitObjectRepository.findAll();
-        List<VisitObjectDto> visitObjectDtos = visitObjectEntities.stream()
-                .map(visitObjectMapper::toDto)
-                .collect(Collectors.toList());
+        List<VisitObjectDto> visitObjectDtos;
+        try (Stream<VisitObjectEntity> stream = visitObjectRepository.findAll().stream()) {
+            visitObjectDtos = stream.map(visitObjectMapper::toDto).toList();
+        }
 
-        List<CategoryVisitorEntity> categoryVisitorEntities = categoryVisitorRepository.findAll();
-        List<CategoryVisitorDto> categoryVisitorDtos = categoryVisitorEntities.stream()
-                .map(categoryVisitorMapper::toDto)
-                .collect(Collectors.toList());
+        List<CategoryVisitorDto> categoryVisitorDtos;
+        try (Stream<CategoryVisitorEntity> stream = categoryVisitorRepository.findAll().stream()) {
+            categoryVisitorDtos = stream.map(categoryVisitorMapper::toDto).toList();
+        }
 
         // Формируем итоговый объект ответа
         return ExcursionListResponseDto.builder()

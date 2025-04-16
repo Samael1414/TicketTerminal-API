@@ -28,8 +28,7 @@ public class VersionController {
     })
     @GetMapping("/Version")
     public ResponseEntity<VersionDto> getVersion() {
-        VersionDto versionDto = versionService.getAllVersion();
-        return ResponseEntity.ok(versionDto);
+        return ResponseEntity.ok(versionService.getAllVersion());
     }
 }
 

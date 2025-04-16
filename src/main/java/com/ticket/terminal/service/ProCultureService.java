@@ -5,6 +5,7 @@ import com.ticket.terminal.entity.ActionLogEntity;
 import com.ticket.terminal.entity.OrderServiceEntity;
 import com.ticket.terminal.entity.ProCultureLinkEntity;
 import com.ticket.terminal.entity.UsersEntity;
+import com.ticket.terminal.exception.ProCultureBindingException;
 import com.ticket.terminal.repository.OrderServiceRepository;
 import com.ticket.terminal.repository.ProCultureLinkRepository;
 import com.ticket.terminal.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 
 @Service
@@ -63,7 +65,7 @@ public class ProCultureService {
                         .actorName(currentUser.getUserName())
                         .build());
             } else {
-                throw new IllegalArgumentException("Необходимо указать либо orderServiceId, либо (orderId + seatId)");
+                throw new ProCultureBindingException("Необходимо указать либо orderServiceId, либо (orderId + seatId)");
             }
         }
     }

@@ -1,16 +1,15 @@
 package com.ticket.terminal.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
 @Table(name = "sold_services")
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SoldServiceEntity {

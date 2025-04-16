@@ -3,6 +3,7 @@ package com.ticket.terminal.dto;
 import lombok.*;
 import java.time.LocalDateTime;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

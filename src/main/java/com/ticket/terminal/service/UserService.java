@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -44,9 +45,9 @@ public class UserService {
     }
 
     public List<UsersResponseDto> findAll() {
-        return userRepository.findAll().stream()
-                .map(usersMapper::toDto)
-                .toList();
+        try (Stream<UsersEntity> stream = userRepository.findAll().stream()) {
+            return stream.map(usersMapper::toDto).toList();
+        }
     }
 
     public UsersResponseDto findById(Long id) {

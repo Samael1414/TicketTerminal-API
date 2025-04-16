@@ -7,7 +7,9 @@ import com.ticket.terminal.mapper.*;
 import com.ticket.terminal.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -26,42 +28,39 @@ public class ServiceService {
     private final PriceRepository priceRepository;
 
     public SimpleServiceResponseDto getSimpleService() {
-        List<SimpleServiceDto> service = serviceRepository.findAll().stream()
-                .map(serviceMapper::toSimpleDto)
-                .toList();
+        List<SimpleServiceDto> service;
+        try (Stream<ServiceEntity> stream = serviceRepository.findAll().stream()) {
+            service = stream.map(serviceMapper::toSimpleDto).toList();
+        }
 
-        List<SeanceGridEntity> all = seanceGridRepository.findAll();
-        List<SeanceGridDto> seanceGrid = all.stream()
-                .map(seanceGridMapper::toDto)
-                .toList();
+        List<SeanceGridDto> seanceGrid;
+        try (Stream<SeanceGridEntity> stream = seanceGridRepository.findAll().stream()) {
+            seanceGrid = stream.map(seanceGridMapper::toDto).toList();
+        }
 
-        SimpleServiceResponseDto response = new SimpleServiceResponseDto();
-        response.setServices(service);
-        response.setSeanceGrid(seanceGrid);
-        return response;
+        return SimpleServiceResponseDto.builder().services(service).seanceGrid(seanceGrid).build();
     }
 
     public List<EditableServiceDto> getEditableServices() {
-        List<ServiceEntity> services = serviceRepository.findAllEditableServices();
+        try (Stream<ServiceEntity> stream = serviceRepository.findAllEditableServices().stream()) {
+            return stream.map(service -> {
+                EditableServiceDto dto = editableServiceMapper.toDto(service);
 
-        return services.stream()
-                .map(service -> {
-                    EditableServiceDto dto = editableServiceMapper.toDto(service);
+                List<VisitObjectDto> visitObject = visitObjectMapper
+                        .toDtoList(visitObjectRepository.findByServiceId(service.getId()));
 
-                    List<VisitObjectDto> visitObject = visitObjectMapper
-                            .toDtoList(visitObjectRepository.findByServiceId(service.getId()));
+                List<CategoryVisitorDto> categoryVisitors = categoryVisitorMapper
+                        .toDtoList(categoryVisitorRepository.findByServiceId(service.getId()));
 
-                    List<CategoryVisitorDto> categoryVisitors = categoryVisitorMapper.toDtoList(
-                            categoryVisitorRepository.findByServiceId(service.getId()));
+                List<PriceDto> prices = priceMapper
+                        .toDtoList(priceRepository.findAllByServiceId(service.getId()));
 
-                    List<PriceDto> prices = priceMapper.toDtoList(priceRepository.findAllByServiceId(service.getId()));
+                dto.setVisitObjects(visitObject);
+                dto.setCategoryVisitors(categoryVisitors);
+                dto.setPrices(prices);
 
-                    dto.setVisitObjects(visitObject);
-                    dto.setCategoryVisitors(categoryVisitors);
-                    dto.setPrices(prices);
-
-                    return dto;
-                })
-                .toList();
+                return dto;
+            }).toList();
+        }
     }
 }

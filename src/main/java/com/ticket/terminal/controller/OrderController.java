@@ -35,8 +35,7 @@ public class OrderController {
     })
     @GetMapping("/Order/{orderId}")
     public ResponseEntity<OrderDto> getOrder(@PathVariable("orderId") Long orderId) {
-        OrderDto orderDto = orderService.getOrderById(orderId);
-        return ResponseEntity.ok(orderDto);
+        return ResponseEntity.ok(orderService.getOrderById(orderId));
     }
 
     @Operation(summary = "Получение заказов по диапазону дат")
@@ -52,12 +51,7 @@ public class OrderController {
             @RequestParam(name = "dtBegin") String dtBegin,
             @RequestParam(name = "dtEnd") String dtEnd
     ) {
-        //TODO: перенеси всю логику на уровень сервиса. Тоесть return ResponseEntity.ok(orderService.getOrderByDateRange(dtBegin, dtEnd)); а уже в сервисе парсишь из стринги в дату и время и делаешь с ними что нужно
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDateTime begin = LocalDate.parse(dtBegin, formatter).atStartOfDay();
-        LocalDateTime end = LocalDate.parse(dtEnd, formatter).plusDays(1).atStartOfDay().minusNanos(1);
-        OrderResponseDto response = orderService.getOrderByDateRange(begin, end);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(orderService.getOrderByDateRange(dtBegin, dtEnd));
     }
 
     @Operation(summary = "Создание заказа (simple mode)",
@@ -72,9 +66,7 @@ public class OrderController {
     })
     @PostMapping("/Order/Create")
     public ResponseEntity<OrderCreateResponseDto> createSimpleOrder(@RequestBody SimpleOrderRequestDto requestDto) {
-        //TODO: return ResponseEntity.ok(orderService.createSimpleOrder(requestDto)); не надо создавать кучу не нужных переменных, передавай в OK сразу вызов метода сервиса. ПРОСМОТРИ ВСЕ МЕТОДЫ  КОНТРОЛЛЕРОВ НА НАЛИЧИЕ ТАКИХ МОМЕНТОВ И ПОПРАВЬ
-        OrderCreateResponseDto responseDto = orderService.createSimpleOrder(requestDto);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(orderService.createSimpleOrder(requestDto));
     }
 
     @Operation(summary = "Создание заказа (editable mode)",
@@ -89,8 +81,7 @@ public class OrderController {
     })
     @PostMapping("/Order/CreateEditable")
     public ResponseEntity<OrderCreateResponseDto> createEditableOrder(@RequestBody EditableOrderRequestDto requestDto) {
-        OrderCreateResponseDto responseDto = orderService.createEditableOrder(requestDto);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(orderService.createEditableOrder(requestDto));
     }
 
     @Operation(summary = "Отмена заказа")
@@ -104,8 +95,7 @@ public class OrderController {
     })
     @PostMapping("/Order/Cancel")
     public ResponseEntity<OrderDto> cancelOrder(@RequestBody OrderCancelDto requestDto) {
-        OrderDto orderDto = orderService.cancelOrder(requestDto);
-        return ResponseEntity.ok(orderDto);
+        return ResponseEntity.ok(orderService.cancelOrder(requestDto));
     }
 
     @Operation(summary = "Расчет стоимости заказа")
@@ -119,8 +109,7 @@ public class OrderController {
     })
     @PostMapping("/Order/Cost")
     public ResponseEntity<CostResponseDto> calculateOrderCost(@RequestBody CostCalculationDto requestDto) {
-        CostResponseDto response = orderCostService.calculateCost(requestDto);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(orderCostService.calculateCost(requestDto));
     }
 
     @Operation (summary = "Оплата заказа")
@@ -134,8 +123,7 @@ public class OrderController {
     })
     @PostMapping("/Order/Sold")
     public ResponseEntity<SoldOrderResponseDto> processSoldOrder(@RequestBody SoldOrderRequestDto dto) {
-        SoldOrderResponseDto response = soldOrderService.processSoldOrder(dto);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(soldOrderService.processSoldOrder(dto));
     }
 
     @Operation(summary = "Возврат по заказу")
@@ -149,7 +137,6 @@ public class OrderController {
     })
     @PostMapping("/Order/Refund")
     public ResponseEntity<OrderDto> refundOrder(@RequestBody OrderRefundDto dto) {
-        OrderDto response = orderService.refundOrder(dto);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(orderService.refundOrder(dto));
     }
 }

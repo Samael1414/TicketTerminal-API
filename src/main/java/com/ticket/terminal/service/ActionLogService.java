@@ -7,6 +7,7 @@ import com.ticket.terminal.repository.ActionLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -15,16 +16,15 @@ public class ActionLogService {
     private final ActionLogRepository actionLogRepository;
     private final ActionLogMapper actionLogMapper;
 
-    //TODO: если возвращаемое значение нигде не используется то метод можно сделать void
-    public ActionLogDto save(ActionLogEntity entity) {
-        return actionLogMapper.toDto(actionLogRepository.save(entity));
+    public void save(ActionLogEntity entity) {
+        actionLogMapper.toDto(actionLogRepository.save(entity));
     }
 
     public List<ActionLogDto> findAll() {
-        //TODO: переделать все такие места где stream вызывается на объекте полученном из бд путем findAll на Try with Resources. погугли че да как
-        return actionLogRepository.findAll()
-                .stream()
-                .map(actionLogMapper::toDto)
-                .toList();
+        try (Stream<ActionLogEntity> stream = actionLogRepository.findAll().stream()) {
+            return stream
+                    .map(actionLogMapper::toDto)
+                    .toList();
+        }
     }
 }

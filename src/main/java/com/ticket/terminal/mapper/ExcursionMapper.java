@@ -30,4 +30,5 @@ public interface ExcursionMapper {
         entity.setCreatedAt(LocalDateTime.now());
     }
 
+
 }

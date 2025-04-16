@@ -6,6 +6,7 @@ import com.ticket.terminal.dto.SoldServiceDto;
 import com.ticket.terminal.entity.ActionLogEntity;
 import com.ticket.terminal.entity.SoldServiceEntity;
 import com.ticket.terminal.entity.UsersEntity;
+import com.ticket.terminal.exception.InvalidOrderRequestException;
 import com.ticket.terminal.mapper.SoldServiceMapper;
 import com.ticket.terminal.repository.OrderRepository;
 import com.ticket.terminal.repository.SoldServiceRepository;
@@ -56,20 +57,21 @@ public class SoldOrderService {
 
     private SoldOrderResponseDto confirmOrderPayment(SoldOrderRequestDto dto) {
         if (dto.getOrderId() == null || dto.getService().isEmpty()) {
-            throw new IllegalArgumentException("Список услуг не должен быть пустым");
+            throw new InvalidOrderRequestException("Список услуг не должен быть пустым");
         }
 
         List<Long> orderServiceIds = dto.getService().stream().map(SoldServiceDto::getOrderServiceId).toList();
         soldServiceRepository.deleteByOrderServiceIds(orderServiceIds);
 
         List<SoldServiceEntity> soldServices = dto.getService().stream().map(serviceDto -> {
-            SoldServiceEntity entity = new SoldServiceEntity();
-            entity.setOrderServiceId(serviceDto.getOrderServiceId());
-            entity.setBarcode(BarcodeGeneratorUtil.generateSoldServiceBarcode(serviceDto.getOrderServiceId()));
-            entity.setServiceStateId(SERVICE_STATE_PAID); //оплачено
-            entity.setPaymentKindId(dto.getPaymentKindId());
-            // Устанавливаем срок действия билета до конца текущего дня (23:59:59)
-            entity.setDtActive(getEndOfDay());
+            SoldServiceEntity entity = SoldServiceEntity
+                    .builder()
+                    .orderServiceId(serviceDto.getOrderServiceId())
+                    .barcode(BarcodeGeneratorUtil.generateSoldServiceBarcode(serviceDto.getOrderServiceId()))
+                    .serviceStateId(SERVICE_STATE_PAID) //оплачено
+                    .paymentKindId(dto.getPaymentKindId())
+                    .dtActive(getEndOfDay()) // Устанавливаем срок действия билета до конца текущего дня (23:59:59)
+                    .build();
             return entity;
         }).toList();
         soldServiceRepository.saveAll(soldServices);

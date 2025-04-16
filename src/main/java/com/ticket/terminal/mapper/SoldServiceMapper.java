@@ -9,5 +9,6 @@ public interface SoldServiceMapper {
 
     SoldServiceDto toDto(SoldServiceEntity serviceEntity);
 
+
     SoldServiceEntity toEntity(SoldServiceDto serviceDto);
 }
