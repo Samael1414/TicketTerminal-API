@@ -15,19 +15,19 @@ import java.util.List;
 @AllArgsConstructor
 public class SimpleServiceDto {
 
+    private Long serviceId;
     private String serviceName;
-    // comment нет в ответах json, но есть ниже в инструкции нужно ли добавить @JsonInclude?
     private String comment;
     private Integer cost;
     private Integer activeKindId;
-    private Boolean isNeedVisitDate;
+    private Boolean needVisitDate;
     private Integer proCultureIdentifier;
-    private Boolean isNeedVisitTime;
+    private Boolean needVisitTime;
     private List<Integer> paymentKindIds;
     private List<OffsetDateTime> dates;
     private LocalTime dtBegin;
     private LocalTime dtEnd;
-    private Boolean isProCultureChecked;
+    private Boolean proCultureChecked;
     private List<SeanceGridDto> seanceGrid;
     private Integer activeDays;
 

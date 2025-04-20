@@ -30,7 +30,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @GetMapping("/Service/Simple")
-    public ResponseEntity<SimpleServiceResponseDto> getSimpleService() {
+    public ResponseEntity<List<SimpleServiceResponseDto>> getSimpleService() {
         return ResponseEntity.ok(serviceService.getSimpleService());
     }
 
@@ -43,7 +43,6 @@ public class ServiceController {
     })
     @GetMapping("/Service/Editable")
     public ResponseEntity<List<EditableServiceDto>> getEditableServices() {
-        List<EditableServiceDto> services = serviceService.getEditableServices();
-        return ResponseEntity.ok(services);
+        return ResponseEntity.ok(serviceService.getEditableServices());
     }
 }

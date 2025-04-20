@@ -1,5 +1,7 @@
 server:
   port: 8181
+  servlet:
+    context-path: /TLMuseumGate/REST
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -13,3 +15,9 @@ spring:
 application:
   allowed-origins:
     - http://localhost:*
+  clients:
+    tonline-gate:
+      url:      http://localhost:8181
+      login:    admin
+      password: pass
+

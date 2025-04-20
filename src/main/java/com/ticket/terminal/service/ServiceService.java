@@ -27,7 +27,7 @@ public class ServiceService {
     private final PriceMapper priceMapper;
     private final PriceRepository priceRepository;
 
-    public SimpleServiceResponseDto getSimpleService() {
+    public List<SimpleServiceResponseDto> getSimpleService() {
         List<SimpleServiceDto> service;
         try (Stream<ServiceEntity> stream = serviceRepository.findAll().stream()) {
             service = stream.map(serviceMapper::toSimpleDto).toList();
@@ -38,7 +38,7 @@ public class ServiceService {
             seanceGrid = stream.map(seanceGridMapper::toDto).toList();
         }
 
-        return SimpleServiceResponseDto.builder().services(service).seanceGrid(seanceGrid).build();
+        return List.of(SimpleServiceResponseDto.builder().services(service).seanceGrid(seanceGrid).build());
     }
 
     public List<EditableServiceDto> getEditableServices() {

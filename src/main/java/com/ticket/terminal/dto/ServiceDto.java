@@ -2,12 +2,15 @@ package com.ticket.terminal.dto;
 
 import lombok.*;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
+
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServiceDto {
 
+    private Integer serviceId;
     private String serviceName;
     private String description;
     private Integer cost;
