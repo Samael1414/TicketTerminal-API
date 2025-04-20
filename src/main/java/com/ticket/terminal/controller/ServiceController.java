@@ -30,7 +30,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @GetMapping("/Service/Simple")
-    public ResponseEntity<List<SimpleServiceResponseDto>> getSimpleService() {
+    public ResponseEntity<SimpleServiceResponseDto> getSimpleService() {
         return ResponseEntity.ok(serviceService.getSimpleService());
     }
 
