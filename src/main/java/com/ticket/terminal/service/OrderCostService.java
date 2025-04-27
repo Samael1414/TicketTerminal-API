@@ -35,9 +35,9 @@ public class OrderCostService {
                 .orElseThrow(() -> new IllegalArgumentException
                         (String.format("Service не найден: %s", dto.getServiceId())));
 
-        boolean useVisitObject = Boolean.TRUE.equals(service.getVisitObjectUseForCost());
-        boolean useCategory = Boolean.TRUE.equals(service.getCategoryVisitorUseForCost());
-        boolean useVisitorCount = Boolean.TRUE.equals(service.getVisitorCountUseForCost());
+        boolean useVisitObject = Boolean.TRUE.equals(service.getIsVisitObjectUseForCost());
+        boolean useCategory = Boolean.TRUE.equals(service.getIsCategoryVisitorUseForCost());
+        boolean useVisitorCount = Boolean.TRUE.equals(service.getIsVisitorCountUseForCost());
 
         List<CategoryVisitorCountDto> visitors =
                 dto.getCategoryVisitor() != null ? dto.getCategoryVisitor() : List.of();

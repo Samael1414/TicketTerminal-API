@@ -14,6 +14,6 @@ public class CategoryVisitorEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String categoryName;
+    @Column(name = "category_name", nullable = false)
+    private String categoryVisitorName;
 }

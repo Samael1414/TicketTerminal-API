@@ -10,9 +10,11 @@ import java.util.List;
 @Repository
 public interface VisitObjectRepository extends JpaRepository<VisitObjectEntity, Long> {
 
-    @Query("""
-            SELECT v FROM VisitObjectEntity v JOIN OrderServiceVisitObjectEntity osv ON osv.visitObject.id = v.id
-            WHERE osv.orderService.service.id = :serviceId
-            """)
+    @Query(value = """
+    SELECT vo.* FROM visit_objects vo
+    JOIN order_service_visit_object osv ON osv.visit_object_id = vo.id
+    JOIN order_services os ON osv.order_service_id = os.id
+    WHERE os.service_id = :serviceId
+""", nativeQuery = true)
     List<VisitObjectEntity> findByServiceId(@Param("serviceId") Long serviceId);
 }

@@ -1,12 +1,14 @@
 package com.ticket.terminal.controller;
 
-import com.ticket.terminal.dto.EditableServiceDto;
-import com.ticket.terminal.dto.SimpleServiceResponseDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ticket.terminal.dto.*;
 import com.ticket.terminal.service.ServiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/TLMuseumGate/REST")
+@RequestMapping("/Service")
 public class ServiceController {
 
 
@@ -29,7 +31,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @GetMapping("/Service/Simple")
+    @GetMapping("/Simple")
     public ResponseEntity<SimpleServiceResponseDto> getSimpleService() {
         return ResponseEntity.ok(serviceService.getSimpleService());
     }
@@ -41,8 +43,13 @@ public class ServiceController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @GetMapping("/Service/Editable")
-    public ResponseEntity<List<EditableServiceDto>> getEditableServices() {
+    @GetMapping("/Editable")
+    public ResponseEntity<EditableServiceResponseDto> getEditableServices() {
         return ResponseEntity.ok(serviceService.getEditableServices());
+    }
+
+    @GetMapping("/Full")
+    public ResponseEntity<TLMuseumServiceResponseDto> getFullMuseumServiceResponse() {
+        return ResponseEntity.ok(serviceService.getFullMuseumServiceResponse());
     }
 }

@@ -1,5 +1,7 @@
 package com.ticket.terminal.dto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 import java.time.OffsetDateTime;
 /*
@@ -10,6 +12,7 @@ import java.time.OffsetDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
 public class GateInfoDto {
 
     private String name;

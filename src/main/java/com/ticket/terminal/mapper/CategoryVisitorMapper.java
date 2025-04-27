@@ -10,7 +10,7 @@ import java.util.List;
 public interface CategoryVisitorMapper {
 
     @Mapping(source = "id", target = "categoryVisitorId")
-    @Mapping(source = "categoryName", target = "categoryVisitorName")
+    @Mapping(source = "id", target = "groupCategoryVisitorId")
     CategoryVisitorDto toDto(CategoryVisitorEntity CategoryVisitorEntity);
 
     CategoryVisitorEntity toEntity(CategoryVisitorDto CategoryVisitorDto);

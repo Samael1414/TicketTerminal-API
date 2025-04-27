@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -28,7 +30,7 @@ public class OrderServiceEntity {
     private Integer cost;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm")
-    private OffsetDateTime dtVisit;
+    private LocalDateTime dtVisit;
 
     @Column(name = "service_state_id", nullable = false)
     private Integer serviceStateId;

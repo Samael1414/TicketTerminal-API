@@ -18,5 +18,5 @@ public class VisitObjectEntity {
     private String visitObjectName;
 
     @Column(name = "is_required")
-    private boolean required;
+    private Boolean isRequire;
 }

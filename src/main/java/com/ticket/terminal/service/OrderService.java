@@ -85,6 +85,22 @@ public class OrderService {
                     ServiceEntity service = serviceRepository.findById(serviceDto.getServiceId())
                             .orElseThrow(() -> new EntityNotFoundException
                                     (String.format("Service не найден: %s", serviceDto.getServiceId())));
+
+                    if (Boolean.TRUE.equals(service.getIsNeedVisitDate()) && serviceDto.getDtVisit() == null) {
+                        throw new IllegalArgumentException(
+                                String.format("dtVisit обязателен для услуги с ID %s", serviceDto.getServiceId()));
+                    }
+
+                    if ((serviceDto.getVisitObjectId() == null || serviceDto.getVisitObjectId().isEmpty()) && service.getIsVisitObjectUseForCost()) {
+                        throw new IllegalArgumentException(String.format("VisitObjectId обязатен для услуги ID: %s", service.getId()));
+                    }
+
+                    if ((serviceDto.getCategoryVisitor() == null || serviceDto.getCategoryVisitor().isEmpty()) && service.getIsVisitorCountUseForCost()) {
+                        throw new IllegalArgumentException(String.format("CategoryVisitor обязатен для услуги ID: %s", service.getId()));
+                    }
+
+
+
                     Integer cost = serviceDto.getServiceCost() != null ? serviceDto.getServiceCost() : 0;
                     OrderServiceEntity orderService = orderServiceMapper.toEntity(serviceDto);
                     orderService.setService(service);
@@ -165,6 +181,11 @@ public class OrderService {
                     ServiceEntity service = serviceRepository.findById(editableDto.getServiceId())
                             .orElseThrow(() -> new EntityNotFoundException
                                     (String.format("Service не найден: %s", editableDto.getServiceId())));
+
+                    if (Boolean.TRUE.equals(service.getIsNeedVisitDate()) && editableDto.getDtVisit() == null) {
+                        throw new IllegalArgumentException(
+                                String.format("dtVisit обязателен для услуги с ID %s", editableDto.getServiceId()));
+                    }
 
                     // Маппинг EditableOrderServiceDto в OrderServiceEntity
                     OrderServiceEntity orderService = orderServiceMapper.toEntity(editableDto);

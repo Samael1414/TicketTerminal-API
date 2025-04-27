@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @RestController
-@RequestMapping("/TLMuseumGate/REST")
+@RequestMapping("Order")
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -33,7 +34,7 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Не найдено"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @GetMapping("/Order/{orderId}")
+    @GetMapping("/{orderId}")
     public ResponseEntity<OrderDto> getOrder(@PathVariable("orderId") Long orderId) {
         return ResponseEntity.ok(orderService.getOrderById(orderId));
     }
@@ -46,7 +47,7 @@ public class OrderController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @GetMapping("/Order/Range")
+    @GetMapping("/Range")
     public ResponseEntity<OrderResponseDto> getOrdersByDateRange(
             @RequestParam(name = "dtBegin") String dtBegin,
             @RequestParam(name = "dtEnd") String dtEnd
@@ -64,7 +65,7 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Не найдено"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @PostMapping("/Order/Create")
+    @PostMapping("/Create")
     public ResponseEntity<OrderCreateResponseDto> createSimpleOrder(@RequestBody SimpleOrderRequestDto requestDto) {
         return ResponseEntity.ok(orderService.createSimpleOrder(requestDto));
     }
@@ -79,7 +80,7 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Не найдено"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @PostMapping("/Order/CreateEditable")
+    @PostMapping("/CreateEditable")
     public ResponseEntity<OrderCreateResponseDto> createEditableOrder(@RequestBody EditableOrderRequestDto requestDto) {
         return ResponseEntity.ok(orderService.createEditableOrder(requestDto));
     }
@@ -93,7 +94,7 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Не найдено"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @PostMapping("/Order/Cancel")
+    @PostMapping("/Cancel")
     public ResponseEntity<OrderDto> cancelOrder(@RequestBody OrderCancelDto requestDto) {
         return ResponseEntity.ok(orderService.cancelOrder(requestDto));
     }
@@ -107,7 +108,7 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Не найдено"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @PostMapping("/Order/Cost")
+    @PostMapping("/Cost")
     public ResponseEntity<CostResponseDto> calculateOrderCost(@RequestBody CostCalculationDto requestDto) {
         return ResponseEntity.ok(orderCostService.calculateCost(requestDto));
     }
@@ -121,7 +122,7 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Не найдено"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @PostMapping("/Order/Sold")
+    @PostMapping("/Sold")
     public ResponseEntity<SoldOrderResponseDto> processSoldOrder(@RequestBody SoldOrderRequestDto dto) {
         return ResponseEntity.ok(soldOrderService.processSoldOrder(dto));
     }
@@ -135,7 +136,7 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Не найдено"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @PostMapping("/Order/Refund")
+    @PostMapping("/Refund")
     public ResponseEntity<OrderDto> refundOrder(@RequestBody OrderRefundDto dto) {
         return ResponseEntity.ok(orderService.refundOrder(dto));
     }

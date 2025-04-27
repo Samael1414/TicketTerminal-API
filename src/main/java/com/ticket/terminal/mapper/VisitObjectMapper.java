@@ -10,10 +10,15 @@ import java.util.List;
 public interface VisitObjectMapper {
 
     @Mapping(source = "id", target = "visitObjectId")
-    @Mapping(source = "required", target = "required")
+    @Mapping(source = "isRequire", target = "isRequire")
+    @Mapping(source = "visitObjectName", target = "visitObjectName")
+    @Mapping(source = "id", target = "groupVisitObjectId")
     VisitObjectDto toDto(VisitObjectEntity visitObjectEntity);
 
     VisitObjectEntity toEntity(VisitObjectDto visitObjectDto);
 
+    @Mapping(source = "id", target = "visitObjectId")
+    @Mapping(source = "isRequire", target = "isRequire")
+    @Mapping(source = "visitObjectName", target = "visitObjectName")
     List<VisitObjectDto> toDtoList(List<VisitObjectEntity> entities);
 }

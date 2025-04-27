@@ -7,17 +7,28 @@ springdoc:
     path: /swagger-ui.html
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5434/ticket_terminal
+    url: jdbc:postgresql://localhost:5434/ticket_terminal?characterEncoding=UTF-8&useUnicode=true
     username: admin
     password: pass
   liquibase:
     change-log: classpath:db-changelog/db.changelog-master.yml
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
 application:
   allowed-origins:
-    - http://localhost:*
+    - "http://localhost:*"
+    - "http://localhost:1420"
+    - "https://tauri.localhost"
+    - "tauri://localhost"
   clients:
     tonline-gate:
       url:      http://localhost:8181
-      login:    admin
-      password: pass
+      login:    Admin
+      password:
+logging:
+  level:
+    com.ticket.terminal.client.MuseumClient: DEBUG
+    feign.Logger: DEBUG
+    feign: DEBUG
 
