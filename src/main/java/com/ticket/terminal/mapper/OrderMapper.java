@@ -2,14 +2,9 @@ package com.ticket.terminal.mapper;
 
 import com.ticket.terminal.dto.*;
 import com.ticket.terminal.entity.OrderEntity;
-import com.ticket.terminal.entity.OrderEntityUtil;
-import com.ticket.terminal.enums.OrderStatus;
-import com.ticket.terminal.enums.ServiceState;
-import com.ticket.terminal.util.BarcodeGeneratorUtil;
-import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+
 
 @Mapper(componentModel = "spring", uses = {OrderServiceMapper.class})
 public interface OrderMapper {

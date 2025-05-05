@@ -1,6 +1,5 @@
 package com.ticket.terminal.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Logger;
 import feign.RequestInterceptor;
 import feign.codec.Decoder;
@@ -10,11 +9,7 @@ import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Configuration
 public class FeignClientConfiguration {
