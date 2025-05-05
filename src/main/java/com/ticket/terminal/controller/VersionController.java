@@ -1,3 +1,17 @@
+/**
+ * Контроллер для получения информации о версии приложения.
+ * 
+ * Назначение:
+ * - Обрабатывает HTTP-запросы для получения информации о версии системы.
+ * - Взаимодействует с VersionService для получения информации.
+ * 
+ * Принимает и возвращает DTO:
+ * - VersionDto, SystemInfoDto и др.
+ * 
+ * Основные методы:
+ * - getVersion: Получить текущую версию приложения
+ * - getSystemInfo: Получить информацию о системе
+ */
 package com.ticket.terminal.controller;
 
 import com.ticket.terminal.dto.VersionDto;

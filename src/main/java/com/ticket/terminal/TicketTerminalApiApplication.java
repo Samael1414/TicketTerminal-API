@@ -1,3 +1,11 @@
+/**
+ * Главный класс Spring Boot приложения TicketTerminal-API.
+ * 
+ * Запускает приложение, включает поддержку JPA Auditing, Feign-клиентов и настраивает OpenAPI/Swagger.
+ * Этот класс не обрабатывает бизнес-логику, а только инициализирует инфраструктуру приложения.
+ * 
+ * Обрабатывает только запуск приложения и регистрацию конфигураций.
+ */
 package com.ticket.terminal;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;

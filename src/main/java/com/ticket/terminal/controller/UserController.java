@@ -1,3 +1,19 @@
+/**
+ * Контроллер для управления пользователями (User).
+ * 
+ * Назначение:
+ * - Обрабатывает HTTP-запросы, связанные с созданием, получением и обновлением пользователей.
+ * - Взаимодействует с UserService для выполнения бизнес-логики.
+ * 
+ * Принимает и возвращает DTO:
+ * - UsersCreateDto, UsersResponseDto и др.
+ * 
+ * Основные методы:
+ * - getAllUsers: Получить список всех пользователей
+ * - getUserById: Получить пользователя по ID
+ * - createUser: Создать нового пользователя
+ * - updateUser: Обновить данные пользователя
+ */
 package com.ticket.terminal.controller;
 
 import com.ticket.terminal.dto.UsersCreateDto;

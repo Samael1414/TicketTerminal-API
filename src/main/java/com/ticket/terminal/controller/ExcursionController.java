@@ -1,3 +1,18 @@
+/**
+ * Контроллер для управления экскурсиями (Excursion).
+ * 
+ * Назначение:
+ * - Обрабатывает HTTP-запросы, связанные с получением и созданием экскурсий.
+ * - Взаимодействует с ExcursionService для выполнения бизнес-логики.
+ * 
+ * Принимает и возвращает DTO:
+ * - ExcursionDto, ExcursionRequestDto, ExcursionResponseDto, ExcursionListResponseDto и др.
+ * 
+ * Основные методы:
+ * - getAllExcursions: Получить список всех экскурсий
+ * - getExcursionById: Получить экскурсию по ID
+ * - createExcursion: Создать новую экскурсию
+ */
 package com.ticket.terminal.controller;
 
 import com.ticket.terminal.dto.ExcursionListResponseDto;

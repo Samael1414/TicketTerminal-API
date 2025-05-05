@@ -1,3 +1,18 @@
+/**
+ * Контроллер для управления данными ProCulture GUID.
+ * 
+ * Назначение:
+ * - Обрабатывает HTTP-запросы, связанные с получением и созданием записей ProCulture GUID.
+ * - Взаимодействует с ProCultureService для выполнения бизнес-логики.
+ * 
+ * Принимает и возвращает DTO:
+ * - PROCultureGUIDDto, PROCultureGUIDEntryDto и др.
+ * 
+ * Основные методы:
+ * - getAllProCultureGuids: Получить список всех записей
+ * - getProCultureGuidById: Получить запись по ID
+ * - createProCultureGuid: Создать новую запись
+ */
 package com.ticket.terminal.controller;
 
 import com.ticket.terminal.dto.PROCultureGUIDDto;

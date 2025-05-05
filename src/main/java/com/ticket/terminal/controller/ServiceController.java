@@ -1,3 +1,19 @@
+/**
+ * Контроллер для управления услугами (Service).
+ * 
+ * Назначение:
+ * - Обрабатывает HTTP-запросы, связанные с получением, созданием и обновлением услуг.
+ * - Взаимодействует с ServiceService для выполнения бизнес-логики.
+ * 
+ * Принимает и возвращает DTO:
+ * - ServiceDto, EditableServiceDto, EditableServiceResponseDto, SimpleServiceDto, SimpleServiceResponseDto и др.
+ * 
+ * Основные методы:
+ * - getAllServices: Получить список всех услуг
+ * - getServiceById: Получить услугу по ID
+ * - createService: Создать новую услугу
+ * - updateService: Обновить данные услуги
+ */
 package com.ticket.terminal.controller;
 
 import com.ticket.terminal.dto.*;

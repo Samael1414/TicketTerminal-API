@@ -1,3 +1,13 @@
+/**
+ * Конфигурация Swagger/OpenAPI для автогенерации документации REST API.
+ * 
+ * Определяет:
+ * - Основную информацию о сервисе (title, version, description)
+ * - Схему безопасности (basicAuth)
+ * - Интеграцию с Swagger UI
+ * 
+ * Используется для удобства тестирования и ознакомления с API через Swagger UI.
+ */
 package com.ticket.terminal.config;
 
 import io.swagger.v3.oas.models.Components;
