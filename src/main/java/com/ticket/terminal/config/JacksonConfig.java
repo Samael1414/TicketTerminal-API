@@ -1,3 +1,13 @@
+/**
+ * Конфигурация Jackson для сериализации и десериализации JSON в приложении.
+ * 
+ * Определяет:
+ * - Форматы дат и времени (LocalDate, LocalDateTime, ZonedDateTime)
+ * - Кастомные десериализаторы (например, CustomZonedDateTimeDeserializer)
+ * - Поддерживаемые типы контента для HTTP (application/json, text/json и др.)
+ * 
+ * Используется для корректной работы с датами и форматами данных во всех REST-контроллерах и клиентах.
+ */
 package com.ticket.terminal.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

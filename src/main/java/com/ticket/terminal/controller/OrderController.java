@@ -1,3 +1,22 @@
+/**
+ * Контроллер для управления заказами (Order).
+ * 
+ * Назначение:
+ * - Обрабатывает HTTP-запросы, связанные с созданием, получением, отменой, оплатой и возвратом заказов.
+ * - Взаимодействует с OrderService, OrderCostService и SoldOrderService для выполнения бизнес-логики.
+ * 
+ * Принимает и возвращает DTO:
+ * - OrderDto, OrderCreateResponseDto, OrderCancelDto, CostCalculationDto, CostResponseDto, SoldOrderRequestDto, SoldOrderResponseDto, OrderRefundDto, OrderResponseDto, SimpleOrderRequestDto, EditableOrderRequestDto и др.
+ * 
+ * Основные методы:
+ * - getOrder: Получить заказ по ID
+ * - getOrdersByDateRange: Получить заказы за период
+ * - createSimpleOrder / createEditableOrder: Создать заказ (разные режимы)
+ * - cancelOrder: Отмена заказа
+ * - calculateOrderCost: Расчёт стоимости заказа
+ * - processSoldOrder: Оплата заказа
+ * - refundOrder: Возврат по заказу
+ */
 package com.ticket.terminal.controller;
 
 import com.ticket.terminal.dto.*;

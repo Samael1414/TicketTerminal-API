@@ -1,3 +1,14 @@
+/**
+ * Конфигурация безопасности Spring Security для приложения TicketTerminal-API.
+ * 
+ * Определяет:
+ * - CORS и CSRF настройки
+ * - Фильтры безопасности (SecurityFilterChain)
+ * - Провайдеры аутентификации и кодировщик паролей
+ * - Открытые и защищённые маршруты
+ * 
+ * Использует кастомный сервис пользователей для аутентификации.
+ */
 package com.ticket.terminal.config;
 
 import com.ticket.terminal.security.CustomUserDetailsService;

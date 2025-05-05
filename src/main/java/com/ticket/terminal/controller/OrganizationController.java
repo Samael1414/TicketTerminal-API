@@ -1,3 +1,18 @@
+/**
+ * Контроллер для управления организациями (Organization).
+ * 
+ * Назначение:
+ * - Обрабатывает HTTP-запросы, связанные с получением и созданием организаций.
+ * - Взаимодействует с OrganizationService для выполнения бизнес-логики.
+ * 
+ * Принимает и возвращает DTO:
+ * - OrganizationDto и др.
+ * 
+ * Основные методы:
+ * - getAllOrganizations: Получить список всех организаций
+ * - getOrganizationById: Получить организацию по ID
+ * - createOrganization: Создать новую организацию
+ */
 package com.ticket.terminal.controller;
 
 import com.ticket.terminal.dto.OrganizationDto;

@@ -1,3 +1,17 @@
+/**
+ * Контроллер для управления объектами посещения (VisitObject).
+ * 
+ * Назначение:
+ * - Обрабатывает HTTP-запросы, связанные с получением информации об объектах посещения.
+ * - Взаимодействует с VisitObjectService для выполнения бизнес-логики.
+ * 
+ * Принимает и возвращает DTO:
+ * - VisitObjectDto, VisitObjectItemDto и др.
+ * 
+ * Основные методы:
+ * - getAllVisitObjects: Получить список всех объектов посещения
+ * - getVisitObjectById: Получить объект посещения по ID
+ */
 package com.ticket.terminal.controller;
 
 import com.ticket.terminal.dto.VisitObjectDto;
