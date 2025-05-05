@@ -102,16 +102,24 @@ public class ServiceService {
                 List<PriceDto> prices = priceMapper.toDtoList(priceRepository.findAllByServiceId(service.getId()));
                 dto.setPrices(prices);
 
-                Set<Long> priceCategoryIds = prices.stream()
-                        .map(PriceDto::getCategoryVisitorId)
-                        .collect(Collectors.toSet());
+                List<CategoryVisitorDto> categoriesForService = allCategories.stream()
+                        .map(cat -> {
+                            Integer matchedCount = prices.stream()
+                                    .filter(p -> p.getCategoryVisitorId().equals(cat.getCategoryVisitorId()))
+                                    .findFirst()
+                                    .map(PriceDto::getVisitorCount) // добавь в PriceDto поле visitorCount, если ещё не было
+                                    .orElse(null);
 
-                List<CategoryVisitorDto> matchedCategories = allCategories.stream()
-                        .filter(cat -> priceCategoryIds.contains(cat.getCategoryVisitorId()))
+                            CategoryVisitorDto c = new CategoryVisitorDto();
+                            c.setCategoryVisitorId(cat.getCategoryVisitorId());
+                            c.setCategoryVisitorName(cat.getCategoryVisitorName());
+                            c.setGroupCategoryVisitorId(cat.getGroupCategoryVisitorId());
+                            c.setRequireVisitorCount(matchedCount);
+                            return c;
+                        })
                         .toList();
-                dto.setCategoryVisitor(matchedCategories);
 
-                dto.setAllCategories(allCategories);
+                dto.setCategoryVisitor(categoriesForService);
                 dto.setSeanceGrid(allSeanceGrid);
                 return dto;
             }).toList();
@@ -124,9 +132,9 @@ public class ServiceService {
                 .categoryVisitor(allCategories)
                 .seanceGrid(allSeanceGrid)
                 .service(services)
-                .allCategories(allCategories)
                 .build();
     }
+
 
 
 

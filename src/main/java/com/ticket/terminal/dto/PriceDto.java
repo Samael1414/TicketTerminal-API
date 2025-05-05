@@ -23,4 +23,8 @@ public class PriceDto {
 
     @JsonProperty("Cost")
     private Double cost;
+
+    @JsonProperty("VisitorCount")
+    private Integer visitorCount;
+
 }

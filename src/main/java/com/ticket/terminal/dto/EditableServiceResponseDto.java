@@ -34,10 +34,6 @@ public class EditableServiceResponseDto {
 
     @JsonProperty("GroupCategoryVisitor")
     private List<GroupCategoryVisitorDto> groupCategoryVisitor;
-
-    @JsonProperty("AllCategories")
-    private List<CategoryVisitorDto> allCategories;
-
 }
 
 

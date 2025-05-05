@@ -93,9 +93,4 @@ public class EditableServiceDto {
 
     @JsonProperty("SeanceGrid")
     private List<SeanceGridDto> seanceGrid;
-
-    @JsonProperty("AllCategories")
-    private List<CategoryVisitorDto> allCategories;
-
-
 }
