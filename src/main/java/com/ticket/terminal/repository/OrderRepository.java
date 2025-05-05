@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.lang.NonNull;
 
 @Repository
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
@@ -28,11 +29,13 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     @Query("UPDATE OrderEntity o SET o.orderStateId = :stateId WHERE o.id = :orderId")
     void updateOrderState(@Param("orderId") Long orderId, @Param("stateId") Integer stateId);
 
+    @NonNull
+    @Override
     @EntityGraph(attributePaths = {
             "service",              // List<OrderServiceEntity>
             "service.service"       // OrderServiceEntity.service (=> ServiceEntity)
     })
-    Optional<OrderEntity> findById(Long id);
+    Optional<OrderEntity> findById(@NonNull Long id);
 
     boolean existsByOrderBarcode(String orderBarcode);
 

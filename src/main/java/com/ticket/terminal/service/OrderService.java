@@ -2,7 +2,6 @@ package com.ticket.terminal.service;
 
 import com.ticket.terminal.dto.*;
 import com.ticket.terminal.entity.*;
-import com.ticket.terminal.enums.OrderStatus;
 import com.ticket.terminal.enums.ServiceState;
 import com.ticket.terminal.exception.EmptyRefundListException;
 import com.ticket.terminal.exception.InvalidRefundRequestException;
