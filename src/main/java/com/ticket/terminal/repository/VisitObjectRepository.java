@@ -17,4 +17,12 @@ public interface VisitObjectRepository extends JpaRepository<VisitObjectEntity, 
     WHERE os.service_id = :serviceId
 """, nativeQuery = true)
     List<VisitObjectEntity> findByServiceId(@Param("serviceId") Long serviceId);
+
+    @Query(value = """
+SELECT vo.* FROM visit_objects vo
+JOIN order_service_visit_object osv ON osv.visit_object_id = vo.id
+WHERE osv.order_service_id = :orderServiceId
+""", nativeQuery = true)
+    List<VisitObjectEntity> findByOrderServiceId(@Param("orderServiceId") Long orderServiceId);
+
 }

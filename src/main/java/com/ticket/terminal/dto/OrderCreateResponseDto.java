@@ -1,5 +1,6 @@
 package com.ticket.terminal.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -13,7 +14,7 @@ import java.util.List;
 public class OrderCreateResponseDto {
 
     @JsonProperty("OrderId")
-    private Long orderId;
+    private Integer orderId;
 
     @JsonProperty("OrderBarcode")
     private String orderBarcode;
@@ -59,4 +60,7 @@ public class OrderCreateResponseDto {
 
     @JsonProperty("Service")
     private List<OrderServiceDto> service;
+
+    private SoldOrderRequestDto soldRequest;
+
 }

@@ -29,7 +29,7 @@ public class OrderCostService {
     private final ActionLogService actionLogService;
 
     public CostResponseDto calculateCost(CostCalculationDto dto) {
-        int totalCost = 0;
+        Double totalCost = 0.0;
 
         ServiceEntity service = serviceRepository.findById(dto.getServiceId())
                 .orElseThrow(() -> new IllegalArgumentException
@@ -45,7 +45,7 @@ public class OrderCostService {
         if (useVisitObject) {
             for (CategoryVisitorCountDto category : visitors.isEmpty() ? List.of(new CategoryVisitorCountDto()) : visitors) {
                 for (Long visitObjectId : dto.getVisitObjectId()) {
-                    Integer cost = priceRepository.findMatchingPrice(
+                    Double cost = priceRepository.findMatchingPrice(
                                     service.getId(),
                                     visitObjectId,
                                     useCategory ? category.getCategoryVisitorId() : null
@@ -56,7 +56,7 @@ public class OrderCostService {
                                             null,
                                             useCategory ? category.getCategoryVisitorId() : null).
                                     map(PriceEntity::getCost)
-                                    .orElse(0));
+                                    .orElse(0.0));
 
                     int quantity = useVisitorCount ? category.getVisitorCount().intValue() : 1;
                     totalCost += cost * quantity;
@@ -64,13 +64,13 @@ public class OrderCostService {
             }
         } else {
             for (CategoryVisitorCountDto category : visitors.isEmpty() ? List.of(new CategoryVisitorCountDto()) : visitors) {
-                Integer cost = priceRepository.findMatchingPrice(
+                Double cost = priceRepository.findMatchingPrice(
                                 service.getId(),
                                 null,
                                 useCategory ? category.getCategoryVisitorId() : null
                         )
                         .map(PriceEntity::getCost)
-                        .orElse(0);
+                        .orElse(0.0);
 
                 Long count = category.getVisitorCount();
                 int quantity = useVisitorCount && count != null ? count.intValue() : 1;

@@ -30,7 +30,7 @@ public class ServiceService {
     private final CategoryVisitorRepository categoryVisitorRepository;
     private final PriceMapper priceMapper;
     private final PriceRepository priceRepository;
-    private final MuseumServiceAssembler museumServiceAssembler;
+//    private final MuseumServiceAssembler museumServiceAssembler;
 
     public SimpleServiceResponseDto getSimpleService() {
         List<SeanceGridDto> allSeanceGrid;
@@ -53,78 +53,86 @@ public class ServiceService {
     }
 
     public EditableServiceResponseDto getEditableServices() {
-        List<VisitObjectDto> visitObjects =
-                visitObjectMapper.toDtoList(visitObjectRepository.findAll());
+        List<VisitObjectDto> visitObjects = visitObjectMapper.toDtoList(visitObjectRepository.findAll());
 
         List<VisitObjectItemDto> visitObjectItems = visitObjects.stream()
-                .map(items -> VisitObjectItemDto.builder()
-                        .visitObjectId(items.getVisitObjectId())
-                        .visitObjectName(items.getVisitObjectName())
+                .map(item -> VisitObjectItemDto.builder()
+                        .visitObjectId(item.getVisitObjectId())
+                        .visitObjectName(item.getVisitObjectName())
                         .build())
                 .toList();
 
         List<GroupVisitObjectDto> groupVisitObjects = visitObjects.stream()
-                .map(group -> GroupVisitObjectDto
-                        .builder()
-                        .groupVisitObjectId(group.getVisitObjectId())
-                        .groupVisitObjectName(group.getVisitObjectName())
+                .map(obj -> GroupVisitObjectDto.builder()
+                        .groupVisitObjectId(obj.getVisitObjectId())
+                        .groupVisitObjectName(obj.getVisitObjectName())
                         .build())
                 .toList();
 
-        List<CategoryVisitorDto> categoryVisitors =
-                categoryVisitorMapper.toDtoList(categoryVisitorRepository.findAll());
-        List<GroupCategoryVisitorDto> groupCategoryVisitors = categoryVisitors.stream()
-                .map(categoryVisitorDto -> GroupCategoryVisitorDto.builder()
-                        .groupCategoryVisitorId(categoryVisitorDto.getGroupCategoryVisitorId())
-                        .groupCategoryVisitorName(categoryVisitorDto.getCategoryVisitorName())
+        List<CategoryVisitorDto> allCategories = categoryVisitorMapper.toDtoList(categoryVisitorRepository.findAll());
+        List<GroupCategoryVisitorDto> groupCategoryVisitors = allCategories.stream()
+                .map(cat -> GroupCategoryVisitorDto.builder()
+                        .groupCategoryVisitorId(cat.getGroupCategoryVisitorId())
+                        .groupCategoryVisitorName(cat.getCategoryVisitorName())
                         .build())
                 .toList();
 
         List<SeanceGridDto> allSeanceGrid = seanceGridMapper.toDtoList(seanceGridRepository.findAll());
+
         List<EditableServiceDto> services;
         try (Stream<ServiceEntity> stream = serviceRepository.findAllEditableServices().stream()) {
             services = stream.map(service -> {
                 EditableServiceDto dto = editableServiceMapper.toDto(service);
 
                 Set<Long> allowedIds = visitObjectRepository.findByServiceId(service.getId())
-                        .stream().map(VisitObjectEntity::getId).collect(Collectors.toSet());
+                        .stream()
+                        .map(VisitObjectEntity::getId)
+                        .collect(Collectors.toSet());
 
-                List<VisitObjectDto> fullForThisService = visitObjects.stream()
-                        .map(visitObjectDto -> VisitObjectDto.builder()
-                                .visitObjectId(visitObjectDto.getVisitObjectId())
-                                .visitObjectName(visitObjectDto.getVisitObjectName())
-                                .isRequire(allowedIds.contains(visitObjectDto.getVisitObjectId()))
-                                .groupVisitObjectId(visitObjectDto.getGroupVisitObjectId())
-                                .build()
-                        )
+                List<VisitObjectDto> objectsForService = visitObjects.stream()
+                        .map(vo -> VisitObjectDto.builder()
+                                .visitObjectId(vo.getVisitObjectId())
+                                .visitObjectName(vo.getVisitObjectName())
+                                .isRequire(allowedIds.contains(vo.getVisitObjectId()))
+                                .groupVisitObjectId(vo.getGroupVisitObjectId())
+                                .build())
                         .toList();
-                dto.setVisitObjects(fullForThisService);
+                dto.setVisitObjects(objectsForService);
 
+                List<PriceDto> prices = priceMapper.toDtoList(priceRepository.findAllByServiceId(service.getId()));
+                dto.setPrices(prices);
 
-                dto.setCategoryVisitors(categoryVisitorMapper
-                        .toDtoList(categoryVisitorRepository.findByServiceId(service.getId())));
+                Set<Long> priceCategoryIds = prices.stream()
+                        .map(PriceDto::getCategoryVisitorId)
+                        .collect(Collectors.toSet());
 
-                dto.setPrices(priceMapper.toDtoList(priceRepository
-                        .findAllByServiceId(service.getId())));
+                List<CategoryVisitorDto> matchedCategories = allCategories.stream()
+                        .filter(cat -> priceCategoryIds.contains(cat.getCategoryVisitorId()))
+                        .toList();
+                dto.setCategoryVisitor(matchedCategories);
 
+                dto.setAllCategories(allCategories);
                 dto.setSeanceGrid(allSeanceGrid);
-
                 return dto;
             }).toList();
         }
 
-        return EditableServiceResponseDto
-                .builder()
+        return EditableServiceResponseDto.builder()
                 .groupVisitObject(groupVisitObjects)
                 .groupCategoryVisitor(groupCategoryVisitors)
                 .visitObjects(visitObjectItems)
-                .categoryVisitor(categoryVisitors)
+                .categoryVisitor(allCategories)
                 .seanceGrid(allSeanceGrid)
                 .service(services)
+                .allCategories(allCategories)
                 .build();
     }
 
-    public TLMuseumServiceResponseDto getFullMuseumServiceResponse() {
-        return museumServiceAssembler.getFullMuseumService();
-    }
+
+
+//    public TLMuseumServiceResponseDto getFullMuseumServiceResponse() {
+//        return museumServiceAssembler.getFullMuseumService();
+//    }
+
+
 }

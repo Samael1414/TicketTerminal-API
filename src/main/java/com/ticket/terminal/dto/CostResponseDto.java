@@ -15,5 +15,5 @@ import lombok.*;
 public class CostResponseDto {
 
     @JsonProperty("Cost")
-    private Integer cost;
+    private Double cost;
 }

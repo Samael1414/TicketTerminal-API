@@ -5,8 +5,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Getter
@@ -27,9 +29,9 @@ public class OrderServiceEntity {
     private ServiceEntity service;
 
     @Column(nullable = false)
-    private Integer cost;
+    private Double cost;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime dtVisit;
 
     @Column(name = "service_state_id", nullable = false)
@@ -39,8 +41,8 @@ public class OrderServiceEntity {
     private Integer serviceCount;
 
     @Column(name = "dt_drop")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm")
-    private OffsetDateTime dtDrop;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime dtDrop;
 
     private String proCultureGuid;
 

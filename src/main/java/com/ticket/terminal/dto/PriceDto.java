@@ -19,8 +19,8 @@ public class PriceDto {
     private Integer visitObjectId;
 
     @JsonProperty("CategoryVisitorId")
-    private Integer categoryVisitorId;
+    private Long categoryVisitorId;
 
     @JsonProperty("Cost")
-    private Integer cost;
+    private Double cost;
 }

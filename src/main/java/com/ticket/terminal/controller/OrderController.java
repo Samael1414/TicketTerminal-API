@@ -67,6 +67,7 @@ public class OrderController {
     })
     @PostMapping("/Create")
     public ResponseEntity<OrderCreateResponseDto> createSimpleOrder(@RequestBody SimpleOrderRequestDto requestDto) {
+        System.out.println(this.getClass());
         return ResponseEntity.ok(orderService.createSimpleOrder(requestDto));
     }
 

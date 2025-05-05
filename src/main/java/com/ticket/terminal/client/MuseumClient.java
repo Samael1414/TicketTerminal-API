@@ -14,6 +14,7 @@ import java.util.List;
 @FeignClient(
         name = "museumGateClient",
         url  = "${application.clients.tonline-gate.url}",
+        path = "/TLMuseumGate/REST",
         configuration = FeignClientConfiguration.class
 )
 public interface MuseumClient {

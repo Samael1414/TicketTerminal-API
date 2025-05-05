@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
-import java.time.LocalTime;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -64,9 +64,11 @@ public class EditableServiceDto {
     @JsonProperty("ActiveDays")
     private Integer activeDays;
 
-    private LocalTime dtBegin;
+    @JsonProperty("dtBegin")
+    private String dtBegin;
 
-    private LocalTime dtEnd;
+    @JsonProperty("dtEnd")
+    private String dtEnd;
 
     @JsonProperty("Dates")
     private List<OffsetDateTime> dates;
@@ -84,12 +86,16 @@ public class EditableServiceDto {
     private List<VisitObjectDto> visitObjects;
 
     @JsonProperty("CategoryVisitor")
-    private List<CategoryVisitorDto> categoryVisitors;
+    private List<CategoryVisitorDto> categoryVisitor;
 
     @JsonProperty("Price")
     private List<PriceDto> prices;
 
     @JsonProperty("SeanceGrid")
     private List<SeanceGridDto> seanceGrid;
+
+    @JsonProperty("AllCategories")
+    private List<CategoryVisitorDto> allCategories;
+
 
 }

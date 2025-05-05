@@ -1,6 +1,7 @@
 package com.ticket.terminal.entity;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,10 +9,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "visit_objects")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class VisitObjectEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false)

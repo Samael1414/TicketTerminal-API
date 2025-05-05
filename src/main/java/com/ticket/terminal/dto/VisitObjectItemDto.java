@@ -22,7 +22,7 @@ public class VisitObjectItemDto {
     private String visitObjectName;
 
     @JsonProperty("IsRequire")
-    private boolean isRequire;
+    private Boolean isRequire;
 
     @JsonProperty("GroupVisitObjectId")
     private Long groupVisitObjectId;

@@ -48,8 +48,8 @@ public class ServiceController {
         return ResponseEntity.ok(serviceService.getEditableServices());
     }
 
-    @GetMapping("/Full")
-    public ResponseEntity<TLMuseumServiceResponseDto> getFullMuseumServiceResponse() {
-        return ResponseEntity.ok(serviceService.getFullMuseumServiceResponse());
-    }
+//    @GetMapping("/Full")
+//    public ResponseEntity<TLMuseumServiceResponseDto> getFullMuseumServiceResponse() {
+//        return ResponseEntity.ok(serviceService.getFullMuseumServiceResponse());
+//    }
 }

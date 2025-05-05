@@ -14,7 +14,15 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 
-    List<OrderEntity> findAllByCreatedAtBetween(LocalDateTime dtBegin, LocalDateTime dtEnd);
+    @Query("""
+    SELECT DISTINCT o FROM OrderEntity o
+    JOIN o.service s
+    WHERE s.dtVisit BETWEEN :start AND :end
+""")
+    List<OrderEntity> findOrdersByDtVisitBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+
+
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE OrderEntity o SET o.orderStateId = :stateId WHERE o.id = :orderId")
@@ -25,5 +33,10 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
             "service.service"       // OrderServiceEntity.service (=> ServiceEntity)
     })
     Optional<OrderEntity> findById(Long id);
+
+    boolean existsByOrderBarcode(String orderBarcode);
+
+    @Query("SELECT COALESCE(MAX(o.orderId), 0) FROM OrderEntity o")
+    Integer findMaxOrderId();
 
 }

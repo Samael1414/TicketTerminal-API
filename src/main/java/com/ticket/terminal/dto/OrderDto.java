@@ -46,5 +46,9 @@ public class OrderDto {
     private List<OrderServiceDto> service;
 
     @JsonProperty("Cost")
-    private Integer cost;
+    private Double cost;
+
+    @JsonProperty("OrderId")
+    private Integer orderId;
+
 }

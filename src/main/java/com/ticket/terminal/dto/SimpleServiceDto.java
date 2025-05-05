@@ -5,10 +5,13 @@ package com.ticket.terminal.dto;
 ---
 ## GET /REST/Service/Simple
  */
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -29,7 +32,7 @@ public class SimpleServiceDto {
     private String comment;
 
     @JsonProperty("Cost")
-    private Integer cost;
+    private Double cost;
 
     @JsonProperty("ActiveKindId")
     private Integer activeKindId;
@@ -49,9 +52,13 @@ public class SimpleServiceDto {
     @JsonProperty("Dates")
     private List<OffsetDateTime> dates;
 
-    private LocalTime dtBegin;
+    @JsonProperty("dtBegin")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Moscow")
+    private String dtBegin;
 
-    private LocalTime dtEnd;
+    @JsonProperty("dtEnd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Moscow")
+    private String dtEnd;
 
     @JsonProperty("IsPROCultureChecked")
     private Boolean isProCultureChecked;

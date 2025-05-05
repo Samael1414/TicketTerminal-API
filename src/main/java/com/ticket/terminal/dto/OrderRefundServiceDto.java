@@ -20,5 +20,5 @@ public class OrderRefundServiceDto {
     private Long orderServiceId;
 
     @JsonProperty("Cost")
-    private Integer cost;
+    private Double cost;
 }

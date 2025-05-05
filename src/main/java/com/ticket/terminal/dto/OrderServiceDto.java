@@ -6,14 +6,18 @@ POST /REST/Order/Sold
 POST /REST/Order/Cancel
 POST /REST/Order/Refund
  */
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @NoArgsConstructor
@@ -37,16 +41,18 @@ public class OrderServiceDto {
     private String serviceName;
 
     @JsonProperty("Cost")
-    private Integer cost;
+    private Double cost;
 
-    @JsonProperty("dtVisit")
-    @NotNull(message = "DtVisit is required for this service")
-    private LocalDateTime dtVisit;
+    @JsonAlias("dtVisit")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Moscow")
+    private ZonedDateTime dtVisit;
 
     @JsonProperty("ServiceCount")
     private Integer serviceCount;
 
-    @JsonProperty("DtDrop")
-    private OffsetDateTime dtDrop;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @JsonAlias("dtDrop")
+    @JsonProperty("dtDrop")
+    private LocalDateTime dtDrop;
 
 }

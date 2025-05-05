@@ -26,5 +26,5 @@ public class PriceEntity {
     @JoinColumn(name = "category_visitor_id")
     private CategoryVisitorEntity categoryVisitor;
 
-    private Integer cost;
+    private Double cost;
 }

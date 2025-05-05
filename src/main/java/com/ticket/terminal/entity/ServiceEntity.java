@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 
@@ -23,7 +25,7 @@ public class ServiceEntity {
     private String description;
 
     @Column(name = "cost", nullable = false)
-    private Integer cost;
+    private Double cost;
 
     @Column(nullable = false)
     private Long activeKindId;
@@ -34,11 +36,11 @@ public class ServiceEntity {
     @Column(name = "is_need_visit_time")
     private Boolean isNeedVisitTime;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private LocalTime dtBegin;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private LocalDateTime dtBegin;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private LocalTime dtEnd;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private LocalDateTime dtEnd;
 
     private Integer proCultureIdentifier;
 

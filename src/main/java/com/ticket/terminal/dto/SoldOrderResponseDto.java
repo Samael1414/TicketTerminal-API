@@ -61,4 +61,7 @@ public class SoldOrderResponseDto {
 
     @JsonProperty("Service")
     private List<SoldServiceDto> service;
+
+    @JsonProperty("VisitObject")
+    private List<Long> visitObject;
 }

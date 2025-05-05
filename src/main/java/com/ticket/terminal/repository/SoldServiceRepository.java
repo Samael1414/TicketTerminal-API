@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SoldServiceRepository extends JpaRepository<SoldServiceEntity, Long> {
@@ -22,6 +23,16 @@ public interface SoldServiceRepository extends JpaRepository<SoldServiceEntity, 
         WHERE s.orderServiceId IN :ids
     """)
     int markAsRefunded(@Param("ids") List<Long> orderServiceIds);
+
+
+    Optional<SoldServiceEntity> findByOrderServiceId(Long orderServiceId);
+
+    @Query("""
+    SELECT s FROM SoldServiceEntity s
+    LEFT JOIN FETCH s.visitObject
+    WHERE s.orderServiceId IN :orderServiceIds
+""")
+    List<SoldServiceEntity> findAllWithVisitObjects(@Param("orderServiceIds") List<Long> orderServiceIds);
 
 
 

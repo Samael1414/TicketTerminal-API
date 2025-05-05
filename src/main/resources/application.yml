@@ -31,4 +31,7 @@ logging:
     com.ticket.terminal.client.MuseumClient: DEBUG
     feign.Logger: DEBUG
     feign: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
 

@@ -1,17 +1,25 @@
 package com.ticket.terminal.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SimpleOrderRequestDto {
+
+    @JsonProperty("OrderServiceId")
+    private Long orderServiceId;
 
     @JsonProperty("IsSimpleMode")
     private Boolean isSimpleMode;
@@ -50,13 +58,21 @@ public class SimpleOrderRequestDto {
     private String visitorDocumentNumber;
 
     @JsonProperty("Cost")
-    private Integer cost;
+    private Double cost;
 
     @JsonProperty("Comment")
     private String comment;
 
-    private OffsetDateTime dtDrop;
+    @JsonAlias("dtDrop")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime dtDrop;
 
     @JsonProperty("Service")
     private List<SimpleOrderServiceDto> service;
+
+    @JsonProperty("PaymentKindId")
+    private Integer paymentKindId;
+
+    @JsonProperty("PaymentTransaction")
+    private String paymentTransaction;
 }

@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -29,8 +30,8 @@ public class MuseumServiceItemDto {
     private Boolean isNeedVisitTime;
 
     private Integer activeDays;
-    private LocalTime dtBegin;
-    private LocalTime dtEnd;
+    private LocalDateTime dtBegin;
+    private LocalDateTime dtEnd;
     private List<LocalDate> dates;
 
     private List<VisitObjectItemDto> visitObject;

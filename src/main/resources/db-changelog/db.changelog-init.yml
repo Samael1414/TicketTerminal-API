@@ -984,3 +984,206 @@ databaseChangeLog:
                   type: timestamp
                   constraints:
                     nullable: false
+  - changeSet:
+      id: rename-created-at-to-created
+      author: yourname
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        columnExists:
+          tableName: orders
+          columnName: created_at
+      changes:
+        - renameColumn:
+            tableName: orders
+            oldColumnName: created_at
+            newColumnName: created
+            columnDataType: timestamp
+  - changeSet:
+      id: add-updated-column-orders
+      author: yourname
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          columnExists:
+            tableName: orders
+            columnName: updated
+      changes:
+        - addColumn:
+            tableName: orders
+            columns:
+              - column:
+                  name: updated
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+  - changeSet:
+      id: add-data-column-to-orders
+      author: terminal
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            columnExists:
+              tableName: orders
+              columnName: data
+      changes:
+        - addColumn:
+            tableName: orders
+            columns:
+              - column:
+                  name: data
+                  type: bytea
+  - changeSet:
+      id: add-order-id-and-status-to-orders
+      author: yourname
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            columnExists:
+              tableName: orders
+              columnName: order_id
+        - not:
+            columnExists:
+              tableName: orders
+              columnName: order_status
+      changes:
+        - addColumn:
+            tableName: orders
+            columns:
+              - column:
+                  name: order_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_status
+                  type: varchar(255)
+  - changeSet:
+      id: create-sold-service-visit-object-table
+      author: code-copilot
+      failOnError: false
+      onFail: MARK_RAN
+      changes:
+        - createTable:
+            tableName: sold_service_visit_object
+            columns:
+              - column:
+                  name: sold_service_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: visit_object_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - addPrimaryKey:
+            columnNames: sold_service_id, visit_object_id
+            tableName: sold_service_visit_object
+            constraintName: pk_sold_service_visit_object
+        - addForeignKeyConstraint:
+            baseTableName: sold_service_visit_object
+            baseColumnNames: sold_service_id
+            constraintName: fk_ssvo_sold_service
+            referencedTableName: sold_services
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: sold_service_visit_object
+            baseColumnNames: visit_object_id
+            constraintName: fk_ssvo_visit_object
+            referencedTableName: visit_objects
+            referencedColumnNames: id
+  - changeSet:
+      id: alter-services-cost-to-double
+      author: code-copilot
+      changes:
+        - modifyDataType:
+            tableName: services
+            columnName: cost
+            newDataType: double precision
+
+  - changeSet:
+      id: alter-orders-cost-to-double
+      author: code-copilot
+      changes:
+        - modifyDataType:
+            tableName: orders
+            columnName: cost
+            newDataType: double precision
+
+  - changeSet:
+      id: alter-order-services-cost-to-double
+      author: code-copilot
+      changes:
+        - modifyDataType:
+            tableName: order_services
+            columnName: cost
+            newDataType: double precision
+
+  - changeSet:
+      id: alter-prices-cost-to-double
+      author: code-copilot
+      changes:
+        - modifyDataType:
+            tableName: prices
+            columnName: cost
+            newDataType: double precision
+
+  - changeSet:
+      id: alter-payments-amount-to-double
+      author: code-copilot
+      changes:
+        - modifyDataType:
+            tableName: payments
+            columnName: amount
+            newDataType: double precision
+
+  - changeSet:
+      id: add-service-cost-and-count-to-sold-services
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            columnExists:
+              tableName: sold_services
+              columnName: service_cost
+        - not:
+            columnExists:
+              tableName: sold_services
+              columnName: service_count
+      changes:
+        - addColumn:
+            tableName: sold_services
+            columns:
+              - column:
+                  name: service_cost
+                  type: double precision
+                  constraints:
+                    nullable: true
+              - column:
+                  name: service_count
+                  type: integer
+                  constraints:
+                    nullable: true
+        - update:
+            tableName: sold_services
+            columns:
+              - column:
+                  name: service_cost
+                  valueNumeric: 0
+              - column:
+                  name: service_count
+                  valueNumeric: 0
+        - addNotNullConstraint:
+            tableName: sold_services
+            columnName: service_cost
+            columnDataType: double precision
+        - addNotNullConstraint:
+            tableName: sold_services
+            columnName: service_count
+            columnDataType: integer
+
+

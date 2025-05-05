@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SecurityScheme(
 		name = "basicAuth",
@@ -16,8 +17,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @OpenAPIDefinition(
 		security = {@SecurityRequirement(name = "basicAuth")}
 )
-@EnableFeignClients
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.ticket.terminal")
+@EnableJpaAuditing
+@EnableFeignClients(basePackages = "com.ticket.terminal")
 public class TicketTerminalApiApplication {
 
 	public static void main(String[] args) {

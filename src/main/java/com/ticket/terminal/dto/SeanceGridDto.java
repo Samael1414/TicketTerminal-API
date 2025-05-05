@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 import java.time.LocalTime;
+import java.util.List;
+
 /*
 Сетка времени для SimpleServiceDto
  */
@@ -19,9 +21,11 @@ import java.time.LocalTime;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SeanceGridDto {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private LocalTime dtBegin;
+    @JsonFormat(pattern = "HH:mm")
+    @JsonProperty("dtBegin")
+    private String dtBegin;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private LocalTime dtEnd;
+    @JsonFormat(pattern = "HH:mm")
+    @JsonProperty("dtEnd")
+    private String dtEnd;
 }

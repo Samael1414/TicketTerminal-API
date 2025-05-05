@@ -17,7 +17,7 @@ public class SoldOrderRequestDto {
     private Integer isSimpleMode;
 
     @JsonProperty("IsOnlyCheck")
-    private Integer isOnlyCheck;
+    private Boolean isOnlyCheck;
 
     @JsonProperty("OrderId")
     private Long orderId;
@@ -65,7 +65,7 @@ public class SoldOrderRequestDto {
     private String comment;
 
     @JsonProperty("Cost")
-    private Integer cost;
+    private Double cost;
 
     @JsonProperty("Service")
     private List<SoldServiceDto> service;
