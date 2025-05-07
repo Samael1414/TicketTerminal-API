@@ -102,24 +102,21 @@ public class ServiceService {
                 List<PriceDto> prices = priceMapper.toDtoList(priceRepository.findAllByServiceId(service.getId()));
                 dto.setPrices(prices);
 
-                List<CategoryVisitorDto> categoriesForService = allCategories.stream()
-                        .map(cat -> {
-                            Integer matchedCount = prices.stream()
-                                    .filter(p -> p.getCategoryVisitorId().equals(cat.getCategoryVisitorId()))
-                                    .findFirst()
-                                    .map(PriceDto::getVisitorCount) // добавь в PriceDto поле visitorCount, если ещё не было
-                                    .orElse(null);
+                Set<Long> categoryIdsInPrice = prices.stream()
+                        .map(PriceDto::getCategoryVisitorId)
+                        .collect(Collectors.toSet());
 
-                            CategoryVisitorDto c = new CategoryVisitorDto();
-                            c.setCategoryVisitorId(cat.getCategoryVisitorId());
-                            c.setCategoryVisitorName(cat.getCategoryVisitorName());
-                            c.setGroupCategoryVisitorId(cat.getGroupCategoryVisitorId());
-                            c.setRequireVisitorCount(matchedCount);
-                            return c;
-                        })
+                List<CategoryVisitorDto> categoriesForService = allCategories.stream()
+                        .map(cat -> CategoryVisitorDto.builder()
+                                .categoryVisitorId(cat.getCategoryVisitorId())
+                                .categoryVisitorName(cat.getCategoryVisitorName())
+                                .groupCategoryVisitorId(cat.getGroupCategoryVisitorId())
+                                .requireVisitorCount(categoryIdsInPrice.contains(cat.getCategoryVisitorId()) ? 0 : null)
+                                .build())
                         .toList();
 
                 dto.setCategoryVisitor(categoriesForService);
+
                 dto.setSeanceGrid(allSeanceGrid);
                 return dto;
             }).toList();

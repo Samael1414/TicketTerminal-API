@@ -23,9 +23,9 @@ application:
     - "tauri://localhost"
   clients:
     tonline-gate:
-      url:      http://localhost:8181
-      login:    Admin
-      password:
+      url: http://94.141.254.16:7474
+      login:  KirillTest
+      password: "123"
 logging:
   level:
     com.ticket.terminal.client.MuseumClient: DEBUG
@@ -33,5 +33,6 @@ logging:
     feign: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.ticket.terminal: DEBUG
 
 

@@ -19,6 +19,7 @@ DTO для категорий посетителей (CategoryVisitorDto)
 GET /REST/Service/Editable
  */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)

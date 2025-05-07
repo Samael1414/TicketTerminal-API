@@ -41,7 +41,7 @@ public class OrderServiceDto {
     private String serviceStateName;
 
     @JsonProperty("ServiceId")
-    private Integer serviceId;
+    private Long serviceId;
 
     @JsonProperty("ServiceName")
     private String serviceName;

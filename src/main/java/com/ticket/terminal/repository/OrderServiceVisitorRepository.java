@@ -11,9 +11,13 @@ import java.util.List;
 @Repository
 public interface OrderServiceVisitorRepository extends JpaRepository<OrderServiceVisitorEntity, Long> {
 
-    void deleteByOrderServiceIdIn(List<Long> orderServiceIds);
+    @Modifying
+    @Query("DELETE FROM OrderServiceVisitorEntity v WHERE v.orderService.id IN :ids")
+    void deleteByOrderServiceIdIn(@Param("ids") List<Long> ids);
 
-    List<OrderServiceVisitorEntity> findByOrderServiceId(Long orderServiceId);
+    @Query("SELECT v FROM OrderServiceVisitorEntity v WHERE v.orderService.id = :orderServiceId")
+    List<OrderServiceVisitorEntity> findByOrderServiceId(@Param("orderServiceId") Long orderServiceId);
+
 
     @Modifying
     @Query(value = "INSERT INTO order_service_visitor (order_service_id, category_visitor_id, visitor_count) VALUES (:orderServiceId, :categoryVisitorId, :visitorCount)", nativeQuery = true)

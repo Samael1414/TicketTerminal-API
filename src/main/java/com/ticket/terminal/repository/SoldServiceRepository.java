@@ -30,9 +30,12 @@ public interface SoldServiceRepository extends JpaRepository<SoldServiceEntity, 
     @Query("""
     SELECT s FROM SoldServiceEntity s
     LEFT JOIN FETCH s.visitObject
+    LEFT JOIN FETCH s.orderService os
+    LEFT JOIN FETCH os.service
     WHERE s.orderServiceId IN :orderServiceIds
 """)
     List<SoldServiceEntity> findAllWithVisitObjects(@Param("orderServiceIds") List<Long> orderServiceIds);
+
 
 
 

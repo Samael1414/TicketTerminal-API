@@ -1060,8 +1060,11 @@ databaseChangeLog:
   - changeSet:
       id: create-sold-service-visit-object-table
       author: code-copilot
-      failOnError: false
-      onFail: MARK_RAN
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+           - tableExists:
+              tableName: sold_service_visit_object
       changes:
         - createTable:
             tableName: sold_service_visit_object
@@ -1096,6 +1099,8 @@ databaseChangeLog:
             constraintName: fk_ssvo_visit_object
             referencedTableName: visit_objects
             referencedColumnNames: id
+
+
   - changeSet:
       id: alter-services-cost-to-double
       author: code-copilot
@@ -1185,5 +1190,34 @@ databaseChangeLog:
             tableName: sold_services
             columnName: service_count
             columnDataType: integer
+  - changeSet:
+      id: add-service-id-to-sold-services
+      author: m_chelyshev
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          columnExists:
+            tableName: sold_services
+            columnName: service_id
+      changes:
+        - addColumn:
+            tableName: sold_services
+            columns:
+              - column:
+                  name: service_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+        - update:
+            tableName: sold_services
+            columns:
+              - column:
+                  name: service_id
+                  valueNumeric: 0
+        - addNotNullConstraint:
+            tableName: sold_services
+            columnName: service_id
+            columnDataType: bigint
+
 
 

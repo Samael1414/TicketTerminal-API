@@ -38,6 +38,7 @@ public class SoldOrderService {
     private final VisitObjectRepository visitObjectRepository;
     private final OrderServiceRepository orderServiceRepository;
     private final OrderServiceVisitorRepository orderServiceVisitorRepository;
+    private final SoldRequestEnricherService soldRequestEnricherService;
 
     @Transactional
     public SoldOrderResponseDto processSoldOrder(SoldOrderRequestDto dto) {
@@ -58,16 +59,20 @@ public class SoldOrderService {
 
     private SoldOrderResponseDto confirmOrderPayment(SoldOrderRequestDto dto) {
         log.debug(">>> confirmOrderPayment()");
-        logVal("requestDto", dto);
+        log.debug("raw dto            -> {}", dto);
+
         if (dto.getOrderId() == null || dto.getService().isEmpty()) {
             throw new InvalidOrderRequestException("Список услуг не должен быть пустым");
         }
+        log.debug("before enrich      -> {}", dto.getService());
+        soldRequestEnricherService.enrich(dto);
+        log.debug("after  enrich      -> {}", dto.getService());
 
         List<Long> orderServiceIds = dto.getService().stream()
                 .map(SoldServiceDto::getOrderServiceId)
                 .filter(Objects::nonNull)
                 .toList();
-        logVal("orderServiceIds", orderServiceIds);
+
 
         if (orderServiceIds.isEmpty()) {
             throw new InvalidOrderRequestException("Список orderServiceId не должен быть пустым");
@@ -75,42 +80,29 @@ public class SoldOrderService {
 
         soldServiceRepository.deleteByOrderServiceIds(orderServiceIds);
 
-        List<SoldServiceEntity> soldServices = dto.getService().stream().map(serviceDto -> {
+        List<SoldServiceEntity> soldServices = dto.getService()
+                .stream()
+                .peek(s -> {
+                    if (s.getServiceId() == null) {
+                        log.warn("!!! ServiceId is STILL NULL for OrderServiceId={}", s.getOrderServiceId());
+                    }
+                })
+                .map(serviceDto -> {
             Long orderServiceId = serviceDto.getOrderServiceId();
-            logVal("processing orderServiceId", orderServiceId);
+
             if (orderServiceId == null) {
                 throw new InvalidOrderRequestException("OrderServiceId не может быть null");
             }
 
-            var orderService = orderServiceRepository.findById(orderServiceId)
+            var orderService = orderServiceRepository.findWithServiceById(orderServiceId)
                     .orElseThrow(() -> new EntityNotFoundException("OrderService не найден: " + orderServiceId));
 
-            if (serviceDto.getServiceId() == null) {
+            List<Long> visitObjectIds = visitObjectRepository.findByOrderServiceId(orderServiceId).stream()
+                    .map(VisitObjectEntity::getId)
+                    .toList();
+            serviceDto.setVisitObjectId(visitObjectIds);
+            if (serviceDto.getServiceId() == null && orderService.getService() != null) {
                 serviceDto.setServiceId(orderService.getService().getId());
-            }
-            if (serviceDto.getServiceCost() == null) {
-                serviceDto.setServiceCost(orderService.getCost());
-            }
-            if (serviceDto.getServiceCount() == null) {
-                serviceDto.setServiceCount(orderService.getServiceCount());
-            }
-            if (serviceDto.getDtVisit() == null) {
-                serviceDto.setDtVisit(orderService.getDtVisit());
-            }
-
-            List<Long> visitObjectIds = serviceDto.getVisitObjectId();
-            if (visitObjectIds == null || visitObjectIds.isEmpty()) {
-                visitObjectIds = visitObjectRepository.findByOrderServiceId(orderServiceId).stream()
-                        .map(VisitObjectEntity::getId)
-                        .collect(Collectors.toList());
-                serviceDto.setVisitObjectId(visitObjectIds);
-                serviceDto.setVisitObject(visitObjectIds);
-                logVal("visitObjIds", visitObjectIds);
-            }
-
-            if (serviceDto.getServiceCost() == null || serviceDto.getServiceCount() == null) {
-                throw new IllegalStateException(
-                        "ServiceCost или ServiceCount остались null для orderServiceId " + orderServiceId);
             }
 
             if (serviceDto.getCategoryVisitor() != null) {
@@ -126,7 +118,7 @@ public class SoldOrderService {
             List<VisitObjectEntity> visitObjects = visitObjectIds.stream()
                     .map(id -> visitObjectRepository.findById(id)
                             .orElseThrow(() -> new EntityNotFoundException("VisitObject не найден: " + id)))
-                    .collect(Collectors.toList());
+                    .toList();
 
             return SoldServiceEntity.builder()
                     .orderServiceId(orderServiceId)
@@ -138,25 +130,31 @@ public class SoldOrderService {
                     .visitObject(visitObjects)
                     .serviceCost(serviceDto.getServiceCost())
                     .serviceCount(serviceDto.getServiceCount())
+                    .serviceId(serviceDto.getServiceId())
                     .build();
         }).toList();
-        logVal("soldServices.size", soldServices.size());
 
         soldServiceRepository.saveAll(soldServices);
         soldServiceRepository.flush();
 
         List<SoldServiceEntity> enrichedServices = soldServiceRepository.findAllWithVisitObjects(orderServiceIds);
 
-        List<SoldServiceDto> serviceDtos = enrichedServices.stream().map(entity -> {
-            SoldServiceDto dtoItem = soldServiceMapper.toDto(entity);
-            List<CategoryVisitorCountDto> visitorList = orderServiceVisitorRepository.findByOrderServiceId(entity.getOrderServiceId())
-                    .stream()
-                    .map(v -> new CategoryVisitorCountDto(v.getCategoryVisitor().getId(), v.getVisitorCount()))
-                    .collect(Collectors.toList());
-            dtoItem.setVisitor(visitorList);
-            return dtoItem;
-        }).toList();
-        logVal("serviceDtos.size", serviceDtos.size());
+        List<SoldServiceDto> serviceDtos = enrichedServices.stream()
+                .map(soldServiceMapper::toDto)   // каждый элемент отдельно
+                .peek(dtoItem -> {
+                    List<CategoryVisitorCountDto> visitorList =
+                            orderServiceVisitorRepository.findByOrderServiceId(dtoItem.getOrderServiceId())
+                                    .stream()
+                                    .map(v -> new CategoryVisitorCountDto(
+                                            v.getCategoryVisitor().getId(),
+                                            v.getVisitorCount()))
+                                    .toList();
+                    dtoItem.setVisitor(visitorList);
+                })
+                .toList();
+
+
+
 
         orderRepository.updateOrderState(dto.getOrderId(), STATUS_PAID);
 
@@ -169,7 +167,7 @@ public class SoldOrderService {
                 .actorName(currentUser.getUserName())
                 .build());
 
-        SoldOrderResponseDto response = SoldOrderResponseDto.builder()
+        return SoldOrderResponseDto.builder()
                 .orderId(dto.getOrderId())
                 .orderStateId(STATUS_PAID)
                 .orderBarcode(BarcodeGeneratorUtil.generateSoldServiceBarcode(dto.getOrderId()))
@@ -186,13 +184,11 @@ public class SoldOrderService {
                 .visitorDocumentSerial(dto.getVisitorDocumentSerial())
                 .visitorDocumentNumber(dto.getVisitorDocumentNumber())
                 .service(serviceDtos)
-                .visitObject(dto.getService().stream()
+                .visitObject(serviceDtos.stream()
                         .flatMap(s -> s.getVisitObjectId() == null ? Stream.empty() : s.getVisitObjectId().stream())
                         .distinct()
                         .toList())
                 .build();
-        logVal("SoldOrderResponseDto (out)", response);
-        return response;
     }
 
     private LocalDateTime getEndOfDay() {
@@ -206,10 +202,5 @@ public class SoldOrderService {
                 .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
 
-    private static <T> void logVal(String name, T value) {
-        log.debug("{} -> type: {}, value: {}", name,
-                value == null ? "null" : value.getClass().getName(),
-                value);
-    }
 
 }

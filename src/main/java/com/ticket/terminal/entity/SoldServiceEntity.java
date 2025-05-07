@@ -52,4 +52,8 @@ public class SoldServiceEntity {
     )
     private OrderServiceEntity orderService;
 
+    @Column(name = "service_id", nullable = false)
+    private Long serviceId;
+
+
 }
