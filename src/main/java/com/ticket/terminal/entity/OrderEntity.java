@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -82,11 +81,11 @@ public class OrderEntity {
      * Данные посетителя (имя, телефон, email).
      * Тип: String (строка), может быть null.
      */
-    private String visitorName1; // Первое имя посетителя
-    private String visitorName2; // Второе имя (если есть)
-    private String visitorName3; // Третье имя (если есть)
-    private String visitorPhone; // Телефон
-    private String visitorMail;  // Email
+    private String visitorName1;
+    private String visitorName2;
+    private String visitorName3;
+    private String visitorPhone;
+    private String visitorMail;
 
         /**
      * Дата и время создания заказа.
@@ -128,15 +127,15 @@ public class OrderEntity {
      * Типы: String для текстовых данных, Double для стоимости, LocalDateTime для даты.
      * Все поля могут быть null, если не заполнены.
      */
-    private String visitorAddress;        // Адрес посетителя
-    private String visitorDocumentName;   // Название документа
-    private String visitorDocumentSerial; // Серия документа
-    private String visitorDocumentNumber; // Номер документа
-    private String orderSiteId;           // ID заказа на сайте
-    private String visitorSiteId;         // ID посетителя на сайте
-    private String comment;               // Комментарий к заказу
-    private Double cost;                  // Стоимость заказа
-    private LocalDateTime dtDrop;         // Дата "сброса"/отмены/завершения заказа
+    private String visitorAddress;
+    private String visitorDocumentName;
+    private String visitorDocumentSerial;
+    private String visitorDocumentNumber;
+    private String orderSiteId;
+    private String visitorSiteId;
+    private String comment;
+    private Double cost;
+    private LocalDateTime dtDrop;
 
         /**
      * Внутренний идентификатор заказа (например, для интеграции с внешними системами).

@@ -22,9 +22,6 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 """)
     List<OrderEntity> findOrdersByDtVisitBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-
-
-
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE OrderEntity o SET o.orderStateId = :stateId WHERE o.id = :orderId")
     void updateOrderState(@Param("orderId") Long orderId, @Param("stateId") Integer stateId);
@@ -32,8 +29,8 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     @NonNull
     @Override
     @EntityGraph(attributePaths = {
-            "service",              // List<OrderServiceEntity>
-            "service.service"       // OrderServiceEntity.service (=> ServiceEntity)
+            "service",
+            "service.service"
     })
     Optional<OrderEntity> findById(@NonNull Long id);
 

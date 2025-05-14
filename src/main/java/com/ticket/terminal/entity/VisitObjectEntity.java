@@ -22,4 +22,13 @@ public class VisitObjectEntity {
 
     @Column(name = "is_required")
     private Boolean isRequire;
+
+    @Column(name = "category_visitor_id")
+    private Integer categoryVisitorId;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "comment")
+    private String comment;
 }

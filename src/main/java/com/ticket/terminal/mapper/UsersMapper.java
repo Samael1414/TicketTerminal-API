@@ -5,7 +5,6 @@ import com.ticket.terminal.dto.UsersResponseDto;
 import com.ticket.terminal.entity.UsersEntity;
 import org.mapstruct.Mapper;
 
-
 @Mapper(componentModel = "spring")
 public interface UsersMapper {
 

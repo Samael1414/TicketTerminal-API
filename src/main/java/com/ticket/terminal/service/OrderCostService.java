@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -92,8 +91,8 @@ public class OrderCostService {
 
     private UsersEntity getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        return userRepository.findByUserNameIgnoreCase(username)
+        String userName = auth.getName();
+        return userRepository.findByUserNameIgnoreCase(userName)
                 .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
 }

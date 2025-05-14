@@ -21,11 +21,10 @@ import com.ticket.terminal.service.ServiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,8 +59,33 @@ public class ServiceController {
         return ResponseEntity.ok(serviceService.getEditableServices());
     }
 
-//    @GetMapping("/Full")
-//    public ResponseEntity<TLMuseumServiceResponseDto> getFullMuseumServiceResponse() {
-//        return ResponseEntity.ok(serviceService.getFullMuseumServiceResponse());
-//    }
+    @Operation(summary = "Создать новую услугу")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Услуга успешно создана"),
+            @ApiResponse(responseCode = "400", description = "Некорректный запрос"),
+            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+    })
+
+    @PostMapping("/Create")
+    public ResponseEntity<Void> createService(@Valid @RequestBody ServiceCreateDto dto) {
+        serviceService.createService(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Обновить услугу по ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Услуга успешно обновлена"),
+            @ApiResponse(responseCode = "404", description = "Услуга не найдена"),
+            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+    })
+    @PutMapping("/Update/{id}")
+    public ResponseEntity<Void> updateService(
+            @PathVariable Long id,
+            @Valid @RequestBody ServiceUpdateDto dto) {
+        serviceService.updateService(id, dto);
+        return ResponseEntity.ok().build();
+    }
+
+
+
 }

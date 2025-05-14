@@ -1,6 +1,5 @@
 package com.ticket.terminal.service;
 
-
 import com.ticket.terminal.dto.GateInfoDto;
 import com.ticket.terminal.dto.RequisiteInfoDto;
 import com.ticket.terminal.dto.SystemInfoDto;
@@ -16,7 +15,6 @@ import com.ticket.terminal.repository.RequisiteInfoRepository;
 import com.ticket.terminal.repository.SystemInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Stream;
 

@@ -9,13 +9,10 @@ import com.ticket.terminal.repository.OrderServiceVisitorRepository;
 import com.ticket.terminal.repository.VisitObjectRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class SoldRequestEnricherService {
 
@@ -26,53 +23,51 @@ public class SoldRequestEnricherService {
     /**
      * Заполняет ServiceId, Cost, Count, VisitObjectId, CategoryVisitor, DtVisit.
      */
-    public void enrich(SoldOrderRequestDto req) {
+    public void enrich(SoldOrderRequestDto requestDto) {
 
-        req.getService().forEach(it -> {
-            Long osId = it.getOrderServiceId();
-            log.debug("enrich [{}] before -> {}", osId, it);
-            if (osId == null) {
+        requestDto.getService().forEach(dto -> {
+            Long serviceId = dto.getOrderServiceId();
+            if (serviceId == null) {
                 throw new IllegalArgumentException("OrderServiceId is null");
             }
 
-            OrderServiceEntity os = orderServiceRepository
-                    .findWithServiceById(osId)
+            OrderServiceEntity serviceEntity = orderServiceRepository
+                    .findWithServiceById(serviceId)
                     .orElseThrow(() ->
-                            new EntityNotFoundException("OrderService not found " + osId));
+                            new EntityNotFoundException("OrderService not found " + serviceId));
 
             // 1. ServiceId
-            if (it.getServiceId() == null) {
-                it.setServiceId(os.getService().getId());
+            if (dto.getServiceId() == null) {
+                dto.setServiceId(serviceEntity.getService().getId());
             }
 
             // 2. Cost / Count
-            if (it.getServiceCost()  == null) it.setServiceCost(os.getCost());
-            if (it.getServiceCount() == null) it.setServiceCount(os.getServiceCount());
+            if (dto.getServiceCost()  == null) dto.setServiceCost(serviceEntity.getCost());
+            if (dto.getServiceCount() == null) dto.setServiceCount(serviceEntity.getServiceCount());
 
             // 3. DtVisit
-            if (it.getDtVisit() == null) it.setDtVisit(os.getDtVisit());
+            if (dto.getDtVisit() == null) dto.setDtVisit(serviceEntity.getDtVisit());
 
             // 4. VisitObjectId
-            if (it.getVisitObjectId() == null || it.getVisitObjectId().isEmpty()) {
-                List<Long> voIds = visitObjectRepository
-                        .findByOrderServiceId(osId)
+            if (dto.getVisitObjectId() == null || dto.getVisitObjectId().isEmpty()) {
+                List<Long> visitObjectIds = visitObjectRepository
+                        .findByOrderServiceId(serviceId)
                         .stream()
                         .map(VisitObjectEntity::getId)
                         .toList();
-                it.setVisitObjectId(voIds);
+                dto.setVisitObjectId(visitObjectIds);
             }
 
             // 5. CategoryVisitor
-            if (it.getCategoryVisitor() == null || it.getCategoryVisitor().isEmpty()) {
+            if (dto.getCategoryVisitor() == null || dto.getCategoryVisitor().isEmpty()) {
                 var visitors = orderServiceVisitorRepository
-                        .findByOrderServiceId(osId)
+                        .findByOrderServiceId(serviceId)
                         .stream()
-                        .map(v -> new CategoryVisitorCountDto(
-                                v.getCategoryVisitor().getId(),
-                                v.getVisitorCount()))
+                        .map(visitor -> new CategoryVisitorCountDto(
+                                visitor.getCategoryVisitor().getId(),
+                                visitor.getVisitorCount()))
                         .toList();
-                it.setCategoryVisitor(visitors);
-                log.debug("enrich [{}] after  -> {}", osId, it);
+                dto.setCategoryVisitor(visitors);
             }
         });
     }

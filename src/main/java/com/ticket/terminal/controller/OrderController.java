@@ -23,21 +23,25 @@ import com.ticket.terminal.dto.*;
 import com.ticket.terminal.service.OrderCostService;
 import com.ticket.terminal.service.OrderService;
 import com.ticket.terminal.service.SoldOrderService;
+import com.ticket.terminal.service.SoldRequestEnricherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("Order")
 @RequiredArgsConstructor
+@Slf4j
 public class OrderController {
 
     private final OrderService orderService;
     private final OrderCostService orderCostService;
     private final SoldOrderService soldOrderService;
+    private final SoldRequestEnricherService soldRequestEnricherService;
 
 
     @Operation(summary = "Получение заказа по ID")
@@ -82,7 +86,6 @@ public class OrderController {
     })
     @PostMapping("/Create")
     public ResponseEntity<OrderCreateResponseDto> createSimpleOrder(@RequestBody SimpleOrderRequestDto requestDto) {
-        System.out.println(this.getClass());
         return ResponseEntity.ok(orderService.createSimpleOrder(requestDto));
     }
 
@@ -140,6 +143,7 @@ public class OrderController {
     })
     @PostMapping("/Sold")
     public ResponseEntity<SoldOrderResponseDto> processSoldOrder(@RequestBody SoldOrderRequestDto dto) {
+        soldRequestEnricherService.enrich(dto);
         return ResponseEntity.ok(soldOrderService.processSoldOrder(dto));
     }
 

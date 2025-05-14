@@ -9,17 +9,11 @@
  * - id услуги, параметры редактирования, стоимость, ограничения и др.
  */
 package com.ticket.terminal.dto;
-/*
-# Получение списка редактируемых услуг, доступных для продажи
----
-## GET /REST/Service/Editable
 
- */
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 

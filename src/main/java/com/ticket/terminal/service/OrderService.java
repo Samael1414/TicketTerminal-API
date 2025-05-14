@@ -12,12 +12,10 @@ import com.ticket.terminal.repository.*;
 import com.ticket.terminal.util.BarcodeGeneratorUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,7 +23,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class OrderService {
 
@@ -63,27 +60,21 @@ public class OrderService {
 
     @Transactional
     public OrderCreateResponseDto createSimpleOrder(SimpleOrderRequestDto requestDto) {
-        log.debug(">>> createSimpleOrder()");
-        logVal("requestDto", requestDto);
         OrderEntity orderEntity = orderMapper.toEntity(requestDto);
         OrderEntityUtil.initialize(orderEntity);
 
         if (orderEntity.getOrderId() == null) {
             orderEntity.setOrderId(generateUniqueOrderId());
-            logVal("generated orderId", orderEntity.getOrderId());
         }
 
         if (orderEntity.getOrderBarcode() == null || orderEntity.getOrderBarcode().isEmpty()) {
             orderEntity.setOrderBarcode(BarcodeGeneratorUtil.generateUniqueOrderBarcode(orderRepository));
-            logVal("generated barcode", orderEntity.getOrderBarcode());
         }
 
         List<OrderServiceEntity> orderServiceEntities = buildOrderServices(requestDto, orderEntity);
         orderEntity.setService(orderServiceEntities);
-        logVal("orderServiceEntities.size", orderServiceEntities.size());
 
         OrderEntity savedOrder = orderRepository.save(orderEntity);
-        logVal("savedOrder.id", savedOrder.getId());
 
         for (int i = 0; i < orderServiceEntities.size(); i++) {
             OrderServiceEntity orderServiceEntity = orderServiceEntities.get(i);
@@ -94,27 +85,27 @@ public class OrderService {
                     VisitObjectEntity visitObject = visitObjectRepository.findById(visitObjects)
                             .orElseThrow(() -> new EntityNotFoundException("VisitObject не найден: " + visitObjects));
 
-                    OrderServiceVisitObjectEntity osv = OrderServiceVisitObjectEntity.builder()
+                    OrderServiceVisitObjectEntity objectEntity = OrderServiceVisitObjectEntity.builder()
                             .orderService(orderServiceEntity)
                             .visitObject(visitObject)
                             .build();
 
-                    orderServiceVisitObjectRepository.save(osv);
+                    orderServiceVisitObjectRepository.save(objectEntity);
                 }
             }
 
             if (serviceDto.getCategoryVisitor() != null) {
-                for (CategoryVisitorCountDto catDto : serviceDto.getCategoryVisitor()) {
-                    CategoryVisitorEntity catEntity = categoryVisitorRepository.findById(catDto.getCategoryVisitorId())
-                            .orElseThrow(() -> new EntityNotFoundException("CategoryVisitor не найден: " + catDto.getCategoryVisitorId()));
+                for (CategoryVisitorCountDto visitorCountDto : serviceDto.getCategoryVisitor()) {
+                    CategoryVisitorEntity entity = categoryVisitorRepository.findById(visitorCountDto.getCategoryVisitorId())
+                            .orElseThrow(() -> new EntityNotFoundException("CategoryVisitor не найден: " + visitorCountDto.getCategoryVisitorId()));
 
-                    OrderServiceVisitorEntity osv = OrderServiceVisitorEntity.builder()
+                    OrderServiceVisitorEntity visitorEntity = OrderServiceVisitorEntity.builder()
                             .orderService(orderServiceEntity)
-                            .categoryVisitor(catEntity)
-                            .visitorCount(catDto.getVisitorCount())
+                            .categoryVisitor(entity)
+                            .visitorCount(visitorCountDto.getVisitorCount())
                             .build();
 
-                    orderServiceVisitorRepository.save(osv);
+                    orderServiceVisitorRepository.save(visitorEntity);
                 }
             }
         }
@@ -140,7 +131,6 @@ public class OrderService {
 
             return dto;
         }).toList();
-        logVal("soldServices.size", soldServices.size());
 
         SoldOrderRequestDto soldRequest = new SoldOrderRequestDto();
         soldRequest.setOrderId(savedOrder.getId());
@@ -157,19 +147,13 @@ public class OrderService {
 
         OrderCreateResponseDto response = orderMapper.toResponseDto(savedOrder);
         response.setSoldRequest(soldRequest);
-        logVal("OrderCreateResponseDto (out)", response);
         return response;
     }
 
 
     private List<OrderServiceEntity> buildOrderServices(SimpleOrderRequestDto dto, OrderEntity order) {
-        log.debug("--- buildOrderServices() ---");
-        logVal("dto.service.size", dto.getService().size());
         return dto.getService().stream()
                 .map(serviceDto -> {
-                    logVal("serviceDto.serviceId", serviceDto.getServiceId());
-                    logVal("serviceDto.dtVisit",    serviceDto.getDtVisit());
-                    logVal("serviceDto.visitObjectId", serviceDto.getVisitObjectId());
                     ServiceEntity service = serviceRepository.findById(serviceDto.getServiceId())
                             .orElseThrow(() -> new EntityNotFoundException
                                     (String.format("Service не найден: %s", serviceDto.getServiceId())));
@@ -203,27 +187,20 @@ public class OrderService {
 
     @Transactional
     public OrderCreateResponseDto createEditableOrder(EditableOrderRequestDto requestDto) {
-        log.debug(">>> createSimpleOrder()");
-        logVal("requestDto", requestDto);
         OrderEntity orderEntity = orderMapper.toEntity(requestDto);
         OrderEntityUtil.initialize(orderEntity);
 
-        logVal("generated orderEntity.orderId", orderEntity.getOrderId());
-
         if (orderEntity.getOrderId() == null) {
             orderEntity.setOrderId(generateUniqueOrderId());
-            logVal("generated orderId", orderEntity.getOrderId());
         }
 
         if (orderEntity.getOrderBarcode() == null || orderEntity.getOrderBarcode().isEmpty()) {
             orderEntity.setOrderBarcode(BarcodeGeneratorUtil.generateUniqueOrderBarcode(orderRepository));
-            logVal("generated barcode", orderEntity.getOrderBarcode());
         }
 
         List<OrderServiceEntity> orderServiceEntities = buildEditableOrderServices(requestDto, orderEntity);
         orderEntity.setService(orderServiceEntities);
 
-        logVal("orderServiceEntities.size", orderServiceEntities.size());
         if (orderRepository.existsByOrderBarcode(orderEntity.getOrderBarcode())) {
             throw new IllegalStateException("Штрихкод уже существует: " + orderEntity.getOrderBarcode());
         }
@@ -235,9 +212,9 @@ public class OrderService {
             EditableOrderServiceDto editableDto = requestDto.getService().get(i);
 
             if (editableDto.getVisitObjectId() != null) {
-                for (Long voId : editableDto.getVisitObjectId()) {
-                    VisitObjectEntity visitObject = visitObjectRepository.findById(voId)
-                            .orElseThrow(() -> new EntityNotFoundException("VisitObject не найден: " + voId));
+                for (Long visitObjectId : editableDto.getVisitObjectId()) {
+                    VisitObjectEntity visitObject = visitObjectRepository.findById(visitObjectId)
+                            .orElseThrow(() -> new EntityNotFoundException("VisitObject не найден: " + visitObjectId));
                     orderServiceVisitObjectRepository.save(OrderServiceVisitObjectEntity.builder()
                             .orderService(orderServiceEntity)
                             .visitObject(visitObject)
@@ -246,40 +223,39 @@ public class OrderService {
             }
 
             if (editableDto.getCategoryVisitor() != null) {
-                for (CategoryVisitorCountDto catDto : editableDto.getCategoryVisitor()) {
-                    CategoryVisitorEntity catEntity = categoryVisitorRepository.findById(catDto.getCategoryVisitorId())
-                            .orElseThrow(() -> new EntityNotFoundException("CategoryVisitor не найден: " + catDto.getCategoryVisitorId()));
+                for (CategoryVisitorCountDto countDto : editableDto.getCategoryVisitor()) {
+                    CategoryVisitorEntity entity = categoryVisitorRepository.findById(countDto.getCategoryVisitorId())
+                            .orElseThrow(() -> new EntityNotFoundException("CategoryVisitor не найден: " + countDto.getCategoryVisitorId()));
                     orderServiceVisitorRepository.save(OrderServiceVisitorEntity.builder()
                             .orderService(orderServiceEntity)
-                            .categoryVisitor(catEntity)
-                            .visitorCount(catDto.getVisitorCount())
+                            .categoryVisitor(entity)
+                            .visitorCount(countDto.getVisitorCount())
                             .build());
                 }
             }
         }
 
-        List<SoldServiceDto> soldServices = orderServiceEntities.stream().map(os -> {
+        List<SoldServiceDto> soldServices = orderServiceEntities.stream().map(orderService -> {
             SoldServiceDto dto = new SoldServiceDto();
-            dto.setOrderServiceId(os.getId());
-            dto.setServiceId(os.getService().getId());
-            dto.setServiceCost(os.getCost());
-            dto.setServiceCount(os.getServiceCount());
-            dto.setDtVisit(os.getDtVisit());
+            dto.setOrderServiceId(orderService.getId());
+            dto.setServiceId(orderService.getService().getId());
+            dto.setServiceCost(orderService.getCost());
+            dto.setServiceCount(orderService.getServiceCount());
+            dto.setDtVisit(orderService.getDtVisit());
 
-            List<Long> visitObjectIds = visitObjectRepository.findByOrderServiceId(os.getId())
+            List<Long> visitObjectIds = visitObjectRepository.findByOrderServiceId(orderService.getId())
                     .stream().map(VisitObjectEntity::getId).toList();
             dto.setVisitObjectId(visitObjectIds);
             dto.setVisitObject(visitObjectIds);
 
-            List<CategoryVisitorCountDto> visitors = orderServiceVisitorRepository.findByOrderServiceId(os.getId())
+            List<CategoryVisitorCountDto> visitors = orderServiceVisitorRepository.findByOrderServiceId(orderService.getId())
                     .stream()
-                    .map(v -> new CategoryVisitorCountDto(v.getCategoryVisitor().getId(), v.getVisitorCount()))
+                    .map(visitor -> new CategoryVisitorCountDto(visitor.getCategoryVisitor().getId(), visitor.getVisitorCount()))
                     .toList();
             dto.setCategoryVisitor(visitors);
 
             return dto;
         }).toList();
-        logVal("soldServices.size", soldServices.size());
 
         SoldOrderRequestDto soldRequest = new SoldOrderRequestDto();
         soldRequest.setOrderId(savedOrder.getId());
@@ -296,9 +272,7 @@ public class OrderService {
 
         OrderCreateResponseDto response = orderMapper.toResponseDto(savedOrder);
         response.setSoldRequest(soldRequest);
-        logVal("OrderCreateResponseDto (out)", response);
 
-        log.debug("Order {} persisted with barcode {}", savedOrder.getId(), savedOrder.getOrderBarcode());
         return response;
     }
 
@@ -307,13 +281,8 @@ public class OrderService {
 
 
     private List<OrderServiceEntity> buildEditableOrderServices(EditableOrderRequestDto dto, OrderEntity order) {
-        log.debug("--- buildEditableOrderServices()");
-        logVal("dto.service.size", dto.getService().size());
         return dto.getService().stream()
                 .map(editableDto -> {
-                    logVal("editableDto.serviceId", editableDto.getServiceId());
-                    logVal("editableDto.dtVisit",   editableDto.getDtVisit());
-                    logVal("editableDto.visitObjectId", editableDto.getVisitObjectId());
                     ServiceEntity service = serviceRepository.findById(editableDto.getServiceId())
                             .orElseThrow(() -> new EntityNotFoundException(
                                     String.format("Service не найден: %s", editableDto.getServiceId())));
@@ -348,7 +317,6 @@ public class OrderService {
 
     @Transactional
     public OrderDto cancelOrder(OrderCancelDto requestDto) {
-        // находим заказ
         Long orderId = requestDto.getOrderId();
 
         OrderEntity orderEntity = orderRepository.findById(orderId)
@@ -358,8 +326,6 @@ public class OrderService {
         List<Long> serviceId = requestDto.getOrderServiceId();
 
         if (serviceId == null || serviceId.isEmpty()) {
-            // полная отмена
-            // удаляем все услуги из order_services для данного заказа
             List<OrderServiceEntity> allServices = orderEntity.getService();
             List<Long> orderServiceIds = allServices.stream()
                     .map(OrderServiceEntity::getId)
@@ -369,15 +335,11 @@ public class OrderService {
             orderServiceRepository.deleteAll(allServices);
             orderEntity.getService().clear();
         } else {
-            // частичная отмена
-            // удаляем только те услуги, чьи ID есть в orderServiceId
             List<OrderServiceEntity> toRemove = orderEntity.getService().stream()
-                    .filter(os -> serviceId.contains(os.getId()))
+                    .filter(orderService -> serviceId.contains(orderService.getId()))
                     .toList();
 
             if (toRemove.isEmpty()) {
-                // ни одна услуга не совпала с тем, что прислали
-                //можно бросить исключение
                 throw new PartialCancellationException("Не найдено соответствующих услуг для частичной отмены");
             }
             List<Long> orderServiceIds = toRemove.stream()
@@ -409,7 +371,6 @@ public class OrderService {
     @Transactional
     public OrderDto refundOrder(OrderRefundDto dto) {
         Long orderId = dto.getOrderId();
-        // Получаем заказ по ID
         OrderEntity order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException
                         (String.format("Заказ не найден: %s", orderId)));
@@ -417,18 +378,15 @@ public class OrderService {
         List<Long> serviceIdsToRefund;
 
         if (dto.getServices() == null || dto.getServices().isEmpty()) {
-            // Полная отмена - соберем все orderServiceId заказа
             List<OrderServiceEntity> allServices = orderServiceRepository.findAllByOrderId(orderId);
             serviceIdsToRefund = allServices.stream()
                     .map(OrderServiceEntity::getId)
                     .toList();
         } else {
-            // частичная отмена - берем из запроса
             serviceIdsToRefund = dto.getServices().stream()
                     .map(OrderRefundServiceDto::getOrderServiceId)
                     .toList();
 
-            // Валидация: проверим, что все услуги принадлежат заказу
             List<Long> existingIds;
             try (Stream<OrderServiceEntity> stream = orderServiceRepository.findAllByOrderId(orderId).stream()) {
                 existingIds = stream.map(OrderServiceEntity::getId).toList();
@@ -441,18 +399,15 @@ public class OrderService {
             }
         }
 
-        // Если список на возврат пуст - ошибка
         if (serviceIdsToRefund.isEmpty()) {
             throw new EmptyRefundListException("Не найдено ни одной услуги для возврата");
         }
 
-        // Обновляем состояние проданных услуг
         soldServiceRepository.markAsRefunded(serviceIdsToRefund);
 
-        // Обновляем состояние услуг в самом заказе
         order.getService().stream()
-                .filter(s -> serviceIdsToRefund.contains(s.getId()))
-                .forEach(s -> s.setServiceStateId(ServiceState.RETURNED.getCode()));
+                .filter(service -> serviceIdsToRefund.contains(service.getId()))
+                .forEach(service -> service.setServiceStateId(ServiceState.RETURNED.getCode()));
 
         orderRepository.save(order);
 
@@ -465,26 +420,19 @@ public class OrderService {
                 .actorName(currentUser.getUserName())
                 .build());
 
-        // вернем заказ в текущем состоянии (уже с измененными услугами)
         return orderMapper.toDto(order);
     }
 
     private UsersEntity getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        return userRepository.findByUserNameIgnoreCase(username)
+        String userName = auth.getName();
+        return userRepository.findByUserNameIgnoreCase(userName)
                 .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
 
     private Integer generateUniqueOrderId() {
         Integer maxOrderId = orderRepository.findMaxOrderId();
         return maxOrderId + 1;
-    }
-
-    private static <T> void logVal(String name, T value) {
-        log.debug("{} -> type: {}, value: {}", name,
-                value == null ? "null" : value.getClass().getName(),
-                value);
     }
 
 

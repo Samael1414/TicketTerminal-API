@@ -15,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 
 @Service
@@ -72,8 +71,8 @@ public class ProCultureService {
 
     private UsersEntity getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        return userRepository.findByUserNameIgnoreCase(username)
+        String userName = auth.getName();
+        return userRepository.findByUserNameIgnoreCase(userName)
                 .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
 }

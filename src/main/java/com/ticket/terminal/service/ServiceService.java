@@ -8,7 +8,6 @@ import com.ticket.terminal.mapper.*;
 import com.ticket.terminal.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,12 +29,11 @@ public class ServiceService {
     private final CategoryVisitorRepository categoryVisitorRepository;
     private final PriceMapper priceMapper;
     private final PriceRepository priceRepository;
-//    private final MuseumServiceAssembler museumServiceAssembler;
 
     public SimpleServiceResponseDto getSimpleService() {
         List<SeanceGridDto> allSeanceGrid;
-        try (Stream<SeanceGridEntity> gridStream = seanceGridRepository.findAll().stream()){
-            allSeanceGrid = gridStream
+        try (Stream<SeanceGridEntity> stream = seanceGridRepository.findAll().stream()){
+            allSeanceGrid = stream
                     .map(seanceGridMapper::toDto)
                     .toList();
         }
@@ -58,22 +56,25 @@ public class ServiceService {
         List<VisitObjectItemDto> visitObjectItems = visitObjects.stream()
                 .map(item -> VisitObjectItemDto.builder()
                         .visitObjectId(item.getVisitObjectId())
+                        .categoryVisitorId(item.getCategoryVisitorId())
+                        .address(item.getAddress())
+                        .comment(item.getComment())
                         .visitObjectName(item.getVisitObjectName())
                         .build())
                 .toList();
 
         List<GroupVisitObjectDto> groupVisitObjects = visitObjects.stream()
-                .map(obj -> GroupVisitObjectDto.builder()
-                        .groupVisitObjectId(obj.getVisitObjectId())
-                        .groupVisitObjectName(obj.getVisitObjectName())
+                .map(objectDto -> GroupVisitObjectDto.builder()
+                        .groupVisitObjectId(objectDto.getVisitObjectId())
+                        .groupVisitObjectName(objectDto.getVisitObjectName())
                         .build())
                 .toList();
 
         List<CategoryVisitorDto> allCategories = categoryVisitorMapper.toDtoList(categoryVisitorRepository.findAll());
         List<GroupCategoryVisitorDto> groupCategoryVisitors = allCategories.stream()
-                .map(cat -> GroupCategoryVisitorDto.builder()
-                        .groupCategoryVisitorId(cat.getGroupCategoryVisitorId())
-                        .groupCategoryVisitorName(cat.getCategoryVisitorName())
+                .map(categoryVisitorDto -> GroupCategoryVisitorDto.builder()
+                        .groupCategoryVisitorId(categoryVisitorDto.getGroupCategoryVisitorId())
+                        .groupCategoryVisitorName(categoryVisitorDto.getCategoryVisitorName())
                         .build())
                 .toList();
 
@@ -90,11 +91,11 @@ public class ServiceService {
                         .collect(Collectors.toSet());
 
                 List<VisitObjectDto> objectsForService = visitObjects.stream()
-                        .map(vo -> VisitObjectDto.builder()
-                                .visitObjectId(vo.getVisitObjectId())
-                                .visitObjectName(vo.getVisitObjectName())
-                                .isRequire(allowedIds.contains(vo.getVisitObjectId()))
-                                .groupVisitObjectId(vo.getGroupVisitObjectId())
+                        .map(objectDto -> VisitObjectDto.builder()
+                                .visitObjectId(objectDto.getVisitObjectId())
+                                .visitObjectName(objectDto.getVisitObjectName())
+                                .isRequire(allowedIds.contains(objectDto.getVisitObjectId()))
+                                .groupVisitObjectId(objectDto.getGroupVisitObjectId())
                                 .build())
                         .toList();
                 dto.setVisitObjects(objectsForService);
@@ -107,11 +108,11 @@ public class ServiceService {
                         .collect(Collectors.toSet());
 
                 List<CategoryVisitorDto> categoriesForService = allCategories.stream()
-                        .map(cat -> CategoryVisitorDto.builder()
-                                .categoryVisitorId(cat.getCategoryVisitorId())
-                                .categoryVisitorName(cat.getCategoryVisitorName())
-                                .groupCategoryVisitorId(cat.getGroupCategoryVisitorId())
-                                .requireVisitorCount(categoryIdsInPrice.contains(cat.getCategoryVisitorId()) ? 0 : null)
+                        .map(visitorDto -> CategoryVisitorDto.builder()
+                                .categoryVisitorId(visitorDto.getCategoryVisitorId())
+                                .categoryVisitorName(visitorDto.getCategoryVisitorName())
+                                .groupCategoryVisitorId(visitorDto.getGroupCategoryVisitorId())
+                                .requireVisitorCount(categoryIdsInPrice.contains(visitorDto.getCategoryVisitorId()) ? 0 : null)
                                 .build())
                         .toList();
 
@@ -132,12 +133,37 @@ public class ServiceService {
                 .build();
     }
 
+    public void createService(ServiceCreateDto dto) {
+        ServiceEntity entity = new ServiceEntity();
+        applyDtoToEntity(dto, entity);
+        serviceRepository.save(entity);
+    }
 
+    public void updateService(Long id, ServiceUpdateDto dto) {
+        ServiceEntity entity = serviceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Service не найден"));
+        applyDtoToEntity(dto, entity);
+        serviceRepository.save(entity);
+    }
 
-
-//    public TLMuseumServiceResponseDto getFullMuseumServiceResponse() {
-//        return museumServiceAssembler.getFullMuseumService();
-//    }
+    private void applyDtoToEntity(ServiceCreateDto dto, ServiceEntity entity) {
+        entity.setServiceName(dto.getServiceName());
+        entity.setDescription(dto.getDescription());
+        entity.setCost(dto.getCost());
+        entity.setActiveKindId(dto.getActiveKindId());
+        entity.setIsNeedVisitDate(dto.getIsNeedVisitDate());
+        entity.setIsNeedVisitTime(dto.getIsNeedVisitTime());
+        entity.setDtBegin(dto.getDtBegin());
+        entity.setDtEnd(dto.getDtEnd());
+        entity.setProCultureIdentifier(dto.getProCultureIdentifier());
+        entity.setIsPROCultureChecked(dto.getIsPROCultureChecked());
+        entity.setIsDisableEditVisitObject(dto.getIsDisableEditVisitObject());
+        entity.setIsDisableEditVisitor(dto.getIsDisableEditVisitor());
+        entity.setIsVisitObjectUseForCost(dto.getIsVisitObjectUseForCost());
+        entity.setIsCategoryVisitorUseForCost(dto.getIsCategoryVisitorUseForCost());
+        entity.setIsVisitorCountUseForCost(dto.getIsVisitorCountUseForCost());
+        entity.setUseOneCategory(dto.getIsUseOneCategory());
+    }
 
 
 }

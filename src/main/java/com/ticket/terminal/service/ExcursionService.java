@@ -13,12 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 
 @Service
 @RequiredArgsConstructor
@@ -72,12 +70,12 @@ public class ExcursionService {
                     .collect(Collectors.toSet());
             dto.setVisitObjects(new ArrayList<>(visitObjectDto));
 
-            Set<CategoryVisitorDto> cVisitors = priceEntitiesForService.stream()
+            Set<CategoryVisitorDto> visitorDtos = priceEntitiesForService.stream()
                     .map(PriceEntity::getCategoryVisitor)
                     .filter(Objects::nonNull)
                     .map(categoryVisitorMapper::toDto)
                     .collect(Collectors.toSet());
-            dto.setCategoryVisitors(new ArrayList<>(cVisitors));
+            dto.setCategoryVisitors(new ArrayList<>(visitorDtos));
         }
         // Загружаем "глобальные" списки VisitObject и CategoryVisitor (для верхнего уровня ответа)
         List<VisitObjectDto> visitObjectDtos;
@@ -117,13 +115,13 @@ public class ExcursionService {
         if (requestDto.getVisitor() != null) {
             for (CategoryVisitorCountDto visitorDto : requestDto.getVisitor()) {
                 // Найти categoryVisitorEntity
-                CategoryVisitorEntity catEntity = categoryVisitorRepository.findById(visitorDto.getCategoryVisitorId())
+                CategoryVisitorEntity categoryVisitorEntity = categoryVisitorRepository.findById(visitorDto.getCategoryVisitorId())
                         .orElseThrow(() -> new EntityNotFoundException
                                 (String.format("CategoryVisitor не найдено: %s", visitorDto.getCategoryVisitorId())));
 
                 excursionLogVisitorRepository.save(ExcursionLogVisitorEntity.builder()
                         .excursionLog(savedLog)
-                        .categoryVisitor(catEntity)
+                        .categoryVisitor(categoryVisitorEntity)
                         .visitorCount(visitorDto.getVisitorCount())
                         .build());
             }
@@ -158,8 +156,8 @@ public class ExcursionService {
 
     private UsersEntity getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        return userRepository.findByUserNameIgnoreCase(username)
+        String userName = auth.getName();
+        return userRepository.findByUserNameIgnoreCase(userName)
                 .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
 

@@ -5,8 +5,6 @@ import com.ticket.terminal.entity.SoldServiceEntity;
 import com.ticket.terminal.mapper.impl.VisitObjectIdMapper;
 import org.mapstruct.*;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Mapper(componentModel = "spring", uses = VisitObjectIdMapper.class)
 public interface SoldServiceMapper {

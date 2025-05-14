@@ -26,14 +26,4 @@ public interface OrderMapper {
     @Mapping(target = "orderBarcode", ignore = true)
     OrderEntity toEntity(EditableOrderRequestDto dto);
 
-//    @AfterMapping
-//    default void afterMappingSimple(@MappingTarget OrderEntity orderEntity, SimpleOrderRequestDto dto) {
-//        OrderEntityUtil.initialize(orderEntity);
-//    }
-
-//    @AfterMapping
-//    default void afterMappingEditable(@MappingTarget OrderEntity orderEntity, EditableOrderRequestDto dto) {
-//        OrderEntityUtil.initialize(orderEntity);
-//    }
-
 }

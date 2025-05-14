@@ -1213,11 +1213,57 @@ databaseChangeLog:
             columns:
               - column:
                   name: service_id
-                  valueNumeric: 0
         - addNotNullConstraint:
             tableName: sold_services
             columnName: service_id
             columnDataType: bigint
+  - changeSet:
+      id: add-column-visit-object-address
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            columnExists:
+              tableName: visit_objects
+              columnName: address
+      changes:
+          - addColumn:
+              tableName: visit_objects
+              columns:
+                - column:
+                    name: address
+                    type: VARCHAR(255)
+                    constraints:
+                      nullable: true
+  - changeSet:
+      id: add-column-visit-object-columns
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            columnExists:
+              tableName: visit_objects
+              columnName: category_visitor_id
+        - not:
+            columnExists:
+              tableName: visit_objects
+              columnName: comment
+      changes:
+        - addColumn:
+            tableName: visit_objects
+            columns:
+              - column:
+                  name: category_visitor_id
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: comment
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+
+
 
 
 

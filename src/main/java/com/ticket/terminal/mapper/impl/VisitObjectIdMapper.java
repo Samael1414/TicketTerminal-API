@@ -6,9 +6,8 @@ import com.ticket.terminal.repository.VisitObjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Component
 @RequiredArgsConstructor
@@ -24,16 +23,21 @@ public class VisitObjectIdMapper {
                         .toList();
     }
 
-    @Named("mapVisitObjectsToDto")
-    public List<VisitObjectItemDto> mapVisitObjectsToDto(List<VisitObjectEntity> entities) {
-        return entities == null ? null :
-                entities.stream()
-                        .map(e -> new VisitObjectItemDto(e.getId(),
-                                e.getVisitObjectName(),
-                                e.getIsRequire(),
-                                null))
-                        .toList();
-    }
+//    @Named("mapVisitObjectsToDto")
+//    public List<VisitObjectItemDto> mapVisitObjectsToDto(List<VisitObjectEntity> entities) {
+//        return entities == null ? null :
+//                entities.stream()
+//                        .map(e -> VisitObjectItemDto.builder()
+//                                .visitObjectId(e.getId())
+//                                .visitObjectName(e.getVisitObjectName())
+//                                .isRequire(e.getIsRequire())
+//                                .categoryVisitorId(e.getCategoryVisitorId())
+//                                .address(e.getAddress())
+//                                .comment(e.getComment())
+//                                .build())
+//                        .toList();
+//    }
+
 
     @Named("mapIdsToVisitObjects")
     public List<VisitObjectEntity> mapIdsToVisitObjects(List<Long> ids) {

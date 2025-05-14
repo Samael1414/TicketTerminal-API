@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -49,7 +48,7 @@ public class ServiceEntity {
     private Boolean IsDisableEditVisitObject;
 
     @Column(name = "is_disable_edit_visitor", nullable = false)
-    private Boolean IsDisableEditVisitor;
+    private Boolean isDisableEditVisitor;
 
     @Column(name = "is_visit_object_use_for_cost", nullable = false)
     private Boolean isVisitObjectUseForCost;

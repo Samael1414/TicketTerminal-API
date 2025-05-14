@@ -1,12 +1,10 @@
 package com.ticket.terminal.mapper;
 
-
 import com.ticket.terminal.dto.SeanceGridDto;
 import com.ticket.terminal.entity.SeanceGridEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;

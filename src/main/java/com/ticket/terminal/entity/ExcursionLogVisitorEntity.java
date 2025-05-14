@@ -16,17 +16,14 @@ public class ExcursionLogVisitorEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Ссылка на бронирование экскурсии
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "excursion_log_id", nullable = false)
     private ExcursionLogEntity excursionLog;
 
-    // Ссылка на категорию посетителей
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_visitor_id", nullable = false)
     private CategoryVisitorEntity categoryVisitor;
 
-    // Количество посетителей для данной категории
     @Column(name = "visitor_count", nullable = false)
     private Long visitorCount;
 }

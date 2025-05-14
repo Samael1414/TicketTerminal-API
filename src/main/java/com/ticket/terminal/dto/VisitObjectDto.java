@@ -23,4 +23,13 @@ public class VisitObjectDto {
 
     @JsonProperty("GroupVisitObjectId")
     private Long groupVisitObjectId;
+
+    @JsonProperty("CategoryVisitorId")
+    private Integer categoryVisitorId;
+
+    @JsonProperty("Address")
+    private String address;
+
+    @JsonProperty("Comment")
+    private String comment;
 }
