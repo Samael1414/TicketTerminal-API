@@ -1,0 +1,48 @@
+package com.ticket.terminal.controller;
+
+import com.ticket.terminal.dto.CategoryVisitorCreateDto;
+import com.ticket.terminal.dto.CategoryVisitorDto;
+import com.ticket.terminal.service.CategoryVisitorService;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/REST/category-visitors")
+@RequiredArgsConstructor
+public class CategoryVisitorController {
+
+    private final CategoryVisitorService categoryVisitorService;
+
+    /**
+     * Получить список всех категорий посетителей
+     */
+    @Operation(summary = "Получение всех категорий посетителей")
+    @GetMapping
+    public ResponseEntity<List<CategoryVisitorDto>> getAll() {
+        return ResponseEntity.ok(categoryVisitorService.getAll());
+    }
+
+    /**
+     * Создать новую категорию
+     */
+    @Operation(summary = "Создание категории посетителя")
+    @PostMapping
+    public ResponseEntity<CategoryVisitorDto> create(@Valid @RequestBody CategoryVisitorCreateDto dto) {
+        return ResponseEntity.ok(categoryVisitorService.create(dto));
+    }
+
+    /**
+     * Удалить категорию по ID
+     */
+    @Operation(summary = "Удаление категории по ID")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        categoryVisitorService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}

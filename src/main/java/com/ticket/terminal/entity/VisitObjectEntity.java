@@ -24,11 +24,16 @@ public class VisitObjectEntity {
     private Boolean isRequire;
 
     @Column(name = "category_visitor_id")
-    private Integer categoryVisitorId;
+    private Long categoryVisitorId;
 
     @Column(name = "address")
     private String address;
 
     @Column(name = "comment")
     private String comment;
+
+    @ManyToOne
+    @JoinColumn(name = "service_id")
+    private ServiceEntity service;
+
 }

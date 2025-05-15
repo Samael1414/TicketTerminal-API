@@ -67,9 +67,9 @@ public class ServiceController {
     })
 
     @PostMapping("/Create")
-    public ResponseEntity<Void> createService(@Valid @RequestBody ServiceCreateDto dto) {
-        serviceService.createService(dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<EditableServiceDto> createService(@Valid @RequestBody ServiceCreateDto dto) {
+        EditableServiceDto response = serviceService.createService(dto);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Обновить услугу по ID")
@@ -79,10 +79,16 @@ public class ServiceController {
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @PutMapping("/Update/{id}")
-    public ResponseEntity<Void> updateService(
+    public ResponseEntity<EditableServiceDto> updateService(
             @PathVariable Long id,
             @Valid @RequestBody ServiceUpdateDto dto) {
-        serviceService.updateService(id, dto);
+        EditableServiceDto updatedService = serviceService.updateService(id, dto);
+        return ResponseEntity.ok(updatedService);
+    }
+
+    @DeleteMapping("/Delete/{id}")
+    public ResponseEntity<Void> deleteService(@PathVariable Long id) {
+        serviceService.deleteService(id);
         return ResponseEntity.ok().build();
     }
 

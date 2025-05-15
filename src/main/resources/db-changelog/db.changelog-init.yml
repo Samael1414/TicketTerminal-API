@@ -1262,6 +1262,81 @@ databaseChangeLog:
                   type: VARCHAR(255)
                   constraints:
                     nullable: true
+  - changeSet:
+      id: add-column-service-id-to-visit-objects
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            columnExists:
+              tableName: visit_objects
+              columnName: service_id
+      changes:
+        - addColumn:
+            tableName: visit_objects
+            columns:
+              - column:
+                  name: service_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: add-on-delete-cascade-to-prices-visit-object
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            foreignKeyConstraintExists:
+              foreignKeyName: fk_prices_visit_objects
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: prices
+            constraintName: fk_prices_visit_objects
+        - addForeignKeyConstraint:
+            baseTableName: prices
+            baseColumnNames: visit_object_id
+            constraintName: fk_prices_visit_objects
+            referencedTableName: visit_objects
+            referencedColumnNames: id
+            onDelete: CASCADE
+  - changeSet:
+      id: add-on-delete-cascade-to-prices-category-visitor
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            foreignKeyConstraintExists:
+              foreignKeyName: fk_prices_category_visitors
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: prices
+            constraintName: fk_prices_category_visitors
+        - addForeignKeyConstraint:
+            baseTableName: prices
+            baseColumnNames: category_visitor_id
+            constraintName: fk_prices_category_visitors
+            referencedTableName: category_visitors
+            referencedColumnNames: id
+            onDelete: CASCADE
+  - changeSet:
+      id: add-on-delete-cascade-to-prices-service
+      author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            foreignKeyConstraintExists:
+              foreignKeyName: fk_prices_services
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: prices
+            constraintName: fk_prices_services
+        - addForeignKeyConstraint:
+            baseTableName: prices
+            baseColumnNames: service_id
+            constraintName: fk_prices_services
+            referencedTableName: services
+            referencedColumnNames: id
+            onDelete: CASCADE
 
 
 

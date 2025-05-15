@@ -3,6 +3,7 @@ package com.ticket.terminal.repository;
 import com.ticket.terminal.entity.VisitObjectEntity;
 import feign.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -25,4 +26,7 @@ WHERE osv.order_service_id = :orderServiceId
 """, nativeQuery = true)
     List<VisitObjectEntity> findByOrderServiceId(@Param("orderServiceId") Long orderServiceId);
 
+    @Modifying
+    @Query("DELETE FROM VisitObjectEntity v WHERE v.service.id = :serviceId")
+    void deleteAllByServiceId(@Param("serviceId") Long serviceId);
 }

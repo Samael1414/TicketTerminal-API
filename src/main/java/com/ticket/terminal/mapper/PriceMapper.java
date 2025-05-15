@@ -13,6 +13,10 @@ public interface PriceMapper {
     @Mapping(source = "categoryVisitor.id", target = "categoryVisitorId")
     PriceDto toDto(PriceEntity priceEntity);
 
+    // Маппим DTO -> Entity, service маппим вручную (setService)
+    @Mapping(target = "service", ignore = true)
+    @Mapping(target = "visitObject", ignore = true)
+    @Mapping(target = "categoryVisitor", ignore = true)
     PriceEntity toEntity(PriceDto priceDto);
 
     List<PriceDto> toDtoList(List<PriceEntity> entities);

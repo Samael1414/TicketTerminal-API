@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -29,4 +30,7 @@ public class ServiceCreateDto {
     private Boolean isCategoryVisitorUseForCost;
     private Boolean isVisitorCountUseForCost;
     private Boolean isUseOneCategory;
+    List<VisitObjectDto> visitObject;
+    List<CategoryVisitorDto> categoryVisitor;
+    List<PriceDto> price;
 }

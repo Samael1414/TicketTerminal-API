@@ -5,25 +5,18 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
-/*
-DTO для цен (PriceDto)
-GET /REST/Service/Editable
+/**
+ * DTO для создания новой категории посетителя.
+ *
+ * Используется только при создании записи, не содержит ID.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
-public class PriceDto {
+public class CategoryVisitorCreateDto {
 
-    @JsonProperty("VisitObjectId")
-    private Long visitObjectId;
-
-    @JsonProperty("CategoryVisitorId")
-    private Long categoryVisitorId;
-
-    @JsonProperty("Cost")
-    private Double cost;
-
-    @JsonProperty("ServiceId")
-    private Long serviceId;
+    @JsonProperty("CategoryVisitorName")
+    private String categoryVisitorName;
 }
