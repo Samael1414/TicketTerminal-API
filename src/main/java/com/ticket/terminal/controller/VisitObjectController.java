@@ -19,7 +19,7 @@ import java.util.List;
  * - Обрабатывает HTTP-запросы, связанные с CRUD-операциями над объектами посещения.
  * - Делегирует бизнес-логику в слой Service.
  *
- * URL prefix: /REST/visit-objects
+ * URL prefix: /VisitObject
  */
 @RestController
 @RequestMapping("/VisitObject")

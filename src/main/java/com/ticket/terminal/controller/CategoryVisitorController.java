@@ -31,7 +31,7 @@ public class CategoryVisitorController {
      * Создать новую категорию
      */
     @Operation(summary = "Создание категории посетителя")
-    @PostMapping
+    @PostMapping("/Create")
     public ResponseEntity<CategoryVisitorDto> create(@Valid @RequestBody CategoryVisitorCreateDto dto) {
         return ResponseEntity.ok(categoryVisitorService.create(dto));
     }
@@ -54,7 +54,7 @@ public class CategoryVisitorController {
      * Удалить категорию по ID
      */
     @Operation(summary = "Удаление категории по ID")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/Delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         categoryVisitorService.delete(id);
         return ResponseEntity.noContent().build();
