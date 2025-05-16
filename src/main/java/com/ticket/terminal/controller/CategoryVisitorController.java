@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/REST/CategoryVisitors")
+@RequestMapping("/REST/category-visitors")
 @RequiredArgsConstructor
 public class CategoryVisitorController {
 
@@ -31,7 +31,7 @@ public class CategoryVisitorController {
      * Создать новую категорию
      */
     @Operation(summary = "Создание категории посетителя")
-    @PostMapping("/Create")
+    @PostMapping
     public ResponseEntity<CategoryVisitorDto> create(@Valid @RequestBody CategoryVisitorCreateDto dto) {
         return ResponseEntity.ok(categoryVisitorService.create(dto));
     }
@@ -40,7 +40,7 @@ public class CategoryVisitorController {
      * Удалить категорию по ID
      */
     @Operation(summary = "Удаление категории по ID")
-    @DeleteMapping("/Delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         categoryVisitorService.delete(id);
         return ResponseEntity.noContent().build();

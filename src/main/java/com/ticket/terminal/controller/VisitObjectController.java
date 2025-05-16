@@ -22,7 +22,7 @@ import java.util.List;
  * URL prefix: /REST/visit-objects
  */
 @RestController
-@RequestMapping("/REST/VisitObject")
+@RequestMapping("/REST/visit-objects")
 @RequiredArgsConstructor
 @Tag(name = "Visit Objects", description = "Управление объектами посещения")
 public class VisitObjectController {
@@ -47,7 +47,7 @@ public class VisitObjectController {
      * @return созданный VisitObjectDto
      */
     @Operation(summary = "Создать объект посещения")
-    @PostMapping("/Create")
+    @PostMapping
     public ResponseEntity<VisitObjectDto> create(@Valid @RequestBody VisitObjectCreateDto dto) {
         return ResponseEntity.ok(visitObjectService.createVisitObject(dto));
     }
@@ -59,7 +59,7 @@ public class VisitObjectController {
      * @return HTTP 204 No Content
      */
     @Operation(summary = "Удалить объект посещения по ID")
-    @DeleteMapping("/Delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         visitObjectService.deleteVisitObject(id);
         return ResponseEntity.noContent().build();
