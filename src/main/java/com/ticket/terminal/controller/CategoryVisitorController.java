@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/REST/category-visitors")
+@RequestMapping("/REST/CategoryVisitors")
 @RequiredArgsConstructor
 public class CategoryVisitorController {
 

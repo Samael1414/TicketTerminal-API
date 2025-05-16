@@ -53,6 +53,20 @@ public class VisitObjectController {
     }
 
     /**
+     * Обновить объект посещения по ID.
+     *
+     * @param id идентификатор редактируемого объекта
+     * @param dto обновлённые поля объекта
+     * @return обновлённый VisitObjectDto
+     */
+    @Operation(summary = "Обновить объект посещения по ID")
+    @PutMapping("/Update/{id}")
+    public ResponseEntity<VisitObjectDto> update(@PathVariable Long id,
+                                                 @Valid @RequestBody VisitObjectCreateDto dto) {
+        return ResponseEntity.ok(visitObjectService.updateVisitObject(id, dto));
+    }
+
+    /**
      * Удалить объект посещения по ID.
      *
      * @param id идентификатор объекта
