@@ -22,7 +22,7 @@ import java.util.List;
  * URL prefix: /REST/visit-objects
  */
 @RestController
-@RequestMapping("/REST/VisitObject")
+@RequestMapping("/VisitObject")
 @RequiredArgsConstructor
 @Tag(name = "Visit Objects", description = "Управление объектами посещения")
 public class VisitObjectController {
