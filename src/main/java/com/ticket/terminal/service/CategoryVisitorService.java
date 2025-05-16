@@ -53,6 +53,26 @@ public class CategoryVisitorService {
     }
 
     /**
+     * Обновление существующей категории.
+     *
+     * Проверяет наличие по ID, обновляет поля, сохраняет и возвращает результат.
+     *
+     * @param id идентификатор обновляемой категории
+     * @param dto новые значения для обновления
+     * @return обновлённая категория
+     */
+    @Transactional
+    public CategoryVisitorDto update(Long id, CategoryVisitorCreateDto dto) {
+        CategoryVisitorEntity entity = categoryVisitorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Категория не найдена с ID = " + id));
+
+        entity.setCategoryVisitorName(dto.getCategoryVisitorName());
+
+        CategoryVisitorEntity updated = categoryVisitorRepository.save(entity);
+        return categoryVisitorMapper.toDto(updated);
+    }
+
+    /**
      * Удаление категории по ID
      *
      * Удаляет категорию из БД, если она не используется в связанной таблице (например, prices).

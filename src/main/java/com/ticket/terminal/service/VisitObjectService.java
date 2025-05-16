@@ -56,6 +56,34 @@ public class VisitObjectService {
     }
 
     /**
+     * Обновление существующего объекта посещения по ID.
+     *
+     * Если объект не найден — выбрасывает исключение.
+     * Иначе обновляет все его поля на основе DTO.
+     *
+     * @param id   ID обновляемого объекта
+     * @param dto  новые значения полей
+     * @return обновлённый объект в виде DTO
+     */
+    @Transactional
+    public VisitObjectDto updateVisitObject(Long id, VisitObjectCreateDto dto) {
+        // Найти существующий объект или выбросить исключение
+        VisitObjectEntity entity = visitObjectRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("VisitObject не найден: id=" + id));
+
+        // Обновить поля из DTO
+        entity.setVisitObjectName(dto.getVisitObjectName());        // Название объекта (обновлённое)
+        entity.setCategoryVisitorId(dto.getCategoryVisitorId());    // ID категории посетителя
+        entity.setAddress(dto.getAddress());                        // Адрес
+        entity.setComment(dto.getComment());                        // Комментарий
+        entity.setIsRequire(dto.getIsRequire());                    // Признак обязательности
+
+        // Сохранить и вернуть как DTO
+        VisitObjectEntity updated = visitObjectRepository.save(entity);
+        return visitObjectMapper.toDto(updated);
+    }
+
+    /**
      * Удаляет объект посещения по ID.
      * Предполагается, что связанные записи (например, в price)
      * обрабатываются через ON DELETE CASCADE или отдельно в бизнес-логике.

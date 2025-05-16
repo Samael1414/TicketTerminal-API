@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/REST/category-visitors")
+@RequestMapping("/REST/CategoryVisitors")
 @RequiredArgsConstructor
 public class CategoryVisitorController {
 
@@ -31,16 +31,30 @@ public class CategoryVisitorController {
      * Создать новую категорию
      */
     @Operation(summary = "Создание категории посетителя")
-    @PostMapping
+    @PostMapping("/Create")
     public ResponseEntity<CategoryVisitorDto> create(@Valid @RequestBody CategoryVisitorCreateDto dto) {
         return ResponseEntity.ok(categoryVisitorService.create(dto));
+    }
+
+    /**
+     * Обновить существующую категорию.
+     *
+     * @param id  идентификатор категории
+     * @param dto данные для обновления
+     * @return обновлённая категория
+     */
+    @Operation(summary = "Обновить категорию посетителя")
+    @PutMapping("/Update/{id}")
+    public ResponseEntity<CategoryVisitorDto> update(@PathVariable Long id,
+                                                     @Valid @RequestBody CategoryVisitorCreateDto dto) {
+        return ResponseEntity.ok(categoryVisitorService.update(id, dto));
     }
 
     /**
      * Удалить категорию по ID
      */
     @Operation(summary = "Удаление категории по ID")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/Delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         categoryVisitorService.delete(id);
         return ResponseEntity.noContent().build();
