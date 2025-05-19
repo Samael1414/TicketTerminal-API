@@ -1,0 +1,545 @@
+{
+    "ServiceId": 8,
+    "ServiceName": "уай",
+    "Comment": "йуайцу",
+    "IsDisableEditVisitObject": false,
+    "IsDisableEditVisitor": false,
+    "IsVisitObjectUseForCost": true,
+    "IsCategoryVisitorUseForCost": true,
+    "IsVisitorCountUseForCost": false,
+    "IsUseOneCategory": null,
+    "MaxVisitObjectCount": null,
+    "MaxVisitorCount": null,
+    "ActiveKindId": 1,
+    "IsNeedVisitDate": true,
+    "IsNeedVisitTime": true,
+    "ActiveDays": null,
+    "dtBegin": "2025-05-21",
+    "dtEnd": "2025-05-24",
+    "Dates": null,
+    "ProCultureIdentifier": null,
+    "ProCultureChecked": null,
+    "PaymentKindId": null,
+    "VisitObject": [
+      {
+        "VisitObjectId": 3,
+        "VisitObjectName": "Мемориальные комнаты",
+        "IsRequire": false,
+        "GroupVisitObjectId": 3,
+        "CategoryVisitorId": null,
+        "Address": null,
+        "Comment": null
+      },
+      {
+        "VisitObjectId": 4,
+        "VisitObjectName": "Выставочный зал",
+        "IsRequire": false,
+        "GroupVisitObjectId": 4,
+        "CategoryVisitorId": null,
+        "Address": null,
+        "Comment": null
+      },
+      {
+        "VisitObjectId": 2,
+        "VisitObjectName": "Дворик Пушкина",
+        "IsRequire": false,
+        "GroupVisitObjectId": 2,
+        "CategoryVisitorId": null,
+        "Address": null,
+        "Comment": null
+      },
+      {
+        "VisitObjectId": 7,
+        "VisitObjectName": "Шишка",
+        "IsRequire": false,
+        "GroupVisitObjectId": 7,
+        "CategoryVisitorId": null,
+        "Address": null,
+        "Comment": null
+      },
+      {
+        "VisitObjectId": 1,
+        "VisitObjectName": "1Домик Пушкина",
+        "IsRequire": false,
+        "GroupVisitObjectId": 1,
+        "CategoryVisitorId": null,
+        "Address": null,
+        "Comment": null
+      },
+      {
+        "VisitObjectId": 5,
+        "VisitObjectName": "Зал камерной музыки1",
+        "IsRequire": false,
+        "GroupVisitObjectId": 5,
+        "CategoryVisitorId": null,
+        "Address": null,
+        "Comment": null
+      }
+    ],
+    "CategoryVisitor": [
+      {
+        "CategoryVisitorId": 2,
+        "CategoryVisitorName": "Дети",
+        "RequireVisitorCount": null,
+        "GroupCategoryVisitorId": 2
+      },
+      {
+        "CategoryVisitorId": 3,
+        "CategoryVisitorName": "Школьники",
+        "RequireVisitorCount": 0,
+        "GroupCategoryVisitorId": 3
+      },
+      {
+        "CategoryVisitorId": 4,
+        "CategoryVisitorName": "Студенты",
+        "RequireVisitorCount": null,
+        "GroupCategoryVisitorId": 4
+      },
+      {
+        "CategoryVisitorId": 5,
+        "CategoryVisitorName": "Пенсионеры",
+        "RequireVisitorCount": 0,
+        "GroupCategoryVisitorId": 5
+      },
+      {
+        "CategoryVisitorId": 1,
+        "CategoryVisitorName": "Взрослые",
+        "RequireVisitorCount": null,
+        "GroupCategoryVisitorId": 1
+      },
+      {
+        "CategoryVisitorId": 6,
+        "CategoryVisitorName": "Льготники",
+        "RequireVisitorCount": null,
+        "GroupCategoryVisitorId": 6
+      }
+    ],
+    "Price": [
+      {
+        "VisitObjectId": 1,
+        "CategoryVisitorId": 3,
+        "Cost": 150,
+        "ServiceId": null
+      },
+      {
+        "VisitObjectId": 1,
+        "CategoryVisitorId": 5,
+        "Cost": 159,
+        "ServiceId": null
+      },
+      {
+        "VisitObjectId": 5,
+        "CategoryVisitorId": 3,
+        "Cost": 110,
+        "ServiceId": null
+      },
+      {
+        "VisitObjectId": 5,
+        "CategoryVisitorId": 5,
+        "Cost": 120,
+        "ServiceId": null
+      }
+    ],
+    "SeanceGrid": [
+      {
+        "dtBegin": "10:00",
+        "dtEnd": "10:20"
+      },
+      {
+        "dtBegin": "10:20",
+        "dtEnd": "10:40"
+      },
+      {
+        "dtBegin": "10:40",
+        "dtEnd": "11:00"
+      },
+      {
+        "dtBegin": "11:00",
+        "dtEnd": "11:20"
+      },
+      {
+        "dtBegin": "15:00",
+        "dtEnd": "15:20"
+      },
+      {
+        "dtBegin": "15:20",
+        "dtEnd": "15:40"
+      },
+      {
+        "dtBegin": "19:00",
+        "dtEnd": "19:20"
+      }
+    ]
+  }
+
+  {
+    "ServiceId": 8,
+    "ServiceName": "уай",
+    "Comment": "йуайцу",
+    "IsDisableEditVisitObject": false,
+    "IsDisableEditVisitor": false,
+    "IsVisitObjectUseForCost": true,
+    "IsCategoryVisitorUseForCost": true,
+    "IsVisitorCountUseForCost": false,
+    "IsUseOneCategory": null,
+    "MaxVisitObjectCount": null,
+    "MaxVisitorCount": null,
+    "ActiveKindId": 1,
+    "IsNeedVisitDate": true,
+    "IsNeedVisitTime": true,
+    "ActiveDays": null,
+    "dtBegin": "2025-05-21",
+    "dtEnd": "2025-05-24",
+    "Dates": null,
+    "ProCultureIdentifier": null,
+    "ProCultureChecked": null,
+    "PaymentKindId": null,
+    "VisitObject": [
+      {
+        "VisitObjectId": 1,
+        "VisitObjectName": "1Домик Пушкина",
+        "IsRequire": true,
+        "GroupVisitObjectId": 1,
+        "CategoryVisitorId": null,
+        "Address": null,
+        "Comment": null
+      },
+      {
+        "VisitObjectId": 5,
+        "VisitObjectName": "Зал камерной музыки1",
+        "IsRequire": true,
+        "GroupVisitObjectId": 5,
+        "CategoryVisitorId": null,
+        "Address": null,
+        "Comment": null
+      }
+    ],
+    "CategoryVisitor": [
+      {
+        "CategoryVisitorId": 3,
+        "CategoryVisitorName": "Школьники",
+        "RequireVisitorCount": 0,
+        "GroupCategoryVisitorId": 3
+      },
+      {
+        "CategoryVisitorId": 5,
+        "CategoryVisitorName": "Пенсионеры",
+        "RequireVisitorCount": 0,
+        "GroupCategoryVisitorId": 5
+      }
+    ],
+    "Price": [
+      {
+        "VisitObjectId": 1,
+        "CategoryVisitorId": 3,
+        "Cost": 150,
+        "ServiceId": null
+      },
+      {
+        "VisitObjectId": 1,
+        "CategoryVisitorId": 5,
+        "Cost": 159,
+        "ServiceId": null
+      },
+      {
+        "VisitObjectId": 5,
+        "CategoryVisitorId": 3,
+        "Cost": 110,
+        "ServiceId": null
+      },
+      {
+        "VisitObjectId": 5,
+        "CategoryVisitorId": 5,
+        "Cost": 120,
+        "ServiceId": null
+      }
+    ],
+    "SeanceGrid": [
+      {
+        "dtBegin": "10:00",
+        "dtEnd": "10:20"
+      },
+      {
+        "dtBegin": "10:20",
+        "dtEnd": "10:40"
+      },
+      {
+        "dtBegin": "10:40",
+        "dtEnd": "11:00"
+      },
+      {
+        "dtBegin": "11:00",
+        "dtEnd": "11:20"
+      },
+      {
+        "dtBegin": "15:00",
+        "dtEnd": "15:20"
+      },
+      {
+        "dtBegin": "15:20",
+        "dtEnd": "15:40"
+      },
+      {
+        "dtBegin": "19:00",
+        "dtEnd": "19:20"
+      }
+    ]
+  }
+]
+
+Отправка данных услуги: 
+{ServiceId: undefined, ServiceName: 'уай', Description: 'йуайцу', Cost: 0, ActiveKindId: 1, …}
+ActiveKindId
+: 
+1
+CategoryVisitor
+: 
+Proxy(Array)
+[[Handler]]
+: 
+MutableReactiveHandler
+[[Target]]
+: 
+Array(2)
+0
+: 
+CategoryVisitorId
+: 
+3
+CategoryVisitorName
+: 
+"Школьники"
+GroupCategoryVisitorId
+: 
+3
+RequireVisitorCount
+: 
+0
+[[Prototype]]
+: 
+Object
+1
+: 
+{CategoryVisitorId: 5, CategoryVisitorName: 'Пенсионеры', RequireVisitorCount: 0, GroupCategoryVisitorId: 5}
+length
+: 
+2
+[[Prototype]]
+: 
+Array(0)
+[[IsRevoked]]
+: 
+false
+Cost
+: 
+0
+Description
+: 
+"йуайцу"
+DtBegin
+: 
+"2025-05-21T00:00:00.000Z"
+DtEnd
+: 
+"2025-05-24T00:00:00.000Z"
+IsCategoryVisitorUseForCost
+: 
+true
+IsDisableEditVisitObject
+: 
+false
+IsDisableEditVisitor
+: 
+false
+IsNeedVisitDate
+: 
+true
+IsNeedVisitTime
+: 
+true
+IsPROCultureChecked
+: 
+false
+IsUseOneCategory
+: 
+false
+IsVisitObjectUseForCost
+: 
+true
+IsVisitorCountUseForCost
+: 
+false
+Price
+: 
+Proxy(Array)
+[[Handler]]
+: 
+MutableReactiveHandler
+[[Target]]
+: 
+Array(4)
+0
+: 
+Proxy(Object)
+[[Handler]]
+: 
+MutableReactiveHandler
+[[Target]]
+: 
+Object
+CategoryVisitorId
+: 
+3
+Cost
+: 
+150
+ServiceId
+: 
+null
+VisitObjectId
+: 
+1
+[[Prototype]]
+: 
+Object
+[[IsRevoked]]
+: 
+false
+1
+: 
+Proxy(Object)
+[[Handler]]
+: 
+MutableReactiveHandler
+[[Target]]
+: 
+Object
+CategoryVisitorId
+: 
+5
+Cost
+: 
+159
+ServiceId
+: 
+null
+VisitObjectId
+: 
+1
+[[Prototype]]
+: 
+Object
+[[IsRevoked]]
+: 
+false
+2
+: 
+Proxy(Object)
+[[Handler]]
+: 
+MutableReactiveHandler
+[[Target]]
+: 
+Object
+CategoryVisitorId
+: 
+3
+Cost
+: 
+110
+ServiceId
+: 
+null
+VisitObjectId
+: 
+5
+[[Prototype]]
+: 
+Object
+[[IsRevoked]]
+: 
+false
+3
+: 
+CategoryVisitorId
+: 
+5
+Cost
+: 
+120
+ServiceId
+: 
+null
+VisitObjectId
+: 
+5
+[[Prototype]]
+: 
+Object
+length
+: 
+4
+[[Prototype]]
+: 
+Array(0)
+[[IsRevoked]]
+: 
+false
+ProCultureIdentifier
+: 
+null
+ServiceId
+: 
+undefined
+ServiceName
+: 
+"уай"
+VisitObject
+: 
+Proxy(Array)
+[[Handler]]
+: 
+MutableReactiveHandler
+[[Target]]
+: 
+Array(2)
+0
+: 
+{VisitObjectId: 1, VisitObjectName: '1Домик Пушкина', IsRequire: false, GroupVisitObjectId: 1, CategoryVisitorId: null, …}
+1
+: 
+Address
+: 
+null
+CategoryVisitorId
+: 
+null
+Comment
+: 
+null
+GroupVisitObjectId
+: 
+5
+IsRequire
+: 
+false
+VisitObjectId
+: 
+5
+VisitObjectName
+: 
+"Зал камерной музыки1"
+[[Prototype]]
+: 
+Object
+length
+: 
+2
+[[Prototype]]
+: 
+Array(0)
+[[IsRevoked]]
+: 
+false
+
+

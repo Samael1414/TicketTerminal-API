@@ -17,6 +17,9 @@ public interface CategoryVisitorMapper {
 
     List<CategoryVisitorDto> toDtoList(List<CategoryVisitorEntity> entities);
 
+    // 💡 Маппер для создания из DTO поле id игнорируется
+    @Mapping(target = "id", ignore = true)
+    //@Mapping(target = "requireVisitorCount", ignore = true)
     CategoryVisitorEntity toEntity(CategoryVisitorDto dto);
 
     // 💡 Маппер для создания из CreateDto

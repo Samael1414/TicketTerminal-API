@@ -25,7 +25,7 @@ public class VisitObjectDto {
     private Long groupVisitObjectId;
 
     @JsonProperty("CategoryVisitorId")
-    private Integer categoryVisitorId;
+    private Long categoryVisitorId;
 
     @JsonProperty("Address")
     private String address;

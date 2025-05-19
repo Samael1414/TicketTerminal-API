@@ -41,14 +41,18 @@ public class VisitObjectService {
      */
     @Transactional
     public VisitObjectDto createVisitObject(VisitObjectCreateDto dto) {
-        VisitObjectEntity entity = new VisitObjectEntity();
+        // Создаем временный DTO с теми же полями, что и CreateDto
+        VisitObjectDto tempDto = VisitObjectDto.builder()
+                .visitObjectName(dto.getVisitObjectName())
+                .categoryVisitorId(dto.getCategoryVisitorId())
+                .address(dto.getAddress())
+                .comment(dto.getComment())
+                .isRequire(dto.getIsRequire())
+                .groupVisitObjectId(dto.getGroupVisitObjectId())
+                .build();
 
-        // Устанавливаем поля из DTO в entity
-        entity.setVisitObjectName(dto.getVisitObjectName());        // Название объекта посещения (например, "Домик Пушкина")
-        entity.setCategoryVisitorId(dto.getCategoryVisitorId());    // Привязка к категории посетителя (если есть, может быть null)
-        entity.setAddress(dto.getAddress());                        // Адрес или местоположение объекта (текстовое описание)
-        entity.setComment(dto.getComment());                        // Дополнительный комментарий/примечание к объекту
-        entity.setIsRequire(dto.getIsRequire());                    // Обязателен ли объект для посещения (true — нельзя пропустить)
+        // Используем маппер для создания сущности (игнорирует ID)
+        VisitObjectEntity entity = visitObjectMapper.toEntity(tempDto);
 
 
         // Сохраняем и возвращаем как DTO
@@ -77,6 +81,7 @@ public class VisitObjectService {
         entity.setAddress(dto.getAddress());                        // Адрес
         entity.setComment(dto.getComment());                        // Комментарий
         entity.setIsRequire(dto.getIsRequire());                    // Признак обязательности
+        // groupVisitObjectId маппится из id в маппере VisitObjectMapper
 
         // Сохранить и вернуть как DTO
         VisitObjectEntity updated = visitObjectRepository.save(entity);

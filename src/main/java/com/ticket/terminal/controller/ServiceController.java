@@ -59,15 +59,16 @@ public class ServiceController {
         return ResponseEntity.ok(serviceService.getEditableServices());
     }
 
-    @Operation(summary = "Получить услуг по id")
+    @Operation(summary = "Получить полную информацию об услуге по id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Успешно"),
             @ApiResponse(responseCode = "401", description = "Не авторизован"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
+            @ApiResponse(responseCode = "404", description = "Услуга не найдена"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @GetMapping("/Get/{id}")
-    public ResponseEntity<ServiceDto> findById(@PathVariable Long id) {
+    public ResponseEntity<EditableServiceDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(serviceService.findById(id));
     }
 
