@@ -1063,8 +1063,8 @@ databaseChangeLog:
       preConditions:
         - onFail: MARK_RAN
         - not:
-           - tableExists:
-              tableName: sold_service_visit_object
+            - tableExists:
+                tableName: sold_service_visit_object
       changes:
         - createTable:
             tableName: sold_service_visit_object
@@ -1227,14 +1227,14 @@ databaseChangeLog:
               tableName: visit_objects
               columnName: address
       changes:
-          - addColumn:
-              tableName: visit_objects
-              columns:
-                - column:
-                    name: address
-                    type: VARCHAR(255)
-                    constraints:
-                      nullable: true
+        - addColumn:
+            tableName: visit_objects
+            columns:
+              - column:
+                  name: address
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
   - changeSet:
       id: add-column-visit-object-columns
       author: m_chelyshev
@@ -1337,6 +1337,110 @@ databaseChangeLog:
             referencedTableName: services
             referencedColumnNames: id
             onDelete: CASCADE
+  - changeSet:
+      id: remove-fk-from-order-service-visitor
+      author: m_chelyshev
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: order_service_visitor
+            constraintName: fk_order_service_visitor_cv
+
+        - addColumn:
+            tableName: order_service_visitor
+            columns:
+              - column:
+                  name: category_visitor_name
+                  type: varchar(255)
+  - changeSet:
+      id: drop-category-visitor-id-column-if-needed
+      author: m_chelyshev
+      changes:
+        - dropColumn:
+            columnName: category_visitor_id
+            tableName: order_service_visitor
+  - changeSet:
+      id: fix-cascade-delete-prices-category
+      author: m_chelyshev
+      preConditions:
+        - onFail: CONTINUE
+        - foreignKeyConstraintExists:
+            foreignKeyName: fk_prices_category_visitors
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: prices
+            constraintName: fk_prices_category_visitors
+        - addForeignKeyConstraint:
+            baseTableName: prices
+            baseColumnNames: category_visitor_id
+            constraintName: fk_prices_category_visitors
+            referencedTableName: category_visitors
+            referencedColumnNames: id
+            onDelete: CASCADE
+  - changeSet:
+      id: fix-cascade-delete-visit-objects-v2
+      author: m_chellyshev
+      preConditions:
+        onFail: CONTINUE
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: order_service_visit_object
+            constraintName: fk_order_service_visit_object_vo
+        - addForeignKeyConstraint:
+            baseTableName: order_service_visit_object
+            baseColumnNames: visit_object_id
+            constraintName: fk_order_service_visit_object_vo
+            referencedTableName: visit_objects
+            referencedColumnNames: id
+            onDelete: CASCADE
+  - changeSet:
+      id: fix-cascade-delete-ssvo-visit-object
+      author: m_chellyshev
+      preConditions:
+        onFail: CONTINUE
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: sold_service_visit_object
+            constraintName: fk_ssvo_visit_object
+        - addForeignKeyConstraint:
+            baseTableName: sold_service_visit_object
+            baseColumnNames: visit_object_id
+            constraintName: fk_ssvo_visit_object
+            referencedTableName: visit_objects
+            referencedColumnNames: id
+            onDelete: CASCADE
+  - changeSet:
+      id: fix-cascade-delete-prices-visit-objects
+      author: m_chellyshev
+      preConditions:
+        onFail: CONTINUE
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: prices
+            constraintName: fk_prices_visit_objects
+        - addForeignKeyConstraint:
+            baseTableName: prices
+            baseColumnNames: visit_object_id
+            constraintName: fk_prices_visit_objects
+            referencedTableName: visit_objects
+            referencedColumnNames: id
+            onDelete: CASCADE
+  - changeSet:
+      id: add-category-visitor-id-to-order-service-visitor
+      author: m_chelyshev
+      preConditions:
+          - onFail: MARK_RAN
+          - not:
+              columnExists:
+                tableName: order_service_visitor
+                columnName: category_visitor_id
+      changes:
+        - addColumn:
+            tableName: order_service_visitor
+            columns:
+              - column:
+                  name: category_visitor_id
+                  type: bigint
+
 
 
 

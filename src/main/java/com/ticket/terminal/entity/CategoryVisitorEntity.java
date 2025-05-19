@@ -16,4 +16,9 @@ public class CategoryVisitorEntity {
 
     @Column(name = "category_name", nullable = false)
     private String categoryVisitorName;
+
+    // ➕ Метод-заглушка для getGroupCategoryVisitorId()
+    public Long getGroupCategoryVisitorId() {
+        return this.id; // временно вернем id как группу
+    }
 }

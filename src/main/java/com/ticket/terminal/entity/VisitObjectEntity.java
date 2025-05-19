@@ -17,7 +17,7 @@ public class VisitObjectEntity {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "visit_object_name", nullable = false)
     private String visitObjectName;
 
     @Column(name = "is_required")
@@ -35,5 +35,10 @@ public class VisitObjectEntity {
     @ManyToOne
     @JoinColumn(name = "service_id")
     private ServiceEntity service;
+
+    // ➕ Метод для getGroupVisitObjectId() заглушкой
+    public Long getGroupVisitObjectId() {
+        return this.id; // если нет отдельного поля group_id — временно вернем id
+    }
 
 }

@@ -20,4 +20,7 @@ public class CategoryVisitorCountDto {
 
     @JsonProperty("VisitorCount")
     private Long visitorCount;
+
+    @JsonProperty("CategoryVisitorName")
+    private String categoryVisitorName;
 }

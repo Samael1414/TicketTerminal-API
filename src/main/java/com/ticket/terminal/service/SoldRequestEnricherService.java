@@ -65,7 +65,8 @@ public class SoldRequestEnricherService {
                         .stream()
                         .map(visitor -> new CategoryVisitorCountDto(
                                 visitor.getCategoryVisitor().getId(),
-                                visitor.getVisitorCount()))
+                                visitor.getVisitorCount(),
+                                visitor.getCategoryVisitorName()))
                         .toList();
                 dto.setCategoryVisitor(visitors);
             }

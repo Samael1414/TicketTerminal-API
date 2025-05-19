@@ -51,51 +51,32 @@ public class ServiceService {
     }
 
     public EditableServiceResponseDto getEditableServices() {
-        List<VisitObjectDto> visitObjects = visitObjectMapper.toDtoList(visitObjectRepository.findAll());
-
-        List<VisitObjectItemDto> visitObjectItems = visitObjects.stream()
-                .map(item -> VisitObjectItemDto.builder()
-                        .visitObjectId(item.getVisitObjectId())
-                        .categoryVisitorId(item.getCategoryVisitorId())
-                        .address(item.getAddress())
-                        .comment(item.getComment())
-                        .visitObjectName(item.getVisitObjectName())
-                        .build())
-                .toList();
-
-        List<GroupVisitObjectDto> groupVisitObjects = visitObjects.stream()
-                .map(objectDto -> GroupVisitObjectDto.builder()
-                        .groupVisitObjectId(objectDto.getVisitObjectId())
-                        .groupVisitObjectName(objectDto.getVisitObjectName())
+        List<SeanceGridDto> allSeanceGrid = seanceGridMapper.toDtoList(seanceGridRepository.findAll());
+        List<VisitObjectItemDto> allVisitObjects = visitObjectRepository.findAll().stream()
+                .map(object -> VisitObjectItemDto.builder()
+                        .visitObjectId(object.getId())
+                        .visitObjectName(object.getVisitObjectName())
+                        .categoryVisitorId(object.getCategoryVisitorId())
+                        .address(object.getAddress())
+                        .comment(object.getComment())
                         .build())
                 .toList();
 
         List<CategoryVisitorDto> allCategories = categoryVisitorMapper.toDtoList(categoryVisitorRepository.findAll());
-        List<GroupCategoryVisitorDto> groupCategoryVisitors = allCategories.stream()
-                .map(categoryVisitorDto -> GroupCategoryVisitorDto.builder()
-                        .groupCategoryVisitorId(categoryVisitorDto.getGroupCategoryVisitorId())
-                        .groupCategoryVisitorName(categoryVisitorDto.getCategoryVisitorName())
-                        .build())
-                .toList();
 
-        List<SeanceGridDto> allSeanceGrid = seanceGridMapper.toDtoList(seanceGridRepository.findAll());
 
         List<EditableServiceDto> services;
         try (Stream<ServiceEntity> stream = serviceRepository.findAllEditableServices().stream()) {
             services = stream.map(service -> {
                 EditableServiceDto dto = editableServiceMapper.toDto(service);
 
-                Set<Long> allowedIds = visitObjectRepository.findByServiceId(service.getId())
-                        .stream()
-                        .map(VisitObjectEntity::getId)
-                        .collect(Collectors.toSet());
-
-                List<VisitObjectDto> objectsForService = visitObjects.stream()
-                        .map(objectDto -> VisitObjectDto.builder()
-                                .visitObjectId(objectDto.getVisitObjectId())
-                                .visitObjectName(objectDto.getVisitObjectName())
-                                .isRequire(allowedIds.contains(objectDto.getVisitObjectId()))
-                                .groupVisitObjectId(objectDto.getGroupVisitObjectId())
+                List<VisitObjectEntity> relatedVisitObjects = visitObjectRepository.findAllByServiceId(service.getId());
+                List<VisitObjectDto> objectsForService = relatedVisitObjects.stream()
+                        .map(object -> VisitObjectDto.builder()
+                                .visitObjectId(object.getId())
+                                .visitObjectName(object.getVisitObjectName())
+                                .groupVisitObjectId(object.getGroupVisitObjectId())
+                                .isRequire(Boolean.TRUE)
                                 .build())
                         .toList();
                 dto.setVisitObjects(objectsForService);
@@ -107,15 +88,15 @@ public class ServiceService {
                         .map(PriceDto::getCategoryVisitorId)
                         .collect(Collectors.toSet());
 
-                List<CategoryVisitorDto> categoriesForService = allCategories.stream()
-                        .map(visitorDto -> CategoryVisitorDto.builder()
-                                .categoryVisitorId(visitorDto.getCategoryVisitorId())
-                                .categoryVisitorName(visitorDto.getCategoryVisitorName())
-                                .groupCategoryVisitorId(visitorDto.getGroupCategoryVisitorId())
-                                .requireVisitorCount(categoryIdsInPrice.contains(visitorDto.getCategoryVisitorId()) ? 0 : null)
+                List<CategoryVisitorEntity> categoryEntities = categoryVisitorRepository.findAllById(categoryIdsInPrice);
+                List<CategoryVisitorDto> categoriesForService = categoryEntities.stream()
+                        .map(visitor -> CategoryVisitorDto.builder()
+                                .categoryVisitorId(visitor.getId())
+                                .categoryVisitorName(visitor.getCategoryVisitorName())
+                                .groupCategoryVisitorId(visitor.getGroupCategoryVisitorId())
+                                .requireVisitorCount(0)
                                 .build())
                         .toList();
-
                 dto.setCategoryVisitor(categoriesForService);
 
                 dto.setSeanceGrid(allSeanceGrid);
@@ -124,14 +105,14 @@ public class ServiceService {
         }
 
         return EditableServiceResponseDto.builder()
-                .groupVisitObject(groupVisitObjects)
-                .groupCategoryVisitor(groupCategoryVisitors)
-                .visitObjects(visitObjectItems)
-                .categoryVisitor(allCategories)
+                .visitObjects(allVisitObjects) // 🔥 добавь это
+                .categoryVisitor(allCategories) // 🔥 и это
                 .seanceGrid(allSeanceGrid)
                 .service(services)
                 .build();
     }
+
+
 
     /**
      * Создание новой услуги на основе данных DTO.

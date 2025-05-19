@@ -140,7 +140,8 @@ public class SoldOrderService {
                             orderServiceVisitorRepository.findByOrderServiceId(dtoItem.getOrderServiceId()).stream()
                                     .map(visitor -> new CategoryVisitorCountDto(
                                             visitor.getCategoryVisitor().getId(),
-                                            visitor.getVisitorCount()))
+                                            visitor.getVisitorCount(),
+                                            visitor.getCategoryVisitorName()))
                                     .toList();
                     dtoItem.setVisitor(visitorList);
                 })

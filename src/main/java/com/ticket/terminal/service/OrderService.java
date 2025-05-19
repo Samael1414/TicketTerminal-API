@@ -103,6 +103,7 @@ public class OrderService {
                             .orderService(orderServiceEntity)
                             .categoryVisitor(entity)
                             .visitorCount(visitorCountDto.getVisitorCount())
+                            .categoryVisitorName(entity.getCategoryVisitorName())
                             .build();
 
                     orderServiceVisitorRepository.save(visitorEntity);
@@ -125,7 +126,9 @@ public class OrderService {
 
             List<CategoryVisitorCountDto> visitors = orderServiceVisitorRepository.findByOrderServiceId(orderService.getId())
                     .stream()
-                    .map(v -> new CategoryVisitorCountDto(v.getCategoryVisitor().getId(), v.getVisitorCount()))
+                    .map(visitor -> new CategoryVisitorCountDto(visitor.getCategoryVisitor().getId(),
+                            visitor.getVisitorCount(),
+                            visitor.getCategoryVisitorName()))
                     .toList();
             dto.setCategoryVisitor(visitors);
 
@@ -229,6 +232,7 @@ public class OrderService {
                     orderServiceVisitorRepository.save(OrderServiceVisitorEntity.builder()
                             .orderService(orderServiceEntity)
                             .categoryVisitor(entity)
+                            .categoryVisitorName(entity.getCategoryVisitorName())
                             .visitorCount(countDto.getVisitorCount())
                             .build());
                 }
@@ -250,7 +254,9 @@ public class OrderService {
 
             List<CategoryVisitorCountDto> visitors = orderServiceVisitorRepository.findByOrderServiceId(orderService.getId())
                     .stream()
-                    .map(visitor -> new CategoryVisitorCountDto(visitor.getCategoryVisitor().getId(), visitor.getVisitorCount()))
+                    .map(visitor -> new CategoryVisitorCountDto(visitor.getCategoryVisitor().getId(),
+                            visitor.getVisitorCount(),
+                            visitor.getCategoryVisitorName()))
                     .toList();
             dto.setCategoryVisitor(visitors);
 

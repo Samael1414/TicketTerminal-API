@@ -29,4 +29,7 @@ WHERE osv.order_service_id = :orderServiceId
     @Modifying
     @Query("DELETE FROM VisitObjectEntity v WHERE v.service.id = :serviceId")
     void deleteAllByServiceId(@Param("serviceId") Long serviceId);
+
+    List<VisitObjectEntity> findAllByServiceId(Long serviceId);
+
 }

@@ -25,7 +25,10 @@ public class OrderServiceVisitorEntity {
     @JoinColumn(name = "category_visitor_id", nullable = false)
     private CategoryVisitorEntity categoryVisitor;
 
-
     @Column(name = "visitor_count", nullable = false)
     private Long visitorCount;
+
+    @Column(name = "category_visitor_name")
+    private String categoryVisitorName;
+
 }
