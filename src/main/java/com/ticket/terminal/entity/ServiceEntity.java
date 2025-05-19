@@ -45,7 +45,7 @@ public class ServiceEntity {
     private Boolean isPROCultureChecked;
 
     @Column(name = "is_disable_edit_visit_object", nullable = false)
-    private Boolean IsDisableEditVisitObject;
+    private Boolean isDisableEditVisitObject;
 
     @Column(name = "is_disable_edit_visitor", nullable = false)
     private Boolean isDisableEditVisitor;

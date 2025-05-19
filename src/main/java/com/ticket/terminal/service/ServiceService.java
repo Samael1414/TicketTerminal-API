@@ -4,6 +4,7 @@ import com.ticket.terminal.dto.*;
 import com.ticket.terminal.entity.*;
 import com.ticket.terminal.mapper.*;
 import com.ticket.terminal.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -154,7 +155,7 @@ public class ServiceService {
                 if (visitObjectId != null) {
                     // Проверка существования объекта посещения
                     VisitObjectEntity visitObject = visitObjectRepository.findById(visitObjectId)
-                            .orElseThrow(() -> new RuntimeException("VisitObject not found: " + visitObjectId));
+                            .orElseThrow(() -> new RuntimeException("VisitObject не найден: " + visitObjectId));
 
                     // Привязка к текущей услуге
                     visitObject.setService(entity);
@@ -174,14 +175,14 @@ public class ServiceService {
                 // Привязка к объекту посещения (если указан)
                 if (priceDto.getVisitObjectId() != null) {
                     VisitObjectEntity visitObject = visitObjectRepository.findById(priceDto.getVisitObjectId())
-                            .orElseThrow(() -> new RuntimeException("VisitObject not found: " + priceDto.getVisitObjectId()));
+                            .orElseThrow(() -> new RuntimeException("VisitObject не найден: " + priceDto.getVisitObjectId()));
                     priceEntity.setVisitObject(visitObject);
                 }
 
                 // Привязка к категории посетителей (если указана)
                 if (priceDto.getCategoryVisitorId() != null) {
                     CategoryVisitorEntity category = categoryVisitorRepository.findById(priceDto.getCategoryVisitorId())
-                            .orElseThrow(() -> new RuntimeException("CategoryVisitor not found: " + priceDto.getCategoryVisitorId()));
+                            .orElseThrow(() -> new RuntimeException("CategoryVisitor не найдена: " + priceDto.getCategoryVisitorId()));
                     priceEntity.setCategoryVisitor(category);
                 }
 
@@ -221,7 +222,7 @@ public class ServiceService {
                 Long visitObjectId = visitObjectDto.getVisitObjectId();
                 if (visitObjectId != null) {
                     VisitObjectEntity visitObject = visitObjectRepository.findById(visitObjectId)
-                            .orElseThrow(() -> new RuntimeException("VisitObject not found: " + visitObjectId));
+                            .orElseThrow(() -> new RuntimeException("VisitObject не найден: " + visitObjectId));
 
                     // Обновление связи с текущей услугой
                     visitObject.setService(entity);
@@ -238,13 +239,13 @@ public class ServiceService {
 
                 if (priceDto.getVisitObjectId() != null) {
                     VisitObjectEntity visitObject = visitObjectRepository.findById(priceDto.getVisitObjectId())
-                            .orElseThrow(() -> new RuntimeException("VisitObject not found: " + priceDto.getVisitObjectId()));
+                            .orElseThrow(() -> new RuntimeException("VisitObject не найден: " + priceDto.getVisitObjectId()));
                     priceEntity.setVisitObject(visitObject);
                 }
 
                 if (priceDto.getCategoryVisitorId() != null) {
                     CategoryVisitorEntity category = categoryVisitorRepository.findById(priceDto.getCategoryVisitorId())
-                            .orElseThrow(() -> new RuntimeException("CategoryVisitor not found: " + priceDto.getCategoryVisitorId()));
+                            .orElseThrow(() -> new RuntimeException("CategoryVisitor не найдена: " + priceDto.getCategoryVisitorId()));
                     priceEntity.setCategoryVisitor(category);
                 }
 
@@ -267,6 +268,12 @@ public class ServiceService {
 
         // Удаляем саму услугу
         serviceRepository.deleteById(id);
+    }
+
+    public ServiceDto findById(Long id) {
+        return serviceRepository.findById(id)
+                .map(serviceMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("Услуга не найдена"));
     }
 
 
