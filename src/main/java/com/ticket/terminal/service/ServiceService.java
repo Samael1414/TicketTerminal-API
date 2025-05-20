@@ -213,7 +213,7 @@ public class ServiceService {
     public EditableServiceDto updateService(Long id, ServiceUpdateDto dto) {
         // Загрузка существующей сущности по ID
         ServiceEntity entity = serviceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Service не найден"));
+                .orElseThrow(() -> new EntityNotFoundException("Услуга не найдена: " + id));
 
         // Обновление полей сущности из DTO
         applyDtoToEntity(dto, entity);
@@ -223,36 +223,45 @@ public class ServiceService {
         // Не трогаем сами visit_objects, они являются справочными
         priceRepository.deleteAllByServiceId(id);
 
-        // Повторная привязка указанных visit_objects к услуге
-        if (dto.getVisitObject() != null) {
+        // Сначала отвязываем все объекты посещения от этой услуги
+        List<VisitObjectEntity> exitingObjects = visitObjectRepository.findAllByServiceId(id);
+        for (VisitObjectEntity obj : exitingObjects) {
+            obj.setService(null);
+            visitObjectRepository.save(obj);
+        }
+
+        // Привязываем указанные объекты посещения к услуге
+        if (dto.getVisitObject() != null && !dto.getVisitObject().isEmpty()) {
             for (VisitObjectDto visitObjectDto : dto.getVisitObject()) {
                 Long visitObjectId = visitObjectDto.getVisitObjectId();
                 if (visitObjectId != null) {
                     VisitObjectEntity visitObject = visitObjectRepository.findById(visitObjectId)
-                            .orElseThrow(() -> new RuntimeException("VisitObject не найден: " + visitObjectId));
-
-                    // Обновление связи с текущей услугой
+                            .orElseThrow(() -> new RuntimeException("Объект посещения не найден: " + visitObjectId));
+                    
+                    // Обновляем связи с текущей услугой
                     visitObject.setService(entity);
                     visitObjectRepository.save(visitObject);
                 }
             }
         }
 
-        // Повторная вставка цен (перезапись)
-        if (dto.getPrice() != null) {
+        // Создаем новые цены
+        if (dto.getPrice() != null && !dto.getPrice().isEmpty()) {
             for (PriceDto priceDto : dto.getPrice()) {
                 PriceEntity priceEntity = new PriceEntity();
-                priceEntity.setService(entity); // связь с услугой
+
+                // Привязка к текущей услуге
+                priceEntity.setService(entity);
 
                 if (priceDto.getVisitObjectId() != null) {
                     VisitObjectEntity visitObject = visitObjectRepository.findById(priceDto.getVisitObjectId())
-                            .orElseThrow(() -> new RuntimeException("VisitObject не найден: " + priceDto.getVisitObjectId()));
+                            .orElseThrow(() -> new RuntimeException("Объект посещения не найден: " + priceDto.getVisitObjectId()));
                     priceEntity.setVisitObject(visitObject);
                 }
 
                 if (priceDto.getCategoryVisitorId() != null) {
                     CategoryVisitorEntity category = categoryVisitorRepository.findById(priceDto.getCategoryVisitorId())
-                            .orElseThrow(() -> new RuntimeException("CategoryVisitor не найдена: " + priceDto.getCategoryVisitorId()));
+                            .orElseThrow(() -> new RuntimeException("Категория посетителя не найдена: " + priceDto.getCategoryVisitorId()));
                     priceEntity.setCategoryVisitor(category);
                 }
 
@@ -261,9 +270,10 @@ public class ServiceService {
             }
         }
 
-        // Возврат обновлённого состояния
-        return buildEditableServiceDto(entity);
-    }
+    // Возвращаем расширенное представление услуги
+    return buildServiceDtoWithRelatedDataOnly(entity);
+}
+
 
 
 
