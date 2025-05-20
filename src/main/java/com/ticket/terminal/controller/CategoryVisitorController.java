@@ -51,7 +51,7 @@ public class CategoryVisitorController {
     }
 
     /**
-     * Удалить категорию по ID
+     * Каскадное удаление категории по ID
      */
     @Operation(summary = "Удаление категории по ID")
     @DeleteMapping("/Delete/{id}")

@@ -29,7 +29,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/TLMuseumGate/REST")
+@RequestMapping("/Info")
 public class OrganizationController {
 
     private final OrganizationService organizationService;

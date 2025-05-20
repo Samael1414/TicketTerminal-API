@@ -37,7 +37,7 @@ public class ServiceController {
 
     @Operation(summary = "Получить список простых услуг")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно"),
+            @ApiResponse(responseCode = "200", description = "Простые услуги успешно найдены"),
             @ApiResponse(responseCode = "401", description = "Не авторизован"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
@@ -49,7 +49,7 @@ public class ServiceController {
 
     @Operation(summary = "Получить список редактируемых услуг")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно"),
+            @ApiResponse(responseCode = "200", description = "Услуги для терминала успешно найдены"),
             @ApiResponse(responseCode = "401", description = "Не авторизован"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
@@ -61,13 +61,13 @@ public class ServiceController {
 
     @Operation(summary = "Получить полную информацию об услуге по id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно"),
+            @ApiResponse(responseCode = "200", description = "Услуга успешно найдена"),
             @ApiResponse(responseCode = "401", description = "Не авторизован"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "404", description = "Услуга не найдена"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @GetMapping("/Get/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<EditableServiceDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(serviceService.findById(id));
     }
@@ -75,6 +75,9 @@ public class ServiceController {
     @Operation(summary = "Создать новую услугу")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Услуга успешно создана"),
+            @ApiResponse(responseCode = "401", description = "Не авторизован"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
+            @ApiResponse(responseCode = "404", description = "Услуга не найдена"),
             @ApiResponse(responseCode = "400", description = "Некорректный запрос"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
@@ -88,9 +91,13 @@ public class ServiceController {
     @Operation(summary = "Обновить услугу по ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Услуга успешно обновлена"),
+            @ApiResponse(responseCode = "401", description = "Не авторизован"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "404", description = "Услуга не найдена"),
+            @ApiResponse(responseCode = "400", description = "Некорректный запрос"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
+
     @PutMapping("/Update/{id}")
     public ResponseEntity<EditableServiceDto> updateService(
             @PathVariable Long id,
@@ -99,6 +106,14 @@ public class ServiceController {
         return ResponseEntity.ok(updatedService);
     }
 
+    @Operation(summary = "Удалить услугу по ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Услуга успешно удалена"),
+            @ApiResponse(responseCode = "401", description = "Не авторизован"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
+            @ApiResponse(responseCode = "404", description = "Услуга не найдена"),
+            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+    })
     @DeleteMapping("/Delete/{id}")
     public ResponseEntity<Void> deleteService(@PathVariable Long id) {
         serviceService.deleteService(id);

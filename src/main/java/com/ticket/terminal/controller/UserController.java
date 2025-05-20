@@ -30,7 +30,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users")
+@RequestMapping("/Users")
 public class UserController {
 
     private final UserService userService;
@@ -55,7 +55,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @GetMapping("/{id}")
+    @GetMapping("/FindById/{id}")
     public ResponseEntity<UsersResponseDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
@@ -68,7 +68,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @PostMapping
+    @PostMapping("/Create")
     public ResponseEntity<UsersResponseDto> createUser(@RequestBody UsersCreateDto dto) {
         return new ResponseEntity<>(userService.createUser(dto), HttpStatus.CREATED);
     }
@@ -82,7 +82,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @PutMapping("/{id}")
+    @PutMapping("/Update/{id}")
     public ResponseEntity<UsersResponseDto> update(@PathVariable Long id, @RequestBody UsersCreateDto dto) {
         return ResponseEntity.ok(userService.update(id, dto));
     }
@@ -96,7 +96,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/Delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.deleteById(id);
         return ResponseEntity.noContent().build();

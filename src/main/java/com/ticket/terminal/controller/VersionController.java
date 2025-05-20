@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/TLMuseumGate/REST")
+@RequestMapping("/Version")
 @RequiredArgsConstructor
 public class VersionController {
 
@@ -40,7 +40,7 @@ public class VersionController {
             @ApiResponse(responseCode = "404", description = "Версия не найдена"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @GetMapping("/Version")
+    @GetMapping("/Api")
     public ResponseEntity<VersionDto> getVersion() {
         return ResponseEntity.ok(versionService.getAllVersion());
     }

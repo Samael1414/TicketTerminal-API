@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/TLMuseumGate/REST")
+@RequestMapping("/Excursion")
 public class ExcursionController {
 
     private final ExcursionService excursionService;
@@ -41,7 +41,7 @@ public class ExcursionController {
             @ApiResponse(responseCode = "404", description = "Не найдено"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @GetMapping("/Excursion")
+    @GetMapping("/List")
     public ExcursionListResponseDto getAllExcursion() {
         return excursionService.getAllExcursions();
     }
@@ -55,7 +55,7 @@ public class ExcursionController {
             @ApiResponse(responseCode = "404", description = "Не найдено"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @PostMapping("/Excursion/Booking")
+    @PostMapping("/Booking")
     public ResponseEntity<ExcursionResponseDto> createExcursion(@RequestBody ExcursionRequestDto dto) {
         return ResponseEntity.ok(excursionService.createExcursion(dto));
     }
