@@ -52,47 +52,67 @@ public class ServiceService {
     }
 
     public EditableServiceResponseDto getEditableServices() {
+        // Получаем все сеансы
         List<SeanceGridDto> allSeanceGrid = seanceGridMapper.toDtoList(seanceGridRepository.findAll());
+        // Получаем все объекты посещения
         List<VisitObjectItemDto> allVisitObjects = visitObjectRepository.findAll().stream()
                 .map(object -> VisitObjectItemDto.builder()
+                        // Получаем ID объекта посещения
                         .visitObjectId(object.getId())
+                        // Получаем название объекта посещения
                         .visitObjectName(object.getVisitObjectName())
+                        // Получаем ID категории посетителя
                         .categoryVisitorId(object.getCategoryVisitorId())
+                        // Получаем адрес объекта посещения
                         .address(object.getAddress())
+                        // Получаем комментарий объекта посещения
                         .comment(object.getComment())
                         .build())
                 .toList();
 
+        // Получаем все категории посетителей
         List<CategoryVisitorDto> allCategories = categoryVisitorMapper.toDtoList(categoryVisitorRepository.findAll());
 
-
+        // Получаем все услуги
         List<EditableServiceDto> services;
         try (Stream<ServiceEntity> stream = serviceRepository.findAllEditableServices().stream()) {
             services = stream.map(service -> {
+                // Преобразуем сущность в DTO
                 EditableServiceDto dto = editableServiceMapper.toDto(service);
 
+                // Получаем связанные объекты посещения
                 List<VisitObjectEntity> relatedVisitObjects = visitObjectRepository.findAllByServiceId(service.getId());
+                // Преобразуем связанные объекты в DTO
                 List<VisitObjectDto> objectsForService = relatedVisitObjects.stream()
                         .map(object -> VisitObjectDto.builder()
+                                // Получаем ID объекта посещения
                                 .visitObjectId(object.getId())
+                                // Получаем название объекта посещения
                                 .visitObjectName(object.getVisitObjectName())
+                                // Получаем ID группы объекта посещения
                                 .groupVisitObjectId(object.getGroupVisitObjectId())
+                                // Устанавливаем, что объект посещения связан с услугой
                                 .isRequire(Boolean.TRUE)
                                 .build())
                         .toList();
                 dto.setVisitObjects(objectsForService);
 
+                // Получаем цены для услуги
                 List<PriceDto> prices = priceMapper.toDtoList(priceRepository.findAllByServiceId(service.getId()));
                 dto.setPrices(prices);
 
+                // Получаем ID категорий посетителей из цен
                 Set<Long> categoryIdsInPrice = prices.stream()
                         .map(PriceDto::getCategoryVisitorId)
                         .collect(Collectors.toSet());
 
+                // Получаем категории посетителей из базы
                 List<CategoryVisitorEntity> categoryEntities = categoryVisitorRepository.findAllById(categoryIdsInPrice);
                 List<CategoryVisitorDto> categoriesForService = categoryEntities.stream()
                         .map(visitor -> CategoryVisitorDto.builder()
+                                // Получаем ID категории посетителя
                                 .categoryVisitorId(visitor.getId())
+                                // Получаем название категории посетителя
                                 .categoryVisitorName(visitor.getCategoryVisitorName())
                                 .groupCategoryVisitorId(visitor.getGroupCategoryVisitorId())
                                 .requireVisitorCount(0)
@@ -100,15 +120,20 @@ public class ServiceService {
                         .toList();
                 dto.setCategoryVisitor(categoriesForService);
 
+                // Устанавливаем сеансы в DTO
                 dto.setSeanceGrid(allSeanceGrid);
                 return dto;
             }).toList();
         }
 
         return EditableServiceResponseDto.builder()
+                // Устанавливаем объекты посещения
                 .visitObjects(allVisitObjects)
+                // Устанавливаем категории посетителей
                 .categoryVisitor(allCategories)
+                // Устанавливаем сеансы
                 .seanceGrid(allSeanceGrid)
+                // Устанавливаем услуги
                 .service(services)
                 .build();
     }
@@ -266,31 +291,21 @@ public class ServiceService {
         // Маппим основную сущность ServiceEntity в DTO-объект EditableServiceDto
         EditableServiceDto dto = editableServiceMapper.toDto(service);
         
-        // Получаем ID всех VisitObject, связанных с данной услугой
-        Set<Long> visitObjectIds = visitObjectRepository.findByServiceId(service.getId())
-                .stream()
-                .map(VisitObjectEntity::getId)
-                .collect(Collectors.toSet());
+        // Получаем связанные объекты посещения
+        List<VisitObjectEntity> relatedVisitObjects = visitObjectRepository.findAllByServiceId(service.getId());
         
         // Если есть связанные объекты, загружаем их из базы
-        List<VisitObjectDto> objectsForService = new ArrayList<>();
-        if (!visitObjectIds.isEmpty()) {
-            // Загружаем только связанные объекты
-            List<VisitObjectEntity> relatedVisitObjects = visitObjectRepository.findAllById(visitObjectIds);
-            objectsForService = relatedVisitObjects.stream()
-                    .map(object -> VisitObjectDto.builder()
-                            .visitObjectId(object.getId())
-                            .visitObjectName(object.getVisitObjectName())
-                            .isRequire(true) // Объекты уже связаны с услугой
-                            .groupVisitObjectId(object.getGroupVisitObjectId())
-                            .categoryVisitorId(object.getCategoryVisitorId())
-                            .address(object.getAddress())
-                            .comment(object.getComment())
-                            .build())
-                    .toList();
-        }
-        
-        // Устанавливаем список объектов посещения в DTO
+        List<VisitObjectDto> objectsForService = relatedVisitObjects.stream()
+                .map(Object -> VisitObjectDto.builder()
+                        .visitObjectId(Object.getId())
+                        .visitObjectName(Object.getVisitObjectName())
+                        .isRequire(true) // Объекты уже связаны с услугой
+                        .groupVisitObjectId(Object.getGroupVisitObjectId())
+                        .categoryVisitorId(Object.getCategoryVisitorId())
+                        .address(Object.getAddress())
+                        .comment(Object.getComment())
+                        .build())
+                .toList();
         dto.setVisitObjects(objectsForService);
         
         // Получаем все цены, связанные с услугой
