@@ -7,7 +7,11 @@ import com.ticket.terminal.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +34,8 @@ public class ServiceService {
     private final CategoryVisitorRepository categoryVisitorRepository;
     private final PriceMapper priceMapper;
     private final PriceRepository priceRepository;
+    private final ActionLogService actionLogService;
+    private final UserRepository userRepository;
 
     public SimpleServiceResponseDto getSimpleService() {
         List<SeanceGridDto> allSeanceGrid;
@@ -201,6 +207,15 @@ public class ServiceService {
             }
         }
 
+        UsersEntity currentUser = getCurrentUser();
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("CREATE_SERVICE")
+                .description(String.format("Создана услуга: %s", entity.getServiceName()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
+
         // Возврат DTO расширенного формата
         return buildEditableServiceDto(entity);
     }
@@ -270,6 +285,15 @@ public class ServiceService {
             }
         }
 
+        UsersEntity currentUser = getCurrentUser();
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("UPDATE_SERVICE")
+                .description(String.format("Обновлена услуга: %s", entity.getServiceName()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
+
     // Возвращаем расширенное представление услуги
     return buildServiceDtoWithRelatedDataOnly(entity);
 }
@@ -282,9 +306,17 @@ public class ServiceService {
     public void deleteService(Long id) {
         // Удаляем связанные цены
         priceRepository.deleteAllByServiceId(id);
-
         // Удаляем саму услугу
         serviceRepository.deleteById(id);
+
+        UsersEntity currentUser = getCurrentUser();
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("DELETE_SERVICE")
+                .description(String.format("Удалена услуга: id=%d", id))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
     }
 
     public EditableServiceDto findById(Long id) {
@@ -424,6 +456,13 @@ public class ServiceService {
         dto.setSeanceGrid(seanceGridMapper.toDtoList(seanceGridRepository.findAll()));
 
         return dto;
+    }
+
+    private UsersEntity getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
+        return userRepository.findByUserNameIgnoreCase(userName)
+                .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
 
 

@@ -2,13 +2,20 @@ package com.ticket.terminal.service;
 
 import com.ticket.terminal.dto.CategoryVisitorCreateDto;
 import com.ticket.terminal.dto.CategoryVisitorDto;
+import com.ticket.terminal.entity.ActionLogEntity;
 import com.ticket.terminal.entity.CategoryVisitorEntity;
+import com.ticket.terminal.entity.UsersEntity;
 import com.ticket.terminal.mapper.CategoryVisitorMapper;
 import com.ticket.terminal.repository.CategoryVisitorRepository;
+import com.ticket.terminal.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,6 +27,8 @@ public class CategoryVisitorService {
 
     // Маппер для преобразования между Entity и DTO
     private final CategoryVisitorMapper categoryVisitorMapper;
+    private final ActionLogService actionLogService;
+    private final UserRepository userRepository;
 
     /**
      * Получение всех категорий посетителей
@@ -48,6 +57,15 @@ public class CategoryVisitorService {
         // Сохраняем в БД
         CategoryVisitorEntity saved = categoryVisitorRepository.save(entity);
 
+        UsersEntity currentUser = getCurrentUser();
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("CREATE_CATEGORY_VISITOR")
+                .description(String.format("Создана категория посетителя: %s", saved.getCategoryVisitorName()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
+
         // Возвращаем обратно как DTO
         return categoryVisitorMapper.toDto(saved);
     }
@@ -69,6 +87,16 @@ public class CategoryVisitorService {
         entity.setCategoryVisitorName(dto.getCategoryVisitorName());
 
         CategoryVisitorEntity updated = categoryVisitorRepository.save(entity);
+
+        UsersEntity currentUser = getCurrentUser();
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("UPDATE_CATEGORY_VISITOR")
+                .description(String.format("Обновлена категория посетителя: %s", updated.getCategoryVisitorName()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
+
         return categoryVisitorMapper.toDto(updated);
     }
 
@@ -83,5 +111,21 @@ public class CategoryVisitorService {
     @Transactional
     public void delete(Long id) {
         categoryVisitorRepository.deleteById(id);
+
+        UsersEntity currentUser = getCurrentUser();
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("DELETE_CATEGORY_VISITOR")
+                .description(String.format("Удалена категория посетителя: id=%d", id))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
+    }
+
+    private UsersEntity getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
+        return userRepository.findByUserNameIgnoreCase(userName)
+                .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
 }

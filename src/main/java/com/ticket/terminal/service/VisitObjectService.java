@@ -2,13 +2,20 @@ package com.ticket.terminal.service;
 
 import com.ticket.terminal.dto.VisitObjectCreateDto;
 import com.ticket.terminal.dto.VisitObjectDto;
+import com.ticket.terminal.entity.ActionLogEntity;
+import com.ticket.terminal.entity.UsersEntity;
 import com.ticket.terminal.entity.VisitObjectEntity;
 import com.ticket.terminal.mapper.VisitObjectMapper;
+import com.ticket.terminal.repository.UserRepository;
 import com.ticket.terminal.repository.VisitObjectRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,6 +27,8 @@ public class VisitObjectService {
 
     // Маппер для преобразования между Entity и DTO
     private final VisitObjectMapper visitObjectMapper;
+    private final ActionLogService actionLogService;
+    private UserRepository userRepository;
 
     /**
      * Получить список всех объектов посещения из базы
@@ -53,10 +62,20 @@ public class VisitObjectService {
 
         // Используем маппер для создания сущности (игнорирует ID)
         VisitObjectEntity entity = visitObjectMapper.toEntity(tempDto);
+        VisitObjectEntity saved = visitObjectRepository.save(entity);
+
+        UsersEntity currentUser = getCurrentUser();
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("CREATE_VISIT_OBJECT")
+                .description(String.format("Создан объект посещения: %s", saved.getVisitObjectName()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
 
 
         // Сохраняем и возвращаем как DTO
-        return visitObjectMapper.toDto(visitObjectRepository.save(entity));
+        return visitObjectMapper.toDto(saved);
     }
 
     /**
@@ -85,6 +104,16 @@ public class VisitObjectService {
 
         // Сохранить и вернуть как DTO
         VisitObjectEntity updated = visitObjectRepository.save(entity);
+
+        UsersEntity currentUser = getCurrentUser();
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("UPDATE_VISIT_OBJECT")
+                .description(String.format("Обновлён объект посещения: %s", updated.getVisitObjectName()))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
+
         return visitObjectMapper.toDto(updated);
     }
 
@@ -98,5 +127,21 @@ public class VisitObjectService {
     @Transactional
     public void deleteVisitObject(Long id) {
         visitObjectRepository.deleteById(id);
+
+        UsersEntity currentUser = getCurrentUser();
+        actionLogService.save(ActionLogEntity.builder()
+                .user(currentUser)
+                .actionType("DELETE_VISIT_OBJECT")
+                .description(String.format("Удалён объект посещения: id=%d", id))
+                .createdAt(LocalDateTime.now())
+                .actorName(currentUser.getUserName())
+                .build());
+    }
+
+    private UsersEntity getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
+        return userRepository.findByUserNameIgnoreCase(userName)
+                .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
 }
