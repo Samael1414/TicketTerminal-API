@@ -159,10 +159,11 @@ public class ServiceService {
         if (dto.getVisitObject() != null) {
             for (VisitObjectDto visitObjectDto : dto.getVisitObject()) {
                 Long visitObjectId = visitObjectDto.getVisitObjectId();
-                if (visitObjectId != null) {
+                // Привязываем только объекты с флагом isRequire=true
+                if (visitObjectId != null && Boolean.TRUE.equals(visitObjectDto.getIsRequire())) {
                     // Проверка существования объекта посещения
                     VisitObjectEntity visitObject = visitObjectRepository.findById(visitObjectId)
-                            .orElseThrow(() -> new RuntimeException("VisitObject не найден: " + visitObjectId));
+                            .orElseThrow(() -> new EntityNotFoundException("Объект посещения не найден: " + visitObjectId));
 
                     // Привязка к текущей услуге
                     visitObject.setService(entity);
@@ -182,14 +183,14 @@ public class ServiceService {
                 // Привязка к объекту посещения (если указан)
                 if (priceDto.getVisitObjectId() != null) {
                     VisitObjectEntity visitObject = visitObjectRepository.findById(priceDto.getVisitObjectId())
-                            .orElseThrow(() -> new RuntimeException("VisitObject не найден: " + priceDto.getVisitObjectId()));
+                            .orElseThrow(() -> new EntityNotFoundException("Объект посещения не найден: " + priceDto.getVisitObjectId()));
                     priceEntity.setVisitObject(visitObject);
                 }
 
                 // Привязка к категории посетителей (если указана)
                 if (priceDto.getCategoryVisitorId() != null) {
                     CategoryVisitorEntity category = categoryVisitorRepository.findById(priceDto.getCategoryVisitorId())
-                            .orElseThrow(() -> new RuntimeException("CategoryVisitor не найдена: " + priceDto.getCategoryVisitorId()));
+                            .orElseThrow(() -> new EntityNotFoundException("Категория посетителя не найдена: " + priceDto.getCategoryVisitorId()));
                     priceEntity.setCategoryVisitor(category);
                 }
 
@@ -220,23 +221,26 @@ public class ServiceService {
         serviceRepository.save(entity);
 
         // Удаляем все старые цены, связанные с услугой
-        // Не трогаем сами visit_objects, они являются справочными
         priceRepository.deleteAllByServiceId(id);
 
         // Сначала отвязываем все объекты посещения от этой услуги
-        List<VisitObjectEntity> exitingObjects = visitObjectRepository.findAllByServiceId(id);
-        for (VisitObjectEntity obj : exitingObjects) {
+        List<VisitObjectEntity> existingObjects = visitObjectRepository.findAllByServiceId(id);
+        for (VisitObjectEntity obj : existingObjects) {
             obj.setService(null);
             visitObjectRepository.save(obj);
         }
 
         // Привязываем указанные объекты посещения к услуге
         if (dto.getVisitObject() != null && !dto.getVisitObject().isEmpty()) {
+            // Проверяем, запрещено ли редактирование объектов посещения
+            boolean disableEditVisitObject = Boolean.TRUE.equals(entity.getIsDisableEditVisitObject());
+            
             for (VisitObjectDto visitObjectDto : dto.getVisitObject()) {
                 Long visitObjectId = visitObjectDto.getVisitObjectId();
-                if (visitObjectId != null) {
+                // Привязываем только объекты с флагом isRequire=true или если редактирование запрещено
+                if (visitObjectId != null && (Boolean.TRUE.equals(visitObjectDto.getIsRequire()) || disableEditVisitObject)) {
                     VisitObjectEntity visitObject = visitObjectRepository.findById(visitObjectId)
-                            .orElseThrow(() -> new RuntimeException("Объект посещения не найден: " + visitObjectId));
+                            .orElseThrow(() -> new EntityNotFoundException("Объект посещения не найден: " + visitObjectId));
                     
                     // Обновляем связи с текущей услугой
                     visitObject.setService(entity);
