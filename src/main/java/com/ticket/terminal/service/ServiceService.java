@@ -86,19 +86,38 @@ public class ServiceService {
                 // Преобразуем сущность в DTO
                 EditableServiceDto dto = editableServiceMapper.toDto(service);
 
-                // Получаем связанные объекты посещения
-                List<VisitObjectEntity> relatedVisitObjects = visitObjectRepository.findAllByServiceId(service.getId());
-                // Преобразуем связанные объекты в DTO
-                List<VisitObjectDto> objectsForService = relatedVisitObjects.stream()
+                // Получаем объекты посещения, связанные с услугой напрямую
+                List<VisitObjectEntity> directlyRelatedObjects = visitObjectRepository.findAllByServiceId(service.getId());
+                
+                // Получаем ID объектов посещения, связанных с услугой через таблицу price
+                Set<Long> visitObjectIdsFromPrices = priceRepository.findAllByServiceId(service.getId()).stream()
+                        .filter(price -> price.getVisitObject() != null)
+                        .map(price -> price.getVisitObject().getId())
+                        .collect(Collectors.toSet());
+                
+                // Получаем объекты посещения по ID из цен (если они еще не включены в directlyRelatedObjects)
+                List<VisitObjectEntity> priceRelatedObjects = new ArrayList<>();
+                if (!visitObjectIdsFromPrices.isEmpty()) {
+                    priceRelatedObjects = visitObjectRepository.findAllById(visitObjectIdsFromPrices).stream()
+                            .filter(obj -> directlyRelatedObjects.stream().noneMatch(direct -> direct.getId().equals(obj.getId())))
+                            .toList();
+                }
+                
+                // Объединяем все связанные объекты
+                List<VisitObjectEntity> allRelatedObjects = new ArrayList<>(directlyRelatedObjects);
+                allRelatedObjects.addAll(priceRelatedObjects);
+                
+                // Преобразуем объекты в DTO
+                List<VisitObjectDto> objectsForService = allRelatedObjects.stream()
                         .map(object -> VisitObjectDto.builder()
-                                // Получаем ID объекта посещения
                                 .visitObjectId(object.getId())
-                                // Получаем название объекта посещения
                                 .visitObjectName(object.getVisitObjectName())
-                                // Получаем ID группы объекта посещения
+                                // Устанавливаем isRequire=true только для объектов, напрямую связанных с услугой
+                                .isRequire(directlyRelatedObjects.contains(object))
                                 .groupVisitObjectId(object.getGroupVisitObjectId())
-                                // Устанавливаем, что объект посещения связан с услугой
-                                .isRequire(Boolean.TRUE)
+                                .categoryVisitorId(object.getCategoryVisitorId())
+                                .address(object.getAddress())
+                                .comment(object.getComment())
                                 .build())
                         .toList();
                 dto.setVisitObjects(objectsForService);
@@ -274,13 +293,13 @@ public class ServiceService {
 
                 if (priceDto.getVisitObjectId() != null) {
                     VisitObjectEntity visitObject = visitObjectRepository.findById(priceDto.getVisitObjectId())
-                            .orElseThrow(() -> new RuntimeException("Объект посещения не найден: " + priceDto.getVisitObjectId()));
+                            .orElseThrow(() -> new EntityNotFoundException("Объект посещения не найден: " + priceDto.getVisitObjectId()));
                     priceEntity.setVisitObject(visitObject);
                 }
 
                 if (priceDto.getCategoryVisitorId() != null) {
                     CategoryVisitorEntity category = categoryVisitorRepository.findById(priceDto.getCategoryVisitorId())
-                            .orElseThrow(() -> new RuntimeException("Категория посетителя не найдена: " + priceDto.getCategoryVisitorId()));
+                            .orElseThrow(() -> new EntityNotFoundException("Категория посетителя не найдена: " + priceDto.getCategoryVisitorId()));
                     priceEntity.setCategoryVisitor(category);
                 }
 
@@ -337,19 +356,38 @@ public class ServiceService {
         // Маппим основную сущность ServiceEntity в DTO-объект EditableServiceDto
         EditableServiceDto dto = editableServiceMapper.toDto(service);
         
-        // Получаем связанные объекты посещения
-        List<VisitObjectEntity> relatedVisitObjects = visitObjectRepository.findAllByServiceId(service.getId());
+        // Получаем объекты посещения, связанные с услугой напрямую
+        List<VisitObjectEntity> directlyRelatedObjects = visitObjectRepository.findAllByServiceId(service.getId());
         
-        // Если есть связанные объекты, загружаем их из базы
-        List<VisitObjectDto> objectsForService = relatedVisitObjects.stream()
-                .map(Object -> VisitObjectDto.builder()
-                        .visitObjectId(Object.getId())
-                        .visitObjectName(Object.getVisitObjectName())
-                        .isRequire(true) // Объекты уже связаны с услугой
-                        .groupVisitObjectId(Object.getGroupVisitObjectId())
-                        .categoryVisitorId(Object.getCategoryVisitorId())
-                        .address(Object.getAddress())
-                        .comment(Object.getComment())
+        // Получаем ID объектов посещения, связанных с услугой через таблицу price
+        Set<Long> visitObjectIdsFromPrices = priceRepository.findAllByServiceId(service.getId()).stream()
+                .filter(price -> price.getVisitObject() != null)
+                .map(price -> price.getVisitObject().getId())
+                .collect(Collectors.toSet());
+        
+        // Получаем объекты посещения по ID из цен (если они еще не включены в directlyRelatedObjects)
+        List<VisitObjectEntity> priceRelatedObjects = new ArrayList<>();
+        if (!visitObjectIdsFromPrices.isEmpty()) {
+            priceRelatedObjects = visitObjectRepository.findAllById(visitObjectIdsFromPrices).stream()
+                    .filter(obj -> directlyRelatedObjects.stream().noneMatch(direct -> direct.getId().equals(obj.getId())))
+                    .toList();
+        }
+        
+        // Объединяем все связанные объекты
+        List<VisitObjectEntity> allRelatedObjects = new ArrayList<>(directlyRelatedObjects);
+        allRelatedObjects.addAll(priceRelatedObjects);
+        
+        // Преобразуем объекты в DTO
+        List<VisitObjectDto> objectsForService = allRelatedObjects.stream()
+                .map(object -> VisitObjectDto.builder()
+                        .visitObjectId(object.getId())
+                        .visitObjectName(object.getVisitObjectName())
+                        // Устанавливаем isRequire=true только для объектов, напрямую связанных с услугой
+                        .isRequire(directlyRelatedObjects.contains(object))
+                        .groupVisitObjectId(object.getGroupVisitObjectId())
+                        .categoryVisitorId(object.getCategoryVisitorId())
+                        .address(object.getAddress())
+                        .comment(object.getComment())
                         .build())
                 .toList();
         dto.setVisitObjects(objectsForService);
