@@ -17,7 +17,9 @@ public class ActionLogService {
     private final ActionLogMapper actionLogMapper;
 
     public void save(ActionLogEntity entity) {
-        actionLogMapper.toDto(actionLogRepository.save(entity));
+        // Убедимся, что id не установлен, чтобы использовать автоинкремент
+        entity.setId(null);
+        actionLogRepository.save(entity);
     }
 
     public List<ActionLogDto> findAll() {

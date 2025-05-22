@@ -28,7 +28,7 @@ public class VisitObjectService {
     // Маппер для преобразования между Entity и DTO
     private final VisitObjectMapper visitObjectMapper;
     private final ActionLogService actionLogService;
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     /**
      * Получить список всех объектов посещения из базы

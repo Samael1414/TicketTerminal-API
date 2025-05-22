@@ -26,20 +26,36 @@ public class UserService {
     private final ActionLogService actionLogService;
 
     public UsersResponseDto createUser(UsersCreateDto dto) {
+        // Проверяем уникальность email
+        if (dto.getEmail() != null && !dto.getEmail().isEmpty()) {
+            if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+                throw new IllegalArgumentException("Пользователь с таким email уже существует");
+            }
+        }
+        
+        // Проверяем уникальность userName
+        if (userRepository.findByUserNameIgnoreCase(dto.getUserName()).isPresent()) {
+            throw new IllegalArgumentException("Пользователь с таким именем уже существует");
+        }
+        
         UsersEntity entity = usersMapper.toEntity(dto);
         entity.setPassword(passwordEncoder.encode(dto.getPassword()));
         entity.setCreatedAt(LocalDateTime.now());
         UsersEntity saved = userRepository.save(entity);
 
-        UsersEntity currentUser = getCurrentUser();
-        actionLogService.save(ActionLogEntity.builder()
-                .user(currentUser)
-                .actionType("CREATE_USER")
-                .description(String.format("Cоздан пользователь: %s", saved.getUserName()))
-                .createdAt(LocalDateTime.now())
-                .actorName(currentUser.getUserName())
-                .build());
-
+        try {
+            UsersEntity currentUser = getCurrentUser();
+            ActionLogEntity logEntity = new ActionLogEntity();
+            logEntity.setUser(currentUser);
+            logEntity.setActionType("CREATE_USER");
+            logEntity.setDescription(String.format("Cоздан пользователь: %s", saved.getUserName()));
+            logEntity.setCreatedAt(LocalDateTime.now());
+            logEntity.setActorName(currentUser.getUserName());
+            actionLogService.save(logEntity);
+        } catch (Exception e) {
+            // Логируем ошибку, но не прерываем основной процесс
+            System.err.println("Ошибка при создании записи в журнале действий: " + e.getMessage());
+        }
 
         return usersMapper.toDto(saved);
     }
@@ -62,19 +78,38 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
         userRepository.deleteById(id);
 
-        UsersEntity currentUser = getCurrentUser();
-        actionLogService.save(ActionLogEntity.builder()
-                .user(currentUser)
-                .actionType("DELETE_USER")
-                .description(String.format("Удален пользователь: %s", user.getUserName()))
-                .createdAt(LocalDateTime.now())
-                .actorName(currentUser.getUserName())
-                .build());
+        try {
+            UsersEntity currentUser = getCurrentUser();
+            ActionLogEntity logEntity = new ActionLogEntity();
+            logEntity.setUser(currentUser);
+            logEntity.setActionType("DELETE_USER");
+            logEntity.setDescription(String.format("Удален пользователь: %s", user.getUserName()));
+            logEntity.setCreatedAt(LocalDateTime.now());
+            logEntity.setActorName(currentUser.getUserName());
+            actionLogService.save(logEntity);
+        } catch (Exception e) {
+            // Логируем ошибку, но не прерываем основной процесс
+            System.err.println("Ошибка при создании записи в журнале действий: " + e.getMessage());
+        }
     }
 
     public UsersResponseDto update(Long id, UsersCreateDto dto) {
         UsersEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+
+        // Проверяем уникальность email, если он изменился
+        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
+            if (!userRepository.findByEmailAndIdNot(dto.getEmail(), id).isEmpty()) {
+                throw new IllegalArgumentException("Пользователь с таким email уже существует");
+            }
+        }
+
+        // Проверяем уникальность userName, если он изменился
+        if (dto.getUserName() != null && !dto.getUserName().equals(user.getUserName())) {
+            if (!userRepository.findByUserNameAndIdNot(dto.getUserName(), id).isEmpty()) {
+                throw new IllegalArgumentException("Пользователь с таким именем уже существует");
+            }
+        }
 
         user.setUserName(dto.getUserName());
         user.setFullName(dto.getFullName());
@@ -85,14 +120,19 @@ public class UserService {
         user.setCreatedAt(user.getCreatedAt());
         UsersEntity updated = userRepository.save(user);
 
-        UsersEntity currentUser = getCurrentUser();
-        actionLogService.save(ActionLogEntity.builder()
-                .user(currentUser)
-                .actionType("UPDATE_USER")
-                .description(String.format("Обновлён пользователь: %s", updated.getUserName()))
-                .createdAt(LocalDateTime.now())
-                .actorName(currentUser.getUserName())
-                .build());
+        try {
+            UsersEntity currentUser = getCurrentUser();
+            ActionLogEntity logEntity = new ActionLogEntity();
+            logEntity.setUser(currentUser);
+            logEntity.setActionType("UPDATE_USER");
+            logEntity.setDescription(String.format("Обновлён пользователь: %s", updated.getUserName()));
+            logEntity.setCreatedAt(LocalDateTime.now());
+            logEntity.setActorName(currentUser.getUserName());
+            actionLogService.save(logEntity);
+        } catch (Exception e) {
+            // Логируем ошибку, но не прерываем основной процесс
+            System.err.println("Ошибка при создании записи в журнале действий: " + e.getMessage());
+        }
 
         return usersMapper.toDto(updated);
     }
