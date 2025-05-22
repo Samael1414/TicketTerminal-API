@@ -116,8 +116,12 @@ public class UserService {
         user.setPhone(dto.getPhone());
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setCreatedAt(user.getCreatedAt());
+
+        // Обновляем пароль только если он предоставлен и не пуст
+        if (dto.getPassword() != null && !dto.getPassword().trim().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+        // user.setCreatedAt(user.getCreatedAt()); // Обычно не обновляется при апдейте
         UsersEntity updated = userRepository.save(user);
 
         try {
