@@ -40,7 +40,7 @@ public class VersionController {
             @ApiResponse(responseCode = "404", description = "Версия не найдена"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @GetMapping("/Api")
+    @GetMapping("/Info")
     public ResponseEntity<VersionDto> getVersion() {
         return ResponseEntity.ok(versionService.getAllVersion());
     }
