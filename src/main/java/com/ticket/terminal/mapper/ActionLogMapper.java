@@ -15,6 +15,7 @@ public interface ActionLogMapper {
 
     @Mapping(target = "user", source = "userId")
     @Mapping(target = "actorName", source = "actorName")
+    @Mapping(target = "id", ignore = true)
     ActionLogEntity toEntity(ActionLogDto actionLogDto);
 
 
