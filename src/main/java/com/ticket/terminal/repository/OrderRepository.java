@@ -16,11 +16,11 @@ import org.springframework.lang.NonNull;
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 
     @Query("""
-    SELECT DISTINCT o FROM OrderEntity o
-    JOIN o.service s
-    WHERE s.dtVisit BETWEEN :start AND :end
+    SELECT o FROM OrderEntity o
+    WHERE o.created BETWEEN :start AND :end
 """)
-    List<OrderEntity> findOrdersByDtVisitBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+    List<OrderEntity> findOrdersCreatedBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE OrderEntity o SET o.orderStateId = :stateId WHERE o.id = :orderId")

@@ -182,7 +182,6 @@ public class SoldOrderService {
                 .build();
     }
 
-
     private LocalDateTime getEndOfDay() {
         return LocalDateTime.now().withHour(23).withMinute(59).withSecond(59);
     }
@@ -193,6 +192,4 @@ public class SoldOrderService {
         return userRepository.findByUserNameIgnoreCase(userName)
                 .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
-
-
 }

@@ -1,6 +1,7 @@
 package com.ticket.terminal.controller;
 
 import com.ticket.terminal.dto.ActionLogDto;
+import com.ticket.terminal.entity.ActionLogEntity;
 import com.ticket.terminal.service.ActionLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,6 +30,13 @@ public class ActionLogController {
     public ResponseEntity<List<ActionLogDto>> findAll() {
         List<ActionLogDto> logs = actionLogService.findAll();
         return ResponseEntity.ok(logs);
+    }
+
+    @Operation(summary = "Удаление логов старше 120 дней")
+    @DeleteMapping("/Delete")
+    public ResponseEntity<Void> delete() {
+        actionLogService.deleteLogsRange();
+        return ResponseEntity.ok().build();
     }
 
 }

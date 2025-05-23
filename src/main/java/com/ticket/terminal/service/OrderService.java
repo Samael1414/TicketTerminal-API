@@ -51,11 +51,12 @@ public class OrderService {
         LocalDateTime end = LocalDate.parse(dtEnd, formatter).plusDays(1).atStartOfDay().minusNanos(1);
 
         List<OrderDto> orderDtos;
-        try (Stream<OrderEntity> stream = orderRepository.findOrdersByDtVisitBetween(begin, end).stream()) {
+        try (Stream<OrderEntity> stream = orderRepository.findOrdersCreatedBetween(begin, end).stream()) {
             orderDtos = stream.map(orderMapper::toDto).toList();
         }
         return OrderResponseDto.builder().order(orderDtos).build();
     }
+
 
 
     @Transactional
