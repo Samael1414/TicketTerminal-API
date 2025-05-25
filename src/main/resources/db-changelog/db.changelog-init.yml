@@ -986,7 +986,7 @@ databaseChangeLog:
                     nullable: false
   - changeSet:
       id: rename-created-at-to-created
-      author: yourname
+      author: m_chelyshev
       preConditions:
         onFail: MARK_RAN
         onError: HALT
@@ -1001,7 +1001,7 @@ databaseChangeLog:
             columnDataType: timestamp
   - changeSet:
       id: add-updated-column-orders
-      author: yourname
+      author: m_chelyshev
       preConditions:
         onFail: MARK_RAN
         not:
@@ -1018,7 +1018,7 @@ databaseChangeLog:
                   defaultValueComputed: CURRENT_TIMESTAMP
   - changeSet:
       id: add-data-column-to-orders
-      author: terminal
+      author: m_chelyshev
       preConditions:
         - onFail: MARK_RAN
         - not:
@@ -1034,7 +1034,7 @@ databaseChangeLog:
                   type: bytea
   - changeSet:
       id: add-order-id-and-status-to-orders
-      author: yourname
+      author: m_chelyshev
       preConditions:
         - onFail: MARK_RAN
         - not:
@@ -1059,7 +1059,7 @@ databaseChangeLog:
                   type: varchar(255)
   - changeSet:
       id: create-sold-service-visit-object-table
-      author: code-copilot
+      author: m_chelyshev
       preConditions:
         - onFail: MARK_RAN
         - not:
@@ -1103,7 +1103,7 @@ databaseChangeLog:
 
   - changeSet:
       id: alter-services-cost-to-double
-      author: code-copilot
+      author: m_chelyshev
       changes:
         - modifyDataType:
             tableName: services
@@ -1112,7 +1112,7 @@ databaseChangeLog:
 
   - changeSet:
       id: alter-orders-cost-to-double
-      author: code-copilot
+      author: m_chelyshev
       changes:
         - modifyDataType:
             tableName: orders
@@ -1121,7 +1121,7 @@ databaseChangeLog:
 
   - changeSet:
       id: alter-order-services-cost-to-double
-      author: code-copilot
+      author: m_chelyshev
       changes:
         - modifyDataType:
             tableName: order_services
@@ -1130,7 +1130,7 @@ databaseChangeLog:
 
   - changeSet:
       id: alter-prices-cost-to-double
-      author: code-copilot
+      author: m_chelyshev
       changes:
         - modifyDataType:
             tableName: prices
@@ -1139,7 +1139,7 @@ databaseChangeLog:
 
   - changeSet:
       id: alter-payments-amount-to-double
-      author: code-copilot
+      author: m_chelyshev
       changes:
         - modifyDataType:
             tableName: payments

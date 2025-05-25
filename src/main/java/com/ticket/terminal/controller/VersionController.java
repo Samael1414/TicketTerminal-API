@@ -21,9 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/Version")
@@ -43,6 +41,20 @@ public class VersionController {
     @GetMapping("/Info")
     public ResponseEntity<VersionDto> getVersion() {
         return ResponseEntity.ok(versionService.getAllVersion());
+    }
+
+    @Operation(summary = "Обновить данные версии")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Успешно обновлено"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные"),
+            @ApiResponse(responseCode = "401", description = "Не авторизован"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
+            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+    })
+    @PostMapping("/Update")
+    public ResponseEntity<Void> updateVersion(@RequestBody VersionDto versionDto) {
+        versionService.updateAllVersion(versionDto);
+        return ResponseEntity.ok().build();
     }
 }
 
