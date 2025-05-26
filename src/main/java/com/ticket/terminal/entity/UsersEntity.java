@@ -46,6 +46,6 @@ public class UsersEntity {
     /**
      * Связь с правами доступа пользователя
      */
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private UserPermissionEntity permissions;
 }

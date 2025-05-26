@@ -1340,6 +1340,11 @@ databaseChangeLog:
   - changeSet:
       id: remove-fk-from-order-service-visitor
       author: m_chelyshev
+      preConditions:
+        - onFail: MARK_RAN
+        - foreignKeyConstraintExists:
+            foreignKeyName: fk_order_service_visitor_cv
+            tableName: order_service_visitor
       changes:
         - dropForeignKeyConstraint:
             baseTableName: order_service_visitor
@@ -1440,10 +1445,30 @@ databaseChangeLog:
               - column:
                   name: category_visitor_id
                   type: bigint
+  - changeSet:
+      id: fix-cascade-delete-prices-services
+      author: m_chelyshev
+      preConditions:
+        onFail: CONTINUE
+        foreignKeyConstraintExists:
+          foreignKeyName: fk_prices_services
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: prices
+            constraintName: fk_prices_services
+        - addForeignKeyConstraint:
+            baseTableName: prices
+            baseColumnNames: service_id
+            constraintName: fk_prices_services
+            referencedTableName: services
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+
 
   - changeSet:
-      id: add-user-permissions
-      author: system
+      id: 020-add-root-user-permissions
+      author: m_chelyshev
       preConditions:
         - onFail: MARK_RAN
         - not:
@@ -1451,6 +1476,100 @@ databaseChangeLog:
               tableName: users
               columnName: is_root
       changes:
-        - sqlFile:
-            path: db/migration/V1__add_user_permissions.sql
-            relativeToChangelogFile: false
+        # Добавление колонки is_root в таблицу users
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: is_root
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        # Создание таблицы user_permissions
+        - createTable:
+            tableName: user_permissions
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column: { name: can_manage_users, type: boolean, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: can_manage_services, type: boolean, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: can_manage_categories, type: boolean, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: can_manage_visit_objects, type: boolean, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: can_view_reports, type: boolean, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: can_manage_settings, type: boolean, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: can_manage_orders, type: boolean, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: can_export_data, type: boolean, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: can_import_data, type: boolean, defaultValueBoolean: false, constraints: { nullable: false } }
+
+        # Добавление внешнего ключа
+        - addForeignKeyConstraint:
+            baseTableName: user_permissions
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: CASCADE
+            constraintName: fk_user_permissions_user
+
+        # Создание индекса на user_id
+        - createIndex:
+            indexName: idx_user_permissions_user_id
+            tableName: user_permissions
+            columns:
+              - column:
+                  name: user_id
+
+        # Добавление root-пользователя если он отсутствует
+        - sql:
+            splitStatements: false
+            sql: |
+              DO $$
+              BEGIN
+                  IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'root') THEN
+                      INSERT INTO users (user_name, password, role, full_name, created_at, is_root)
+                      VALUES (
+                          'root',
+                          '$2a$12$K5Lzs0/CN7.sT.CG72FY9.8CjX7YMZerhVZcU.vWZbqECDCR3jgK6',
+                          'ADMIN',
+                          'Root Administrator',
+                          NOW(),
+                          TRUE
+                      );
+
+                      WITH root_user AS (SELECT id FROM users WHERE user_name = 'root' LIMIT 1)
+                      INSERT INTO user_permissions (
+                          user_id, can_manage_users, can_manage_services, can_manage_categories,
+                          can_manage_visit_objects, can_view_reports, can_manage_settings,
+                          can_manage_orders, can_export_data, can_import_data
+                      )
+                      SELECT id, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE
+                      FROM root_user;
+
+                  ELSE
+                      UPDATE users SET is_root = TRUE WHERE user_name = 'root';
+
+                      WITH root_user AS (SELECT id FROM users WHERE user_name = 'root' LIMIT 1)
+                      INSERT INTO user_permissions (
+                          user_id, can_manage_users, can_manage_services, can_manage_categories,
+                          can_manage_visit_objects, can_view_reports, can_manage_settings,
+                          can_manage_orders, can_export_data, can_import_data
+                      )
+                      SELECT id, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE
+                      FROM root_user
+                      WHERE NOT EXISTS (
+                          SELECT 1 FROM user_permissions p JOIN root_user r ON p.user_id = r.id
+                      );
+                  END IF;
+              END
+              $$;
+
