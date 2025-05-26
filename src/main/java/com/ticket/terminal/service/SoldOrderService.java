@@ -23,7 +23,7 @@ public class SoldOrderService {
 
     private static final String CHECK_MODE_BARCODE = "CHECK-MODE";
     private static final int STATUS_WAITING = 1;
-    private static final int STATUS_PAID = 2;
+    private static final int STATUS_PAID = 5;
     private static final int SERVICE_STATE_PAID = 5;
 
     private final SoldServiceRepository soldServiceRepository;
