@@ -51,7 +51,7 @@ public class VersionController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
-    @PostMapping("/Update")
+    @PutMapping("/Update")
     public ResponseEntity<Void> updateVersion(@RequestBody VersionDto versionDto) {
         versionService.updateAllVersion(versionDto);
         return ResponseEntity.ok().build();
