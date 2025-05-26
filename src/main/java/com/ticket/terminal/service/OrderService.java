@@ -43,27 +43,45 @@ public class OrderService {
         OrderEntity entity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Заказ не найден"));
         try {
-            return orderMapper.toDto(entity);
-        } catch (EntityNotFoundException e) {
-            // Логируем ошибку, но продолжаем обработку
-            System.err.println("Ошибка при маппинге заказа: " + e.getMessage());
-            
-            // Пробуем загрузить заказ с EAGER загрузкой услуг
-            entity = orderRepository.findById(orderId)
-                    .orElseThrow(() -> new EntityNotFoundException("Заказ не найден"));
-            
-            // Инициализируем услуги вручную для предотвращения LazyInitializationException
+            // Предварительная инициализация услуг для предотвращения LazyInitializationException
             entity.getService().forEach(service -> {
                 try {
                     if (service.getService() != null) {
                         service.getService().getServiceName(); // Попытка инициализации
                     }
-                } catch (EntityNotFoundException ex) {
+                } catch (Exception ex) {
                     // Игнорируем ошибку, так как мы обработаем её в маппере
                 }
             });
             
             return orderMapper.toDto(entity);
+        } catch (EntityNotFoundException e) {
+            // Логируем ошибку, но продолжаем обработку
+            System.err.println("Ошибка при маппинге заказа: " + e.getMessage());
+            
+            try {
+                // Пробуем загрузить заказ заново
+                entity = orderRepository.findById(orderId)
+                        .orElseThrow(() -> new EntityNotFoundException("Заказ не найден"));
+                
+                return orderMapper.toDto(entity);
+            } catch (Exception ex) {
+                System.err.println("Не удалось обработать заказ с id " + orderId + ": " + ex.getMessage());
+                
+                // Создаем упрощенный DTO с минимальной информацией
+                OrderDto simpleDto = new OrderDto();
+                simpleDto.setOrderId(entity.getOrderId());
+                simpleDto.setOrderBarcode(entity.getOrderBarcode());
+                simpleDto.setOrderStateId(entity.getOrderStateId());
+                simpleDto.setVisitorName1(entity.getVisitorName1());
+                simpleDto.setVisitorPhone(entity.getVisitorPhone());
+                simpleDto.setVisitorMail(entity.getVisitorMail());
+                // Добавляем пустой список услуг, чтобы избежать NullPointerException
+                simpleDto.setService(new java.util.ArrayList<>());
+                // Устанавливаем стоимость заказа
+                simpleDto.setCost(entity.getCost());
+                return simpleDto;
+            }
         }
     }
 
@@ -72,21 +90,54 @@ public class OrderService {
         LocalDateTime begin = LocalDate.parse(dtBegin, formatter).atStartOfDay();
         LocalDateTime end = LocalDate.parse(dtEnd, formatter).plusDays(1).atStartOfDay().minusNanos(1);
 
-        List<OrderDto> orderDtos;
-        try (Stream<OrderEntity> stream = orderRepository.findOrdersCreatedBetween(begin, end).stream()) {
-            orderDtos = stream
-                .map(entity -> {
+        List<OrderEntity> orders = orderRepository.findOrdersCreatedBetween(begin, end);
+        List<OrderDto> orderDtos = new java.util.ArrayList<>();
+        
+        for (OrderEntity entity : orders) {
+            try {
+                // Предварительная инициализация услуг для предотвращения LazyInitializationException
+                entity.getService().forEach(service -> {
                     try {
-                        return orderMapper.toDto(entity);
-                    } catch (EntityNotFoundException e) {
-                        // Логируем ошибку, но продолжаем обработку
-                        System.err.println("Ошибка при маппинге заказа: " + e.getMessage());
-                        return null;
+                        if (service.getService() != null) {
+                            service.getService().getServiceName(); // Попытка инициализации
+                        }
+                    } catch (Exception ex) {
+                        // Игнорируем ошибку, так как мы обработаем её в маппере
                     }
-                })
-                .filter(dto -> dto != null)
-                .toList();
+                });
+                
+                OrderDto orderDto = orderMapper.toDto(entity);
+                orderDtos.add(orderDto);
+            } catch (EntityNotFoundException e) {
+                // Логируем ошибку, но продолжаем обработку
+                System.err.println("Ошибка при маппинге заказа: " + e.getMessage());
+                
+                // Пробуем загрузить заказ заново
+                OrderEntity refreshedEntity = orderRepository.findById(entity.getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Заказ не найден"));
+                
+                try {
+                    OrderDto orderDto = orderMapper.toDto(refreshedEntity);
+                    orderDtos.add(orderDto);
+                } catch (Exception ex) {
+                    System.err.println("Не удалось обработать заказ с id " + entity.getId() + ": " + ex.getMessage());
+                    // Создаем упрощенный DTO с минимальной информацией
+                    OrderDto simpleDto = new OrderDto();
+                    simpleDto.setOrderId(entity.getOrderId());
+                    simpleDto.setOrderBarcode(entity.getOrderBarcode());
+                    simpleDto.setOrderStateId(entity.getOrderStateId());
+                    simpleDto.setVisitorName1(entity.getVisitorName1());
+                    simpleDto.setVisitorPhone(entity.getVisitorPhone());
+                    simpleDto.setVisitorMail(entity.getVisitorMail());
+                    // Добавляем пустой список услуг, чтобы избежать NullPointerException
+                    simpleDto.setService(new java.util.ArrayList<>());
+                    // Устанавливаем стоимость заказа
+                    simpleDto.setCost(entity.getCost());
+                    orderDtos.add(simpleDto);
+                }
+            }
         }
+        
         return OrderResponseDto.builder().order(orderDtos).build();
     }
 
