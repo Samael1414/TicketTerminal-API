@@ -18,6 +18,7 @@ package com.ticket.terminal.controller;
 
 import com.ticket.terminal.dto.UsersCreateDto;
 import com.ticket.terminal.dto.UsersResponseDto;
+import com.ticket.terminal.security.annotation.RequireManageUsers;
 import com.ticket.terminal.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,12 +29,44 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+/**
+ * Контроллер для управления пользователями
+ * Требует права на управление пользователями
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/Users")
 public class UserController {
 
     private final UserService userService;
+    
+    /**
+     * Получение информации о текущем пользователе
+     */
+    @Operation(summary = "Получить информацию о текущем пользователе")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Успешно"),
+            @ApiResponse(responseCode = "401", description = "Не авторизован"),
+            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+    })
+    @GetMapping("/Current")
+    public ResponseEntity<UsersResponseDto> getCurrentUser() {
+        return ResponseEntity.ok(userService.getCurrentUserInfo());
+    }
+    
+    /**
+     * Проверка, является ли текущий пользователь root-пользователем
+     */
+    @Operation(summary = "Проверить, является ли текущий пользователь root-пользователем")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Успешно"),
+            @ApiResponse(responseCode = "401", description = "Не авторизован"),
+            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+    })
+    @GetMapping("/IsRoot")
+    public ResponseEntity<Boolean> isCurrentUserRoot() {
+        return ResponseEntity.ok(userService.isCurrentUserRoot());
+    }
 
     @Operation(summary = "Получить список пользователей")
     @ApiResponses(value = {
@@ -42,6 +75,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
+    @RequireManageUsers
     @GetMapping
     public ResponseEntity<List<UsersResponseDto>> findAll() {
         return ResponseEntity.ok(userService.findAll());
@@ -55,6 +89,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
+    @RequireManageUsers
     @GetMapping("/FindById/{id}")
     public ResponseEntity<UsersResponseDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
@@ -68,6 +103,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
+    @RequireManageUsers
     @PostMapping("/Create")
     public ResponseEntity<UsersResponseDto> createUser(@RequestBody UsersCreateDto dto) {
         return new ResponseEntity<>(userService.createUser(dto), HttpStatus.CREATED);
@@ -82,6 +118,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
+    @RequireManageUsers
     @PutMapping("/Update/{id}")
     public ResponseEntity<UsersResponseDto> update(@PathVariable Long id, @RequestBody UsersCreateDto dto) {
         return ResponseEntity.ok(userService.update(id, dto));
@@ -96,6 +133,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
+    @RequireManageUsers
     @DeleteMapping("/Delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.deleteById(id);

@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 import java.time.LocalDateTime;
 
+/**
+ * DTO для ответа с информацией о пользователе
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,4 +37,10 @@ public class UsersResponseDto {
 
     @JsonProperty("CreatedAt")
     private LocalDateTime createdAt;
+    
+    @JsonProperty("IsRoot")
+    private Boolean isRoot;
+    
+    @JsonProperty("Permissions")
+    private UserPermissionDto permissions;
 }

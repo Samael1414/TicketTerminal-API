@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
+/**
+ * DTO для создания пользователя
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,4 +33,10 @@ public class UsersCreateDto {
 
     @JsonProperty("Email")
     private String email;
+    
+    @JsonProperty("IsRoot")
+    private Boolean isRoot = false;
+    
+    @JsonProperty("Permissions")
+    private UserPermissionDto permissions = new UserPermissionDto();
 }

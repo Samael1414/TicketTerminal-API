@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+/**
+ * Сущность пользователя системы
+ */
 @Entity
 @Getter
 @Setter
@@ -33,4 +36,16 @@ public class UsersEntity {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm")
     private LocalDateTime createdAt;
+    
+    /**
+     * Признак, что пользователь является root-пользователем (имеет все права и не может быть изменен)
+     */
+    @Column(nullable = false)
+    private Boolean isRoot = false;
+    
+    /**
+     * Связь с правами доступа пользователя
+     */
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private UserPermissionEntity permissions;
 }
