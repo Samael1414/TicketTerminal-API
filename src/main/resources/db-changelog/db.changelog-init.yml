@@ -1441,8 +1441,16 @@ databaseChangeLog:
                   name: category_visitor_id
                   type: bigint
 
-
-
-
-
-
+  - changeSet:
+      id: add-user-permissions
+      author: system
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            columnExists:
+              tableName: users
+              columnName: is_root
+      changes:
+        - sqlFile:
+            path: db/migration/V1__add_user_permissions.sql
+            relativeToChangelogFile: false
