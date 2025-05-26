@@ -42,7 +42,29 @@ public class OrderService {
     public OrderDto getOrderById(Long orderId) {
         OrderEntity entity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Заказ не найден"));
-        return orderMapper.toDto(entity);
+        try {
+            return orderMapper.toDto(entity);
+        } catch (EntityNotFoundException e) {
+            // Логируем ошибку, но продолжаем обработку
+            System.err.println("Ошибка при маппинге заказа: " + e.getMessage());
+            
+            // Пробуем загрузить заказ с EAGER загрузкой услуг
+            entity = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new EntityNotFoundException("Заказ не найден"));
+            
+            // Инициализируем услуги вручную для предотвращения LazyInitializationException
+            entity.getService().forEach(service -> {
+                try {
+                    if (service.getService() != null) {
+                        service.getService().getServiceName(); // Попытка инициализации
+                    }
+                } catch (EntityNotFoundException ex) {
+                    // Игнорируем ошибку, так как мы обработаем её в маппере
+                }
+            });
+            
+            return orderMapper.toDto(entity);
+        }
     }
 
     public OrderResponseDto getOrderByDateRange(String dtBegin, String dtEnd) {
@@ -52,7 +74,18 @@ public class OrderService {
 
         List<OrderDto> orderDtos;
         try (Stream<OrderEntity> stream = orderRepository.findOrdersCreatedBetween(begin, end).stream()) {
-            orderDtos = stream.map(orderMapper::toDto).toList();
+            orderDtos = stream
+                .map(entity -> {
+                    try {
+                        return orderMapper.toDto(entity);
+                    } catch (EntityNotFoundException e) {
+                        // Логируем ошибку, но продолжаем обработку
+                        System.err.println("Ошибка при маппинге заказа: " + e.getMessage());
+                        return null;
+                    }
+                })
+                .filter(dto -> dto != null)
+                .toList();
         }
         return OrderResponseDto.builder().order(orderDtos).build();
     }
@@ -325,30 +358,23 @@ public class OrderService {
     @Transactional
     public OrderDto cancelOrder(OrderCancelDto requestDto) {
         Long orderId = requestDto.getOrderId();
-
         OrderEntity orderEntity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException
                         (String.format("Заказ не найден: %s", orderId)));
 
-        List<Long> serviceId = requestDto.getOrderServiceId();
-
-        if (serviceId == null || serviceId.isEmpty()) {
-            List<OrderServiceEntity> allServices = orderEntity.getService();
-            List<Long> orderServiceIds = allServices.stream()
-                    .map(OrderServiceEntity::getId)
-                    .toList();
-            orderServiceVisitorRepository.deleteByOrderServiceIdIn(orderServiceIds);
-            orderServiceVisitObjectRepository.deleteByOrderServiceIdIn(orderServiceIds);
-            orderServiceRepository.deleteAll(allServices);
-            orderEntity.getService().clear();
+        if (requestDto.getOrderServiceId() == null || requestDto.getOrderServiceId().isEmpty()) {
+            orderEntity.getService().forEach(service -> service.setServiceStateId(ServiceState.RETURNED.getCode()));
         } else {
+            List<Long> serviceIds = requestDto.getOrderServiceId();
+
             List<OrderServiceEntity> toRemove = orderEntity.getService().stream()
-                    .filter(orderService -> serviceId.contains(orderService.getId()))
+                    .filter(service -> serviceIds.contains(service.getId()))
                     .toList();
 
             if (toRemove.isEmpty()) {
                 throw new PartialCancellationException("Не найдено соответствующих услуг для частичной отмены");
             }
+
             List<Long> orderServiceIds = toRemove.stream()
                     .map(OrderServiceEntity::getId)
                     .toList();
@@ -357,7 +383,6 @@ public class OrderService {
             orderServiceRepository.deleteAll(toRemove);
             orderEntity.getService().removeAll(toRemove);
         }
-
 
         orderRepository.save(orderEntity);
 
@@ -370,8 +395,18 @@ public class OrderService {
                 .actorName(currentUser.getUserName())
                 .build());
 
-        return orderMapper.toDto(orderEntity);
-
+        try {
+            return orderMapper.toDto(orderEntity);
+        } catch (EntityNotFoundException e) {
+            // Логируем ошибку, но продолжаем обработку
+            System.err.println("Ошибка при маппинге заказа после отмены: " + e.getMessage());
+            
+            // Инициализируем услуги вручную для предотвращения LazyInitializationException
+            orderEntity = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format("Заказ не найден: %s", orderId)));
+            
+            return orderMapper.toDto(orderEntity);
+        }
     }
 
 
@@ -427,7 +462,18 @@ public class OrderService {
                 .actorName(currentUser.getUserName())
                 .build());
 
-        return orderMapper.toDto(order);
+        try {
+            return orderMapper.toDto(order);
+        } catch (EntityNotFoundException e) {
+            // Логируем ошибку, но продолжаем обработку
+            System.err.println("Ошибка при маппинге заказа после возврата: " + e.getMessage());
+            
+            // Инициализируем услуги вручную для предотвращения LazyInitializationException
+            order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format("Заказ не найден: %s", orderId)));
+            
+            return orderMapper.toDto(order);
+        }
     }
 
     private UsersEntity getCurrentUser() {

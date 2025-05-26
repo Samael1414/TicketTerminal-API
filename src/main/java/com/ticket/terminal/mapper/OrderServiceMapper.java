@@ -16,8 +16,8 @@ public interface OrderServiceMapper {
     @Mapping(target = "orderServiceId", source = "id")
     @Mapping(target = "serviceStateName",
             expression = "java(com.ticket.terminal.enums.ServiceState.getNameByCode(entity.getServiceStateId()))")
-    @Mapping(target = "serviceId", source = "service.id")
-    @Mapping(target = "serviceName", source = "service.serviceName")
+    @Mapping(target = "serviceId", expression = "java(entity.getService() != null ? entity.getService().getId() : null)")
+    @Mapping(target = "serviceName", expression = "java(entity.getService() != null ? entity.getService().getServiceName() : \"Удаленная услуга\")")
     @Mapping(target = "dtVisit", expression = "java(toZoned(entity.getDtVisit()))")
     OrderServiceDto toDto(OrderServiceEntity entity);
 
@@ -37,7 +37,7 @@ public interface OrderServiceMapper {
     @Mapping(target = "order", ignore = true)
     OrderServiceEntity toEntity(EditableOrderServiceDto editableDto);
 
-    @Mapping(target = "serviceId", source = "service.id")
+    @Mapping(target = "serviceId", expression = "java(entity.getService() != null ? entity.getService().getId() : null)")
     @Mapping(target = "serviceCost", source = "cost")
     @Mapping(target = "dtVisit", expression = "java(toZoned(entity.getDtVisit()))")
     @Mapping(target = "dtBegin", expression = "java(formatDate(entity.getDtVisit()))")
