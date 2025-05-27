@@ -1639,4 +1639,22 @@ databaseChangeLog:
             columnName: name
             tableName: requisite_info
 
+  - changeSet:
+      id: add-service-name-to-order-services
+      author: cascade
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            columnExists:
+              tableName: order_services
+              columnName: service_name
+      changes:
+        - addColumn:
+            tableName: order_services
+            columns:
+              - column:
+                  name: service_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
 
