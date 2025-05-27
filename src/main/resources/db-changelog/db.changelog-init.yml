@@ -1529,47 +1529,55 @@ databaseChangeLog:
               - column:
                   name: user_id
 
-        # Добавление root-пользователя если он отсутствует
+  - changeSet:
+      id: force-add-root-user
+      author: m_chelyshev
+      context: dev
+      changes:
         - sql:
             splitStatements: false
+            stripComments: true
             sql: |
               DO $$
               BEGIN
-                  IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'root') THEN
-                      INSERT INTO users (user_name, password, role, full_name, created_at, is_root)
-                      VALUES (
-                          'root',
-                          '$2a$12$K5Lzs0/CN7.sT.CG72FY9.8CjX7YMZerhVZcU.vWZbqECDCR3jgK6',
-                          'ADMIN',
-                          'Root Administrator',
-                          NOW(),
-                          TRUE
-                      );
+                IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'root') THEN
+                  INSERT INTO users (user_name, password, role, full_name, created_at, is_root)
+                  VALUES (
+                    'root',
+                    '$2a$12$K5Lzs0/CN7.sT.CG72FY9.8CjX7YMZerhVZcU.vWZbqECDCR3jgK6',
+                    'ADMIN',
+                    'Root Administrator',
+                    NOW(),
+                    TRUE
+                  );
+                END IF;
+              END $$;
 
-                      WITH root_user AS (SELECT id FROM users WHERE user_name = 'root' LIMIT 1)
-                      INSERT INTO user_permissions (
-                          user_id, can_manage_users, can_manage_services, can_manage_categories,
-                          can_manage_visit_objects, can_view_reports, can_manage_settings,
-                          can_manage_orders, can_export_data, can_import_data
-                      )
-                      SELECT id, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE
-                      FROM root_user;
+  - changeSet:
+      id: force-add-root-permissions
+      author: m_chelyshev
+      context: dev
+      changes:
+        - sql:
+            splitStatements: false
+            stripComments: true
+            sql: |
+              DO $$
+              BEGIN
+                IF EXISTS (
+                  SELECT 1 FROM users WHERE user_name = 'root'
+                ) AND NOT EXISTS (
+                  SELECT 1 FROM user_permissions WHERE user_id = (SELECT id FROM users WHERE user_name = 'root')
+                ) THEN
+                  INSERT INTO user_permissions (
+                    user_id, can_manage_users, can_manage_services, can_manage_categories,
+                    can_manage_visit_objects, can_view_reports, can_manage_settings,
+                    can_manage_orders, can_export_data, can_import_data
+                  )
+                  SELECT id, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE
+                  FROM users WHERE user_name = 'root';
+                END IF;
+              END $$;
+  
 
-                  ELSE
-                      UPDATE users SET is_root = TRUE WHERE user_name = 'root';
-
-                      WITH root_user AS (SELECT id FROM users WHERE user_name = 'root' LIMIT 1)
-                      INSERT INTO user_permissions (
-                          user_id, can_manage_users, can_manage_services, can_manage_categories,
-                          can_manage_visit_objects, can_view_reports, can_manage_settings,
-                          can_manage_orders, can_export_data, can_import_data
-                      )
-                      SELECT id, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE
-                      FROM root_user
-                      WHERE NOT EXISTS (
-                          SELECT 1 FROM user_permissions p JOIN root_user r ON p.user_id = r.id
-                      );
-                  END IF;
-              END
-              $$;
 
