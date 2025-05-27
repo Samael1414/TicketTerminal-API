@@ -267,6 +267,10 @@ public class OrderService {
                     orderService.setCost(cost);
                     orderService.setServiceCount(serviceDto.getServiceCount());
                     orderService.setServiceStateId(ServiceState.ORDERED.getCode());
+                    
+                    // Сохраняем имя услуги непосредственно в OrderServiceEntity
+                    orderService.setServiceName(service.getServiceName());
+                    
                     return orderService;
                 })
                 .toList();
@@ -399,6 +403,10 @@ public class OrderService {
                     orderService.setCost(cost);
                     orderService.setServiceCount(editableDto.getServiceCount());
                     orderService.setServiceStateId(ServiceState.ORDERED.getCode());
+                    
+                    // Сохраняем имя услуги непосредственно в OrderServiceEntity
+                    orderService.setServiceName(service.getServiceName());
+                    
                     return orderService;
                 })
                 .toList();

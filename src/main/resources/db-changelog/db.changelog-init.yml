@@ -1469,6 +1469,7 @@ databaseChangeLog:
   - changeSet:
       id: 020-add-root-user-permissions
       author: m_chelyshev
+      runOnChange: true
       preConditions:
         - onFail: MARK_RAN
         - not:

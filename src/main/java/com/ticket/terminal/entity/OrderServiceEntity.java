@@ -20,9 +20,14 @@ public class OrderServiceEntity {
     @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
 
+    // Связь с сервисом может быть null, если услуга была удалена
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_id", nullable = false)
+    @JoinColumn(name = "service_id")
     private ServiceEntity service;
+    
+    // Поля для хранения данных услуги (используются существующие поля)
+    @Column(name = "service_name")
+    private String serviceName;
 
     @Column(nullable = false)
     private Double cost;
