@@ -1578,6 +1578,64 @@ databaseChangeLog:
                   FROM users WHERE user_name = 'root';
                 END IF;
               END $$;
-  
+  - changeSet:
+      id: make-gate-info-fields-nullable
+      author: m_chelyshev
+      changes:
+        - dropNotNullConstraint:
+            columnName: name
+            tableName: gate_info
+        - dropNotNullConstraint:
+            columnName: version
+            tableName: gate_info
+        - dropNotNullConstraint:
+            columnName: major
+            tableName: gate_info
+        - dropNotNullConstraint:
+            columnName: minor
+            tableName: gate_info
+        - dropNotNullConstraint:
+            columnName: release
+            tableName: gate_info
+        - dropNotNullConstraint:
+            columnName: build
+            tableName: gate_info
+        - dropNotNullConstraint:
+            columnName: dt_licence_finish
+            tableName: gate_info
+
+  - changeSet:
+      id: make-system-info-fields-nullable
+      author: m_chelyshev
+      changes:
+        - dropNotNullConstraint:
+            columnName: name
+            tableName: system_info
+        - dropNotNullConstraint:
+            columnName: version
+            tableName: system_info
+        - dropNotNullConstraint:
+            columnName: major
+            tableName: system_info
+        - dropNotNullConstraint:
+            columnName: minor
+            tableName: system_info
+        - dropNotNullConstraint:
+            columnName: release
+            tableName: system_info
+        - dropNotNullConstraint:
+            columnName: build
+            tableName: system_info
+        - dropNotNullConstraint:
+            columnName: dt_licence_finish
+            tableName: system_info
+
+  - changeSet:
+      id: make-requisite-info-name-nullable
+      author: m_chelyshev
+      changes:
+        - dropNotNullConstraint:
+            columnName: name
+            tableName: requisite_info
 
 

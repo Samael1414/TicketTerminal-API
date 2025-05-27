@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -91,7 +92,7 @@ public class OrderService {
         LocalDateTime end = LocalDate.parse(dtEnd, formatter).plusDays(1).atStartOfDay().minusNanos(1);
 
         List<OrderEntity> orders = orderRepository.findOrdersCreatedBetween(begin, end);
-        List<OrderDto> orderDtos = new java.util.ArrayList<>();
+        List<OrderDto> orderDtos = new ArrayList<>();
         
         for (OrderEntity entity : orders) {
             try {
@@ -130,7 +131,7 @@ public class OrderService {
                     simpleDto.setVisitorPhone(entity.getVisitorPhone());
                     simpleDto.setVisitorMail(entity.getVisitorMail());
                     // Добавляем пустой список услуг, чтобы избежать NullPointerException
-                    simpleDto.setService(new java.util.ArrayList<>());
+                    simpleDto.setService(new ArrayList<>());
                     // Устанавливаем стоимость заказа
                     simpleDto.setCost(entity.getCost());
                     orderDtos.add(simpleDto);

@@ -28,6 +28,9 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
 public class OrderDto {
 
+    @JsonProperty("Id")
+    private Long id;
+
     @JsonProperty("OrderBarcode")
     private String orderBarcode;
 

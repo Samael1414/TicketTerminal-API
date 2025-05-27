@@ -15,6 +15,7 @@ import com.ticket.terminal.repository.RequisiteInfoRepository;
 import com.ticket.terminal.repository.SystemInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -63,59 +64,100 @@ public class VersionService {
                 .build();
     }
 
+
     /**
-     * Обновляет данные таблиц gate_info, system_info и requisite_info.
-     * Использует первый найденный элемент каждой таблицы (если они существуют).
-     * Заменяет старую сущность новой, с сохранением идентификатора.
-     *
-     * Обязательные поля:
-     *   - GateInfo: name, version, major, minor, release, build, dtLicenceFinish
-     *   - SystemInfo: name, version, major, minor, release, build, dtLicenceFinish
-     *   - RequisiteInfo: name (остальные необязательны)
-     *
-     * @param versionDto — DTO с новыми значениями для всех трёх таблиц
+     * Обновляет существующие записи в таблицах gate_info, system_info и requisite_info,
+     * если DTO содержит новые значения (не null).
+     * Старые значения не затираются, если соответствующее поле в DTO не задано.
+     * Предполагается, что в каждой таблице содержится только одна строка.
      */
+    @Transactional
     public void updateAllVersion(VersionDto versionDto) {
-        // Обновление gate_info
-        try (Stream<GateInfoEntity> stream = gateInfoRepository.findAll().stream()) {
-            versionDto.getGate().stream().findFirst().ifPresent(dto -> {
-                // Получаем текущую запись из таблицы gate_info
-                GateInfoEntity current = stream.findFirst()
-                        .orElseThrow(() -> new IllegalStateException("Gate info not found"));
-                // Преобразуем DTO в сущность и сохраняем id текущей записи
-                GateInfoEntity updated = gateInfoMapper.toEntity(dto);
-                updated.setId(current.getId());
-                // Обязательные поля: name, version, major, minor, release, build, dtLicenceFinish
-                gateInfoRepository.save(updated);
-            });
-        }
 
-        // Обновление system_info
-        try (Stream<SystemInfoEntity> stream = systemInfoRepository.findAll().stream()) {
-            versionDto.getSystem().stream().findFirst().ifPresent(dto -> {
-                // Получаем текущую запись из таблицы system_info
-                SystemInfoEntity current = stream.findFirst()
-                        .orElseThrow(() -> new IllegalStateException("System info not found"));
-                // Преобразуем DTO в сущность и сохраняем id текущей записи
-                SystemInfoEntity updated = systemInfoMapper.toEntity(dto);
-                updated.setId(current.getId());
-                // Обязательные поля: name, version, major, minor, release, build, dtLicenceFinish
-                systemInfoRepository.save(updated);
-            });
-        }
+        versionDto.getGate().stream().findFirst().ifPresent(dto -> {
+            GateInfoEntity current = gateInfoRepository.findAll().stream().findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Gate info not found"));
+            boolean changed = false;
+            if (dto.getName() != null && !dto.getName().equals(current.getName())) {
+                current.setName(dto.getName()); changed = true;
+            }
+            if (dto.getVersion() != null && !dto.getVersion().equals(current.getVersion())) {
+                current.setVersion(dto.getVersion()); changed = true;
+            }
+            if (dto.getMajor() != null && !dto.getMajor().equals(current.getMajor())) {
+                current.setMajor(dto.getMajor()); changed = true;
+            }
+            if (dto.getMinor() != null && !dto.getMinor().equals(current.getMinor())) {
+                current.setMinor(dto.getMinor()); changed = true;
+            }
+            if (dto.getRelease() != null && !dto.getRelease().equals(current.getRelease())) {
+                current.setRelease(dto.getRelease()); changed = true;
+            }
+            if (dto.getBuild() != null && !dto.getBuild().equals(current.getBuild())) {
+                current.setBuild(dto.getBuild()); changed = true;
+            }
+            if (dto.getDtLicenceFinish() != null && !dto.getDtLicenceFinish().equals(current.getDtLicenceFinish())) {
+                current.setDtLicenceFinish(dto.getDtLicenceFinish()); changed = true;
+            }
+            if (changed) gateInfoRepository.save(current);
+        });
 
-        // Обновление requisite_info
-        try (Stream<RequisiteInfoEntity> stream = requisiteInfoRepository.findAll().stream()) {
-            versionDto.getRequisite().stream().findFirst().ifPresent(dto -> {
-                // Получаем текущую запись из таблицы requisite_info
-                RequisiteInfoEntity current = stream.findFirst()
-                        .orElseThrow(() -> new IllegalStateException("Requisite info not found"));
-                // Преобразуем DTO в сущность и сохраняем id текущей записи
-                RequisiteInfoEntity updated = requisiteMapper.toEntity(dto);
-                updated.setId(current.getId());
-                // Обязательное поле: name (city, address, phone1, fax — необязательные)
-                requisiteInfoRepository.save(updated);
-            });
-        }
+        versionDto.getSystem().stream().findFirst().ifPresent(dto -> {
+            SystemInfoEntity current = systemInfoRepository.findAll().stream().findFirst()
+                    .orElseThrow(() -> new IllegalStateException("System info not found"));
+            boolean changed = false;
+            if (dto.getName() != null && !dto.getName().equals(current.getName())) {
+                current.setName(dto.getName()); changed = true;
+            }
+            if (dto.getVersion() != null && !dto.getVersion().equals(current.getVersion())) {
+                current.setVersion(dto.getVersion()); changed = true;
+            }
+            if (dto.getMajor() != null && !dto.getMajor().equals(current.getMajor())) {
+                current.setMajor(dto.getMajor()); changed = true;
+            }
+            if (dto.getMinor() != null && !dto.getMinor().equals(current.getMinor())) {
+                current.setMinor(dto.getMinor()); changed = true;
+            }
+            if (dto.getRelease() != null && !dto.getRelease().equals(current.getRelease())) {
+                current.setRelease(dto.getRelease()); changed = true;
+            }
+            if (dto.getBuild() != null && !dto.getBuild().equals(current.getBuild())) {
+                current.setBuild(dto.getBuild()); changed = true;
+            }
+            if (dto.getDtLicenceFinish() != null && !dto.getDtLicenceFinish().equals(current.getDtLicenceFinish())) {
+                current.setDtLicenceFinish(dto.getDtLicenceFinish()); changed = true;
+            }
+            if (changed) systemInfoRepository.save(current);
+        });
+
+        versionDto.getRequisite().stream().findFirst().ifPresent(dto -> {
+            RequisiteInfoEntity current = requisiteInfoRepository.findAll().stream().findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Requisite info not found"));
+            boolean changed = false;
+            if (dto.getName() != null && !dto.getName().equals(current.getName())) {
+                current.setName(dto.getName()); changed = true;
+            }
+            if (dto.getCity() != null && !dto.getCity().equals(current.getCity())) {
+                current.setCity(dto.getCity()); changed = true;
+            }
+            if (dto.getAddress() != null && !dto.getAddress().equals(current.getAddress())) {
+                current.setAddress(dto.getAddress()); changed = true;
+            }
+            if (dto.getPhone1() != null && !dto.getPhone1().equals(current.getPhone1())) {
+                current.setPhone1(dto.getPhone1()); changed = true;
+            }
+            if (dto.getFax() != null && !dto.getFax().equals(current.getFax())) {
+                current.setFax(dto.getFax()); changed = true;
+            }
+            if (dto.getDtBegin() != null && !dto.getDtBegin().equals(current.getDtBegin())) {
+                current.setDtBegin(dto.getDtBegin()); changed = true;
+            }
+            if (dto.getDtEnd() != null && !dto.getDtEnd().equals(current.getDtEnd())) {
+                current.setDtEnd(dto.getDtEnd()); changed = true;
+            }
+            if (changed) requisiteInfoRepository.save(current);
+        });
     }
+
+
 }

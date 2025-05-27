@@ -4,12 +4,15 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
+
 import java.time.LocalTime;
 
 @Entity
 @Table(name = "requisite_info")
 @Getter
 @Setter
+@DynamicUpdate
 public class RequisiteInfoEntity {
 
     @Id
