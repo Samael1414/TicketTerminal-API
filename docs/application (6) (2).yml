@@ -1,0 +1,48 @@
+server.port: 8081
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5434/terminal1
+    username: admin
+    password: pass
+
+application:
+  allowed-origins:
+    - http://localhost:1420
+    - https://tauri.localhost
+    - tauri://localhost
+    - http://192.168.1.70:8181
+  clients:
+    tonline-gate:
+      url: http://192.168.1.70:8181
+      login: Admin
+      password: Admin123
+  mode: museum
+  payment-timeout: 60
+  print-timeout: 120
+  fiscal-registrar-service:
+    supplier: mock
+  bso-service:
+    supplier: mock
+    template-name: RIAMZ.yaml
+  payment-service:
+    supplier: mock
+    workdir: D:\\Development\\ITTS-T1\\backapi\\src\\main\\resources
+
+sveltadriver:
+  template-path: D:\\Development\\ITTS-T1\\backapi\\templates
+  debug-mode: true
+  serial-config:
+    custom:
+      port: COM10
+      baudrate: 115200
+      data-bits: 8
+      stop-bits: 1
+      parity: 0
+
+logging:
+  level:
+    ru.ittouch.t1.backapi: DEBUG
+    com.meridbt.sveltadriver: DEBUG
+    com.netflix: DEBUG
+    feign: DEBUG

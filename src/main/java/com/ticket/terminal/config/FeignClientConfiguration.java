@@ -9,8 +9,10 @@ package com.ticket.terminal.config;
 
 import feign.Logger;
 import feign.RequestInterceptor;
+import feign.auth.BasicAuthRequestInterceptor;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.cloud.openfeign.support.SpringEncoder;
@@ -22,6 +24,12 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 public class FeignClientConfiguration {
 
     private final MappingJackson2HttpMessageConverter jacksonConverter;
+    
+    @Value("${application.clients.tonline-gate.login}")
+    private String login;
+    
+    @Value("${application.clients.tonline-gate.password}")
+    private String password;
 
     public FeignClientConfiguration(MappingJackson2HttpMessageConverter jacksonConverter) {
         this.jacksonConverter = jacksonConverter;
@@ -39,6 +47,11 @@ public class FeignClientConfiguration {
             template.header("Content-Type", "application/json;charset=UTF-8");
             template.header("Accept-Encoding", "gzip");
         };
+    }
+    
+    @Bean
+    public BasicAuthRequestInterceptor basicAuthRequestInterceptor() {
+        return new BasicAuthRequestInterceptor(login, password);
     }
 
     @Bean

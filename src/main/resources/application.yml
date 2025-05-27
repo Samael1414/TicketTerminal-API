@@ -21,6 +21,8 @@ application:
     - "http://localhost:1420"
     - "https://tauri.localhost"
     - "tauri://localhost"
+    - "http://192.168.1.76:*"
+    - "http://192.168.1.76:1420"
   clients:
     tonline-gate:
       url: http://localhost:8181
