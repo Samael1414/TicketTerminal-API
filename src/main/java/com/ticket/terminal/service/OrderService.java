@@ -47,11 +47,18 @@ public class OrderService {
             // Предварительная инициализация услуг для предотвращения LazyInitializationException
             entity.getService().forEach(service -> {
                 try {
+                    // Проверяем, что услуга существует, и если нет - используем сохраненное имя
                     if (service.getService() != null) {
-                        service.getService().getServiceName(); // Попытка инициализации
+                        // Сохраняем имя услуги в поле serviceName, если оно еще не заполнено
+                        if (service.getServiceName() == null) {
+                            service.setServiceName(service.getService().getServiceName());
+                        }
                     }
                 } catch (Exception ex) {
-                    // Игнорируем ошибку, так как мы обработаем её в маппере
+                    // Если услуга не найдена, убедимся, что у нас есть хотя бы имя услуги
+                    if (service.getServiceName() == null) {
+                        service.setServiceName("Удаленная услуга");
+                    }
                 }
             });
             
