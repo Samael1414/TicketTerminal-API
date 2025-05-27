@@ -17,7 +17,7 @@ public interface OrderServiceMapper {
     @Mapping(target = "serviceStateName",
             expression = "java(com.ticket.terminal.enums.ServiceState.getNameByCode(entity.getServiceStateId()))")
     @Mapping(target = "serviceId", expression = "java(entity.getService() != null ? entity.getService().getId() : null)")
-    @Mapping(target = "serviceName", expression = "java(entity.getService() != null ? entity.getService().getServiceName() : entity.getServiceName() != null ? entity.getServiceName() : \"Удаленная услуга\")")
+    @Mapping(target = "serviceName", expression = "java(entity.getServiceName() != null ? entity.getServiceName() : \"Удаленная услуга\")")
     @Mapping(target = "dtVisit", expression = "java(toZoned(entity.getDtVisit()))")
     OrderServiceDto toDto(OrderServiceEntity entity);
 

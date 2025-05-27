@@ -44,26 +44,46 @@ public class OrderService {
         OrderEntity entity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Заказ не найден"));
         try {
-            // Предварительная инициализация услуг для предотвращения LazyInitializationException
-            entity.getService().forEach(service -> {
-                try {
-                    // Проверяем, что услуга существует, и если нет - используем сохраненное имя
-                    if (service.getService() != null) {
-                        // Сохраняем имя услуги в поле serviceName, если оно еще не заполнено
-                        if (service.getServiceName() == null) {
-                            service.setServiceName(service.getService().getServiceName());
+            // Загружаем услуги заказа напрямую из базы данных
+            List<OrderServiceEntity> services = orderServiceRepository.findAllByOrderId(orderId);
+            
+            // Убедимся, что у всех услуг есть имя
+            services.forEach(service -> {
+                if (service.getServiceName() == null) {
+                    try {
+                        // Попробуем получить имя услуги из связанной таблицы
+                        Long serviceId = service.getService() != null ? service.getService().getId() : null;
+                        if (serviceId != null) {
+                            ServiceEntity serviceEntity = serviceRepository.findById(serviceId).orElse(null);
+                            if (serviceEntity != null) {
+                                service.setServiceName(serviceEntity.getServiceName());
+                                // Сохраняем имя услуги в базе данных
+                                orderServiceRepository.save(service);
+                            } else {
+                                service.setServiceName("Удаленная услуга");
+                                orderServiceRepository.save(service);
+                            }
+                        } else {
+                            service.setServiceName("Удаленная услуга");
+                            orderServiceRepository.save(service);
                         }
-                    }
-                } catch (Exception ex) {
-                    // Если услуга не найдена, убедимся, что у нас есть хотя бы имя услуги
-                    if (service.getServiceName() == null) {
+                    } catch (Exception ex) {
+                        // Если не удалось получить имя услуги, устанавливаем значение по умолчанию
                         service.setServiceName("Удаленная услуга");
+                        orderServiceRepository.save(service);
                     }
                 }
             });
             
-            return orderMapper.toDto(entity);
-        } catch (EntityNotFoundException e) {
+            // Загружаем заказ заново с обновленными услугами
+            entity = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new EntityNotFoundException("Заказ не найден"));
+            
+            // Создаем DTO заказа без обращения к связанным таблицам
+            OrderDto orderDto = orderMapper.toDto(entity);
+            
+            return orderDto;
+        } catch (Exception e) {
             // Логируем ошибку, но продолжаем обработку
             System.err.println("Ошибка при маппинге заказа: " + e.getMessage());
             
