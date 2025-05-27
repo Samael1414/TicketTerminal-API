@@ -9,6 +9,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = {OrderServiceMapper.class})
 public interface OrderMapper {
 
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "orderId", source = "orderId")
     OrderDto toDto(OrderEntity orderEntity);
 
     @Mapping(target = "orderBarcode", ignore = true)
