@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -63,5 +65,8 @@ public class OrderDto {
 
     @JsonProperty("OrderId")
     private Integer orderId;
+
+    @JsonProperty("Created")
+    private LocalDateTime created;
 
 }

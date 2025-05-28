@@ -151,6 +151,8 @@ public class OrderService {
                     System.err.println("Не удалось обработать заказ с id " + entity.getId() + ": " + ex.getMessage());
                     // Создаем упрощенный DTO с минимальной информацией
                     OrderDto simpleDto = new OrderDto();
+                    simpleDto.setCreated(entity.getCreated());
+                    simpleDto.setId(entity.getId());
                     simpleDto.setOrderId(entity.getOrderId());
                     simpleDto.setOrderBarcode(entity.getOrderBarcode());
                     simpleDto.setOrderStateId(entity.getOrderStateId());
