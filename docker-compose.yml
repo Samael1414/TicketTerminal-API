@@ -23,7 +23,7 @@ services:
 
   ticket-terminal-api:
     build:
-      context: ../../..
+      context: .
       dockerfile: Dockerfile
     container_name: ticket_terminal_api
     restart: always
@@ -35,6 +35,7 @@ services:
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: pass
       SERVER_PORT: 8181
+      SPRING_LIQUIBASE_CHANGE_LOG: classpath:db-changelog/db.changelog-master.yml
     ports:
       - "8181:8181"
     networks:
@@ -45,3 +46,4 @@ volumes:
 
 networks:
   ticket_network:
+    driver: bridge
