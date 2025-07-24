@@ -16,8 +16,8 @@
  */
 package com.ticket.terminal.controller;
 
-import com.ticket.terminal.dto.UsersCreateDto;
-import com.ticket.terminal.dto.UsersResponseDto;
+import com.ticket.terminal.dto.user.UsersCreateDto;
+import com.ticket.terminal.dto.user.UsersResponseDto;
 import com.ticket.terminal.security.annotation.RequireManageUsers;
 import com.ticket.terminal.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;

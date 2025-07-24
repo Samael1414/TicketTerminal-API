@@ -1,6 +1,6 @@
 package com.ticket.terminal.mapper;
 
-import com.ticket.terminal.dto.SoldServiceDto;
+import com.ticket.terminal.dto.sold.SoldServiceDto;
 import com.ticket.terminal.entity.SoldServiceEntity;
 import com.ticket.terminal.mapper.impl.VisitObjectIdMapper;
 import org.mapstruct.*;

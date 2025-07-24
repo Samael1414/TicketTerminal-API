@@ -1,7 +1,7 @@
 package com.ticket.terminal.mapper;
 
-import com.ticket.terminal.dto.CategoryVisitorCreateDto;
-import com.ticket.terminal.dto.CategoryVisitorDto;
+import com.ticket.terminal.dto.category.CategoryVisitorCreateDto;
+import com.ticket.terminal.dto.category.CategoryVisitorDto;
 import com.ticket.terminal.entity.CategoryVisitorEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

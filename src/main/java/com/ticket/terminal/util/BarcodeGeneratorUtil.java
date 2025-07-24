@@ -1,6 +1,6 @@
 package com.ticket.terminal.util;
 
-import com.ticket.terminal.repository.OrderRepository;
+import com.ticket.terminal.repository.order.OrderRepository;
 
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;

@@ -1,5 +1,6 @@
 package com.ticket.terminal.entity;
 
+import com.ticket.terminal.entity.order.OrderServiceEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;

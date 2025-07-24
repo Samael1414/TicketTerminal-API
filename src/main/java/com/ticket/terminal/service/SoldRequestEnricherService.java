@@ -1,16 +1,21 @@
 package com.ticket.terminal.service;
 
-import com.ticket.terminal.dto.CategoryVisitorCountDto;
-import com.ticket.terminal.dto.SoldOrderRequestDto;
-import com.ticket.terminal.entity.OrderServiceEntity;
+import com.ticket.terminal.dto.category.CategoryVisitorCountDto;
+import com.ticket.terminal.dto.sold.SoldOrderRequestDto;
+import com.ticket.terminal.dto.sold.SoldServiceDto;
+import com.ticket.terminal.entity.order.OrderServiceEntity;
 import com.ticket.terminal.entity.VisitObjectEntity;
-import com.ticket.terminal.repository.OrderServiceRepository;
-import com.ticket.terminal.repository.OrderServiceVisitorRepository;
+import com.ticket.terminal.repository.order.OrderServiceRepository;
+import com.ticket.terminal.repository.order.OrderServiceVisitorRepository;
 import com.ticket.terminal.repository.VisitObjectRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
@@ -24,52 +29,74 @@ public class SoldRequestEnricherService {
      * Заполняет ServiceId, Cost, Count, VisitObjectId, CategoryVisitor, DtVisit.
      */
     public void enrich(SoldOrderRequestDto requestDto) {
+        requestDto.getService().forEach(this::enrichSingle);
+    }
 
-        requestDto.getService().forEach(dto -> {
-            Long serviceId = dto.getOrderServiceId();
-            if (serviceId == null) {
-                throw new IllegalArgumentException("OrderServiceId is null");
-            }
+    private void enrichSingle(SoldServiceDto dto) {
+        // 1) загружаем OrderServiceEntity (или кидаем ошибку)
+        Long orderServiceIdIsNull = Optional.ofNullable(dto.getOrderServiceId())
+                .orElseThrow(() -> new IllegalArgumentException("OrderServiceId is null"));
+        OrderServiceEntity entity = orderServiceRepository
+                .findWithServiceById(orderServiceIdIsNull)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("OrderService not found: " + orderServiceIdIsNull)
+                );
 
-            OrderServiceEntity serviceEntity = orderServiceRepository
-                    .findWithServiceById(serviceId)
-                    .orElseThrow(() ->
-                            new EntityNotFoundException("OrderService not found " + serviceId));
+        // 2) Примитивы (id, cost, count, visit date)
+        defaultIfNull(dto::getServiceId, dto::setServiceId, () -> entity.getService().getId());
+        defaultIfNull(dto::getServiceCost, dto::setServiceCost, entity::getCost);
+        defaultIfNull(dto::getServiceCount, dto::setServiceCount, entity::getServiceCount);
+        defaultIfNull(dto::getDtVisit, dto::setDtVisit, entity::getDtVisit);
 
-            // 1. ServiceId
-            if (dto.getServiceId() == null) {
-                dto.setServiceId(serviceEntity.getService().getId());
-            }
-
-            // 2. Cost / Count
-            if (dto.getServiceCost()  == null) dto.setServiceCost(serviceEntity.getCost());
-            if (dto.getServiceCount() == null) dto.setServiceCount(serviceEntity.getServiceCount());
-
-            // 3. DtVisit
-            if (dto.getDtVisit() == null) dto.setDtVisit(serviceEntity.getDtVisit());
-
-            // 4. VisitObjectId
-            if (dto.getVisitObjectId() == null || dto.getVisitObjectId().isEmpty()) {
-                List<Long> visitObjectIds = visitObjectRepository
-                        .findByOrderServiceId(serviceId)
+        // 3) Списки (visitObjectId, categoryVisitor)
+        defaultIfEmpty(
+                dto::getVisitObjectId,
+                dto::setVisitObjectId,
+                () -> visitObjectRepository
+                        .findByOrderServiceId(orderServiceIdIsNull)
                         .stream()
                         .map(VisitObjectEntity::getId)
-                        .toList();
-                dto.setVisitObjectId(visitObjectIds);
-            }
+                        .toList()
+        );
 
-            // 5. CategoryVisitor
-            if (dto.getCategoryVisitor() == null || dto.getCategoryVisitor().isEmpty()) {
-                var visitors = orderServiceVisitorRepository
-                        .findByOrderServiceId(serviceId)
+        defaultIfEmpty(
+                dto::getCategoryVisitor,
+                dto::setCategoryVisitor,
+                () -> orderServiceVisitorRepository
+                        .findByOrderServiceId(orderServiceIdIsNull)
                         .stream()
-                        .map(visitor -> new CategoryVisitorCountDto(
-                                visitor.getCategoryVisitor().getId(),
-                                visitor.getVisitorCount(),
-                                visitor.getCategoryVisitorName()))
-                        .toList();
-                dto.setCategoryVisitor(visitors);
-            }
-        });
+                        .map(visitorEntity -> new CategoryVisitorCountDto(
+                                visitorEntity.getCategoryVisitor().getId(),
+                                visitorEntity.getVisitorCount(),
+                                visitorEntity.getCategoryVisitorName()))
+                        .toList()
+        );
+    }
+
+    /**
+     * Если getter возвращает null, подставляем defaultSupplier.get()
+     */
+    private <T> void defaultIfNull(
+            Supplier<T> getter,
+            Consumer<T> setter,
+            Supplier<T> defaultSupplier
+    ) {
+        if (getter.get() == null) {
+            setter.accept(defaultSupplier.get());
+        }
+    }
+
+    /**
+     * Если getter возвращает null или пустой список, подставляем defaultSupplier.get()
+     */
+    private <T> void defaultIfEmpty(
+            Supplier<List<T>> getter,
+            Consumer<List<T>> setter,
+            Supplier<List<T>> defaultSupplier
+    ) {
+        List<T> list = getter.get();
+        if (list == null || list.isEmpty()) {
+            setter.accept(defaultSupplier.get());
+        }
     }
 }

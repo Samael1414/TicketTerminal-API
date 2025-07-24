@@ -1,7 +1,10 @@
 package com.ticket.terminal.mapper;
 
-import com.ticket.terminal.dto.*;
-import com.ticket.terminal.entity.OrderEntity;
+import com.ticket.terminal.dto.editable.EditableOrderRequestDto;
+import com.ticket.terminal.dto.order.OrderCreateResponseDto;
+import com.ticket.terminal.dto.order.OrderDto;
+import com.ticket.terminal.dto.simple.SimpleOrderRequestDto;
+import com.ticket.terminal.entity.order.OrderEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -11,6 +14,7 @@ public interface OrderMapper {
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "orderId", source = "orderId")
+    @Mapping(target = "service",   defaultExpression = "java(Collections.emptyList())")
     OrderDto toDto(OrderEntity orderEntity);
 
     @Mapping(target = "orderBarcode", ignore = true)

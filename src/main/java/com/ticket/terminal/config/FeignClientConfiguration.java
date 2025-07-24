@@ -43,8 +43,8 @@ public class FeignClientConfiguration {
     @Bean
     public RequestInterceptor tonlineInterceptor() {
         return template -> {
-            template.header("Accept", "application/json,text/json;charset=UTF-8,text/plain");
-            template.header("Content-Type", "application/json;charset=UTF-8");
+            template.header("Accept", "application.yml/json,text/json;charset=UTF-8,text/plain");
+            template.header("Content-Type", "application.yml/json;charset=UTF-8");
             template.header("Accept-Encoding", "gzip");
         };
     }

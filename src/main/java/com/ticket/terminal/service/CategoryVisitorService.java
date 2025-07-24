@@ -1,7 +1,7 @@
 package com.ticket.terminal.service;
 
-import com.ticket.terminal.dto.CategoryVisitorCreateDto;
-import com.ticket.terminal.dto.CategoryVisitorDto;
+import com.ticket.terminal.dto.category.CategoryVisitorCreateDto;
+import com.ticket.terminal.dto.category.CategoryVisitorDto;
 import com.ticket.terminal.entity.ActionLogEntity;
 import com.ticket.terminal.entity.CategoryVisitorEntity;
 import com.ticket.terminal.entity.UsersEntity;
@@ -9,17 +9,18 @@ import com.ticket.terminal.mapper.CategoryVisitorMapper;
 import com.ticket.terminal.repository.CategoryVisitorRepository;
 import com.ticket.terminal.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CategoryVisitorService {
 
     // Репозиторий для работы с сущностью CategoryVisitorEntity

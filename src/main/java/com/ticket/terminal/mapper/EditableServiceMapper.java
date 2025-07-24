@@ -1,6 +1,6 @@
 package com.ticket.terminal.mapper;
 
-import com.ticket.terminal.dto.EditableServiceDto;
+import com.ticket.terminal.dto.editable.EditableServiceDto;
 import com.ticket.terminal.entity.ServiceEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

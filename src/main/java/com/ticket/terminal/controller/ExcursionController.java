@@ -15,9 +15,9 @@
  */
 package com.ticket.terminal.controller;
 
-import com.ticket.terminal.dto.ExcursionListResponseDto;
-import com.ticket.terminal.dto.ExcursionRequestDto;
-import com.ticket.terminal.dto.ExcursionResponseDto;
+import com.ticket.terminal.dto.excursion.ExcursionListResponseDto;
+import com.ticket.terminal.dto.excursion.ExcursionRequestDto;
+import com.ticket.terminal.dto.excursion.ExcursionResponseDto;
 import com.ticket.terminal.service.ExcursionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

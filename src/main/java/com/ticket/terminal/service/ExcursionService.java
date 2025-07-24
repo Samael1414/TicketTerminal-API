@@ -1,31 +1,45 @@
 package com.ticket.terminal.service;
 
-import com.ticket.terminal.dto.*;
+import com.ticket.terminal.dto.category.CategoryVisitorCountDto;
+import com.ticket.terminal.dto.category.CategoryVisitorDto;
+import com.ticket.terminal.dto.excursion.ExcursionDto;
+import com.ticket.terminal.dto.excursion.ExcursionListResponseDto;
+import com.ticket.terminal.dto.excursion.ExcursionRequestDto;
+import com.ticket.terminal.dto.excursion.ExcursionResponseDto;
+import com.ticket.terminal.dto.visit.VisitObjectDto;
 import com.ticket.terminal.entity.*;
+import com.ticket.terminal.entity.excursion.ExcursionLogEntity;
+import com.ticket.terminal.entity.excursion.ExcursionLogVisitObjectEntity;
+import com.ticket.terminal.entity.excursion.ExcursionLogVisitorEntity;
 import com.ticket.terminal.mapper.CategoryVisitorMapper;
 import com.ticket.terminal.mapper.ExcursionMapper;
 import com.ticket.terminal.mapper.PriceMapper;
 import com.ticket.terminal.mapper.VisitObjectMapper;
 import com.ticket.terminal.repository.*;
+import com.ticket.terminal.repository.excursion.ExcursionLogRepository;
+import com.ticket.terminal.repository.excursion.ExcursionLogVisitObjectRepository;
+import com.ticket.terminal.repository.excursion.ExcursionLogVisitorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static java.util.Collections.emptyList;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ExcursionService {
 
     private final ServiceRepository serviceRepository;
+    private final PriceRepository priceRepository;
     private final VisitObjectRepository visitObjectRepository;
     private final CategoryVisitorRepository categoryVisitorRepository;
-    private final PriceRepository priceRepository;
     private final ExcursionLogRepository excursionLogRepository;
     private final ExcursionLogVisitorRepository excursionLogVisitorRepository;
     private final ExcursionLogVisitObjectRepository excursionLogVisitObjectRepository;
@@ -38,127 +52,120 @@ public class ExcursionService {
     private final PriceMapper priceMapper;
 
     public ExcursionListResponseDto getAllExcursions() {
-        // Маппим каждую ServiceEntity в ExcursionDto (без вложенных списков)
-        List<ExcursionDto> excursionDto;
-        try (Stream<ServiceEntity> stream = serviceRepository.findAll().stream()) {
-            excursionDto = stream.map(excursionMapper::toDto).toList();
-        }
-
-        // берём PriceEntity и группируем по service_id (Пример: сгруппируем все цены по service_id)
-        Map<Long, List<PriceEntity>> priceByServiceId;
-        try (Stream<PriceEntity> stream = priceRepository.findAll().stream()) {
-            priceByServiceId = stream.collect(Collectors.groupingBy(p -> p.getService().getId()));
-        }
-        // Теперь пробежимся по excursionDtos и добавим им соответствующие prices
-        for (ExcursionDto dto : excursionDto) {
-            Long serviceId = dto.getServiceId();
-            List<PriceEntity> priceEntitiesForService = priceByServiceId.
-                    getOrDefault(serviceId, Collections.emptyList());
-            List<PriceDto> priceDtos = priceEntitiesForService.stream()
-                    .map(priceMapper::toDto)
-                    .toList();
-            dto.setPrices(priceDtos);
-
-            // Аналогично для visitObjects и categoryVisitors внутри ExcursionDto,
-            // если нужно собрать "уникальные" visitObjects/categoryVisitors для каждой услуги
-            // Можно, к примеру, достать из PriceEntity visitObject и categoryVisitor
-            // и сформировать списки.
-            Set<VisitObjectDto> visitObjectDto = priceEntitiesForService.stream()
-                    .map(PriceEntity::getVisitObject)
-                    .filter(Objects::nonNull)
-                    .map(visitObjectMapper::toDto)
-                    .collect(Collectors.toSet());
-            dto.setVisitObjects(new ArrayList<>(visitObjectDto));
-
-            Set<CategoryVisitorDto> visitorDtos = priceEntitiesForService.stream()
-                    .map(PriceEntity::getCategoryVisitor)
-                    .filter(Objects::nonNull)
-                    .map(categoryVisitorMapper::toDto)
-                    .collect(Collectors.toSet());
-            dto.setCategoryVisitors(new ArrayList<>(visitorDtos));
-        }
-        // Загружаем "глобальные" списки VisitObject и CategoryVisitor (для верхнего уровня ответа)
-        List<VisitObjectDto> visitObjectDtos;
-        try (Stream<VisitObjectEntity> stream = visitObjectRepository.findAll().stream()) {
-            visitObjectDtos = stream.map(visitObjectMapper::toDto).toList();
-        }
-
-        List<CategoryVisitorDto> categoryVisitorDtos;
-        try (Stream<CategoryVisitorEntity> stream = categoryVisitorRepository.findAll().stream()) {
-            categoryVisitorDtos = stream.map(categoryVisitorMapper::toDto).toList();
-        }
-
-        // Формируем итоговый объект ответа
+        var excursions = loadAllExcursionDtos();
+        var allVisitObjects = loadAllVisitObjects();
+        var allCategories = loadAllCategories();
         return ExcursionListResponseDto.builder()
-                .service(excursionDto)
-                .visitObject(visitObjectDtos)
-                .categoryVisitor(categoryVisitorDtos)
+                .service(excursions)
+                .visitObject(allVisitObjects)
+                .categoryVisitor(allCategories)
                 .build();
     }
 
     @Transactional
     public ExcursionResponseDto createExcursion(ExcursionRequestDto requestDto) {
+        var log = buildLogEntity(requestDto);
+        var saved = excursionLogRepository.save(log);
 
-        // Преобразуем DTO в сущность (без списков visitor/visitObject)
-        ExcursionLogEntity excursionLog = excursionMapper.toEntity(requestDto);
+        saveVisitors(saved, requestDto.getVisitor());
+        saveVisitObjects(saved, requestDto.getVisitObject());
 
-        // Подтягиваем serviceEntity из таблицы 'services'
-        ServiceEntity serviceEntity = serviceRepository.findById(requestDto.getServiceId())
-                .orElseThrow(() -> new EntityNotFoundException
-                        (String.format("Service не найдено: %s", requestDto.getServiceId())));
-        excursionLog.setService(serviceEntity);
+        logAction("CREATE_EXCURSION", "Создана экскурсия: " + log.getService().getServiceName());
+        return excursionMapper.toDto(saved);
+    }
 
-        //  Сохраняем excursionLog (пока без visitor/object)
-        ExcursionLogEntity savedLog = excursionLogRepository.save(excursionLog);
 
-        // Обрабатываем visitor[]: создаём записи в excursion_log_visitor
-        if (requestDto.getVisitor() != null) {
-            for (CategoryVisitorCountDto visitorDto : requestDto.getVisitor()) {
-                // Найти categoryVisitorEntity
-                CategoryVisitorEntity categoryVisitorEntity = categoryVisitorRepository.findById(visitorDto.getCategoryVisitorId())
-                        .orElseThrow(() -> new EntityNotFoundException
-                                (String.format("CategoryVisitor не найдено: %s", visitorDto.getCategoryVisitorId())));
+    private List<ExcursionDto> loadAllExcursionDtos() {
+        // сгруппированные цены
+        var priceMap = priceRepository.findAll().stream()
+                .collect(Collectors.groupingBy(price -> price.getService().getId()));
+        return serviceRepository.findAll().stream()
+                .map(service -> mapServiceToExcursionDto(service, priceMap.get(service.getId())))
+                .toList();
+    }
 
-                excursionLogVisitorRepository.save(ExcursionLogVisitorEntity.builder()
-                        .excursionLog(savedLog)
-                        .categoryVisitor(categoryVisitorEntity)
-                        .visitorCount(visitorDto.getVisitorCount())
-                        .build());
-            }
-        }
+    private ExcursionDto mapServiceToExcursionDto(ServiceEntity serviceEntity, List<PriceEntity> prices) {
+        var dto = excursionMapper.toDto(serviceEntity);
+        var list = Optional.ofNullable(prices).orElse(emptyList());
+        dto.setPrices(list.stream().map(priceMapper::toDto).toList());
+        dto.setVisitObjects(list.stream()
+                .map(PriceEntity::getVisitObject)
+                .filter(Objects::nonNull)
+                .map(visitObjectMapper::toDto)
+                .distinct()
+                .toList());
 
-        // Обрабатываем visitObject[]: создаём записи в excursion_log_visit_object
-        if (requestDto.getVisitObject() != null) {
-            for (Long visit : requestDto.getVisitObject()) {
-                VisitObjectEntity visitObjectEntity = visitObjectRepository.findById(visit)
-                        .orElseThrow(() -> new EntityNotFoundException
-                                (String.format("VisitObject не найдено: %s", visit)));
+        dto.setCategoryVisitors(list.stream()
+                .map(PriceEntity::getCategoryVisitor)
+                .filter(Objects::nonNull)
+                .map(categoryVisitorMapper::toDto)
+                .distinct()
+                .toList());
+        return dto;
+    }
 
-                ExcursionLogVisitObjectEntity objectEntity = new ExcursionLogVisitObjectEntity();
-                objectEntity.setExcursionLog(savedLog);
-                objectEntity.setVisitObject(visitObjectEntity);
+    private List<VisitObjectDto> loadAllVisitObjects() {
+        return visitObjectMapper.toDtoList(visitObjectRepository.findAll());
+    }
 
-                excursionLogVisitObjectRepository.save(objectEntity);
-            }
-        }
-        UsersEntity currentUser = getCurrentUser();
+    private List<CategoryVisitorDto> loadAllCategories() {
+        return categoryVisitorMapper.toDtoList(categoryVisitorRepository.findAll());
+    }
+
+
+    private ExcursionLogEntity buildLogEntity(ExcursionRequestDto requestDto) {
+        var log = excursionMapper.toEntity(requestDto);
+        var entity = serviceRepository.findById(requestDto.getServiceId())
+                .orElseThrow(() -> new EntityNotFoundException("Service не найдено: " + requestDto.getServiceId()));
+        log.setService(entity);
+        return log;
+    }
+
+    private void saveVisitors(ExcursionLogEntity log, List<CategoryVisitorCountDto> visitors) {
+        Optional.ofNullable(visitors).orElse(emptyList()).stream()
+                .forEach(visitorCountDto -> {
+                    var categoryVisitor = categoryVisitorRepository.findById(visitorCountDto.getCategoryVisitorId())
+                            .orElseThrow(() -> new EntityNotFoundException("CategoryVisitor не найдено: " + visitorCountDto.getCategoryVisitorId()));
+                    excursionLogVisitorRepository.save(
+                            ExcursionLogVisitorEntity.builder()
+                                    .excursionLog(log)
+                                    .categoryVisitor(categoryVisitor)
+                                    .visitorCount(visitorCountDto.getVisitorCount())
+                                    .build()
+                    );
+                });
+    }
+
+    private void saveVisitObjects(ExcursionLogEntity log, List<Long> visits) {
+        Optional.ofNullable(visits).orElse(emptyList()).stream()
+                .forEach(id -> {
+                    var visitObjectEntity = visitObjectRepository.findById(id)
+                            .orElseThrow(() -> new EntityNotFoundException("VisitObject не найдено: " + id));
+                    excursionLogVisitObjectRepository.save(
+                            ExcursionLogVisitObjectEntity.builder()
+                                    .excursionLog(log)
+                                    .visitObject(visitObjectEntity)
+                                    .build()
+                    );
+                });
+    }
+
+    private void logAction(String type, String desc) {
+        var user = getCurrentUser();
         actionLogService.save(ActionLogEntity.builder()
-                .user(currentUser)
-                .actionType("CREATE_EXCURSION")
-                .description(String.format("Создана экскурсия: %s", serviceEntity.getServiceName()))
+                .user(user)
+                .actionType(type)
+                .description(desc)
                 .createdAt(LocalDateTime.now())
-                .actorName(currentUser.getUserName())
+                .actorName(user.getUserName())
                 .build());
-        // Формируем ответ
-        return excursionMapper.toDto(savedLog);
-
     }
 
     private UsersEntity getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userName = auth.getName();
-        return userRepository.findByUserNameIgnoreCase(userName)
+        var name = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        return userRepository.findByUserNameIgnoreCase(name)
                 .orElseThrow(() -> new EntityNotFoundException("Текущий пользователь не найден"));
     }
-
 }
+

@@ -7,6 +7,7 @@ import com.ticket.terminal.dto.VersionDto;
 import com.ticket.terminal.entity.GateInfoEntity;
 import com.ticket.terminal.entity.RequisiteInfoEntity;
 import com.ticket.terminal.entity.SystemInfoEntity;
+import com.ticket.terminal.exception.EntityNotFoundException;
 import com.ticket.terminal.mapper.GateInfoMapper;
 import com.ticket.terminal.mapper.RequisiteMapper;
 import com.ticket.terminal.mapper.SystemInfoMapper;
@@ -22,6 +23,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class VersionService {
 
     private final GateInfoRepository gateInfoRepository;
@@ -73,89 +75,28 @@ public class VersionService {
      */
     @Transactional
     public void updateAllVersion(VersionDto versionDto) {
-
+        // gate_info
         versionDto.getGate().stream().findFirst().ifPresent(dto -> {
-            GateInfoEntity current = gateInfoRepository.findAll().stream().findFirst()
+            GateInfoEntity gateInfoEntity = gateInfoRepository.findAll().stream().findFirst()
                     .orElseThrow(() -> new IllegalStateException("Gate info not found"));
-            boolean changed = false;
-            if (dto.getName() != null && !dto.getName().equals(current.getName())) {
-                current.setName(dto.getName()); changed = true;
-            }
-            if (dto.getVersion() != null && !dto.getVersion().equals(current.getVersion())) {
-                current.setVersion(dto.getVersion()); changed = true;
-            }
-            if (dto.getMajor() != null && !dto.getMajor().equals(current.getMajor())) {
-                current.setMajor(dto.getMajor()); changed = true;
-            }
-            if (dto.getMinor() != null && !dto.getMinor().equals(current.getMinor())) {
-                current.setMinor(dto.getMinor()); changed = true;
-            }
-            if (dto.getRelease() != null && !dto.getRelease().equals(current.getRelease())) {
-                current.setRelease(dto.getRelease()); changed = true;
-            }
-            if (dto.getBuild() != null && !dto.getBuild().equals(current.getBuild())) {
-                current.setBuild(dto.getBuild()); changed = true;
-            }
-            if (dto.getDtLicenceFinish() != null && !dto.getDtLicenceFinish().equals(current.getDtLicenceFinish())) {
-                current.setDtLicenceFinish(dto.getDtLicenceFinish()); changed = true;
-            }
-            if (changed) gateInfoRepository.save(current);
+            gateInfoMapper.updateFromDto(dto, gateInfoEntity);
+            gateInfoRepository.save(gateInfoEntity);
         });
 
+        // system_info
         versionDto.getSystem().stream().findFirst().ifPresent(dto -> {
-            SystemInfoEntity current = systemInfoRepository.findAll().stream().findFirst()
+            SystemInfoEntity systemInfoEntity = systemInfoRepository.findAll().stream().findFirst()
                     .orElseThrow(() -> new IllegalStateException("System info not found"));
-            boolean changed = false;
-            if (dto.getName() != null && !dto.getName().equals(current.getName())) {
-                current.setName(dto.getName()); changed = true;
-            }
-            if (dto.getVersion() != null && !dto.getVersion().equals(current.getVersion())) {
-                current.setVersion(dto.getVersion()); changed = true;
-            }
-            if (dto.getMajor() != null && !dto.getMajor().equals(current.getMajor())) {
-                current.setMajor(dto.getMajor()); changed = true;
-            }
-            if (dto.getMinor() != null && !dto.getMinor().equals(current.getMinor())) {
-                current.setMinor(dto.getMinor()); changed = true;
-            }
-            if (dto.getRelease() != null && !dto.getRelease().equals(current.getRelease())) {
-                current.setRelease(dto.getRelease()); changed = true;
-            }
-            if (dto.getBuild() != null && !dto.getBuild().equals(current.getBuild())) {
-                current.setBuild(dto.getBuild()); changed = true;
-            }
-            if (dto.getDtLicenceFinish() != null && !dto.getDtLicenceFinish().equals(current.getDtLicenceFinish())) {
-                current.setDtLicenceFinish(dto.getDtLicenceFinish()); changed = true;
-            }
-            if (changed) systemInfoRepository.save(current);
+            systemInfoMapper.updateFromDto(dto, systemInfoEntity);
+            systemInfoRepository.save(systemInfoEntity);
         });
 
+        // requisite_info
         versionDto.getRequisite().stream().findFirst().ifPresent(dto -> {
-            RequisiteInfoEntity current = requisiteInfoRepository.findAll().stream().findFirst()
+            RequisiteInfoEntity requisiteInfoEntity = requisiteInfoRepository.findAll().stream().findFirst()
                     .orElseThrow(() -> new IllegalStateException("Requisite info not found"));
-            boolean changed = false;
-            if (dto.getName() != null && !dto.getName().equals(current.getName())) {
-                current.setName(dto.getName()); changed = true;
-            }
-            if (dto.getCity() != null && !dto.getCity().equals(current.getCity())) {
-                current.setCity(dto.getCity()); changed = true;
-            }
-            if (dto.getAddress() != null && !dto.getAddress().equals(current.getAddress())) {
-                current.setAddress(dto.getAddress()); changed = true;
-            }
-            if (dto.getPhone1() != null && !dto.getPhone1().equals(current.getPhone1())) {
-                current.setPhone1(dto.getPhone1()); changed = true;
-            }
-            if (dto.getFax() != null && !dto.getFax().equals(current.getFax())) {
-                current.setFax(dto.getFax()); changed = true;
-            }
-            if (dto.getDtBegin() != null && !dto.getDtBegin().equals(current.getDtBegin())) {
-                current.setDtBegin(dto.getDtBegin()); changed = true;
-            }
-            if (dto.getDtEnd() != null && !dto.getDtEnd().equals(current.getDtEnd())) {
-                current.setDtEnd(dto.getDtEnd()); changed = true;
-            }
-            if (changed) requisiteInfoRepository.save(current);
+            requisiteMapper.updateFromDto(dto, requisiteInfoEntity);
+            requisiteInfoRepository.save(requisiteInfoEntity);
         });
     }
 

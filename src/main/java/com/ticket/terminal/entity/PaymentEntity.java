@@ -1,6 +1,7 @@
 package com.ticket.terminal.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ticket.terminal.entity.order.OrderEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

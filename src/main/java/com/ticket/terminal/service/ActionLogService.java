@@ -4,9 +4,9 @@ import com.ticket.terminal.dto.ActionLogDto;
 import com.ticket.terminal.entity.ActionLogEntity;
 import com.ticket.terminal.mapper.ActionLogMapper;
 import com.ticket.terminal.repository.ActionLogRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;

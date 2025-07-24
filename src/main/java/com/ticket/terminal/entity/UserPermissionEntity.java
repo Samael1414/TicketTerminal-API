@@ -47,4 +47,16 @@ public class UserPermissionEntity {
 
     @Column(nullable = false)
     private Boolean canImportData = false;
+
+    public void enableAll() {
+        this.canManageUsers = true;
+        this.canManageServices = true;
+        this.canManageCategories = true;
+        this.canManageVisitObjects = true;
+        this.canViewReports = true;
+        this.canManageSettings = true;
+        this.canManageOrders = true;
+        this.canExportData = true;
+        this.canImportData = true;
+    }
 }

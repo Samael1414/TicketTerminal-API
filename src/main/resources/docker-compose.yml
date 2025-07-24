@@ -1,23 +1,57 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  postgres-db-new:
+  postgres_ticket:
     image: postgres:15
-    container_name: ticket_terminal_db
+    container_name: postgres_ticket
     restart: always
     environment:
-      POSTGRES_DB: ticket_terminal
-      POSTGRES_USER: admin
+      POSTGRES_DB:     ticket_terminal
+      POSTGRES_USER:   admin
       POSTGRES_PASSWORD: pass
     ports:
-      - "5434:5432"
+      - "5432:5432"      # локальный 5432 → контейнер 5432
     volumes:
-      - pgdata_new:/var/lib/postgresql/data
+      - ticket_pgdata:/var/lib/postgresql/data
+    networks:
+      - ticket_network
+
+
+  postgres_term1:
+    image: postgres:15
+    container_name: postgres_term1
+    restart: always
+    environment:
+      POSTGRES_DB:     terminal1
+      POSTGRES_USER:   admin
+      POSTGRES_PASSWORD: pass
+    ports:
+      - "5433:5432"      # локальный 5433 → контейнер 5432
+    volumes:
+      - term1_pgdata:/var/lib/postgresql/data
+    networks:
+      - ticket_network
+
+
+  ticket-terminal-api:
+    image: samael1414/ticket-terminal-api:latest
+    container_name: ticket_terminal_api
+    restart: always
+    depends_on:
+      - postgres_ticket
+    environment:
+      SPRING_DATASOURCE_URL:      jdbc:postgresql://postgres_ticket:5432/ticket_terminal
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: pass
+    ports:
+      - "8181:8181"
     networks:
       - ticket_network
 
 volumes:
-  pgdata_new:
+  ticket_pgdata:
+  term1_pgdata:
 
 networks:
   ticket_network:
+    driver: bridge

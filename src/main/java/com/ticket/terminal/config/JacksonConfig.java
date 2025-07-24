@@ -31,12 +31,19 @@ import java.util.List;
 @Configuration
 public class JacksonConfig {
 
+
+    private static final String DATE_PATTERN = "yyyy-MM-dd";
+    private static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm";
+    private static final MediaType TEXT_JSON = MediaType.valueOf("text/json");
+    private static final MediaType TEXT_JSON_UTF8 = MediaType.valueOf("text/json;charset=UTF-8");
+    private static final MediaType TEXT_PLAIN_UTF8 = MediaType.valueOf("text/plain;charset=UTF-8");
+
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
 
         JavaTimeModule timeModule = new JavaTimeModule();
         timeModule.addDeserializer(ZonedDateTime.class, new CustomZonedDateTimeDeserializer());
@@ -59,10 +66,10 @@ public class JacksonConfig {
 
         List<MediaType> types = new ArrayList<>(converter.getSupportedMediaTypes());
         types.add(MediaType.APPLICATION_JSON);
-        types.add(MediaType.valueOf("text/json"));
-        types.add(MediaType.valueOf("text/json;charset=UTF-8"));
+        types.add(TEXT_JSON);
+        types.add(TEXT_JSON_UTF8);
         types.add(MediaType.TEXT_PLAIN);
-        types.add(MediaType.valueOf("text/plain;charset=UTF-8"));
+        types.add(TEXT_PLAIN_UTF8);
         converter.setSupportedMediaTypes(types);
 
         return converter;

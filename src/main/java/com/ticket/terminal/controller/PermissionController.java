@@ -1,6 +1,6 @@
 package com.ticket.terminal.controller;
 
-import com.ticket.terminal.dto.UserPermissionDto;
+import com.ticket.terminal.dto.user.UserPermissionDto;
 import com.ticket.terminal.entity.UsersEntity;
 import com.ticket.terminal.mapper.UserPermissionMapper;
 import com.ticket.terminal.service.UserService;

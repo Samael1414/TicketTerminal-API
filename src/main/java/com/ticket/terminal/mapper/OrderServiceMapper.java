@@ -1,9 +1,9 @@
 package com.ticket.terminal.mapper;
 
-import com.ticket.terminal.dto.EditableOrderServiceDto;
-import com.ticket.terminal.dto.OrderServiceDto;
-import com.ticket.terminal.dto.SimpleOrderServiceDto;
-import com.ticket.terminal.entity.OrderServiceEntity;
+import com.ticket.terminal.dto.editable.EditableOrderServiceDto;
+import com.ticket.terminal.dto.order.OrderServiceDto;
+import com.ticket.terminal.dto.simple.SimpleOrderServiceDto;
+import com.ticket.terminal.entity.order.OrderServiceEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import java.time.LocalDateTime;

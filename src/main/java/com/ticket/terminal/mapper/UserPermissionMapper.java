@@ -1,15 +1,19 @@
 package com.ticket.terminal.mapper;
 
-import com.ticket.terminal.dto.UserPermissionDto;
+import com.ticket.terminal.dto.user.UserPermissionDto;
 import com.ticket.terminal.entity.UserPermissionEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 /**
  * Маппер для преобразования между DTO и сущностями прав доступа пользователя
  */
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface UserPermissionMapper {
 
     /**

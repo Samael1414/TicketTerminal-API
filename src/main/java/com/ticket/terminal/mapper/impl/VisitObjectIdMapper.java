@@ -1,6 +1,5 @@
 package com.ticket.terminal.mapper.impl;
 
-import com.ticket.terminal.dto.VisitObjectItemDto;
 import com.ticket.terminal.entity.VisitObjectEntity;
 import com.ticket.terminal.repository.VisitObjectRepository;
 import lombok.RequiredArgsConstructor;

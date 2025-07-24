@@ -16,7 +16,11 @@
  */
 package com.ticket.terminal.controller;
 
-import com.ticket.terminal.dto.*;
+import com.ticket.terminal.dto.editable.EditableServiceDto;
+import com.ticket.terminal.dto.editable.EditableServiceResponseDto;
+import com.ticket.terminal.dto.service.ServiceCreateDto;
+import com.ticket.terminal.dto.service.ServiceUpdateDto;
+import com.ticket.terminal.dto.simple.SimpleServiceResponseDto;
 import com.ticket.terminal.service.ServiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

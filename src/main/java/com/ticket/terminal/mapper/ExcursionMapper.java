@@ -1,9 +1,9 @@
 package com.ticket.terminal.mapper;
 
-import com.ticket.terminal.dto.ExcursionDto;
-import com.ticket.terminal.dto.ExcursionRequestDto;
-import com.ticket.terminal.dto.ExcursionResponseDto;
-import com.ticket.terminal.entity.ExcursionLogEntity;
+import com.ticket.terminal.dto.excursion.ExcursionDto;
+import com.ticket.terminal.dto.excursion.ExcursionRequestDto;
+import com.ticket.terminal.dto.excursion.ExcursionResponseDto;
+import com.ticket.terminal.entity.excursion.ExcursionLogEntity;
 import com.ticket.terminal.entity.ServiceEntity;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;

@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "application")
+@ConfigurationProperties(prefix = "application.yml")
 public class AppConfig {
 
     String[] allowedOrigins;

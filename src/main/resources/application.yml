@@ -34,7 +34,6 @@ logging:
     feign.Logger: DEBUG
     feign: DEBUG
     org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     com.ticket.terminal: DEBUG
     com.ticket.terminal.service.SoldOrderService: DEBUG
     com.ticket.terminal.controller.OrderController: WARN

@@ -1,7 +1,7 @@
 package com.ticket.terminal.controller;
 
-import com.ticket.terminal.dto.CategoryVisitorCreateDto;
-import com.ticket.terminal.dto.CategoryVisitorDto;
+import com.ticket.terminal.dto.category.CategoryVisitorCreateDto;
+import com.ticket.terminal.dto.category.CategoryVisitorDto;
 import com.ticket.terminal.service.CategoryVisitorService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;

@@ -15,7 +15,7 @@
  */
 package com.ticket.terminal.controller;
 
-import com.ticket.terminal.dto.PROCultureGUIDDto;
+import com.ticket.terminal.dto.culture.PROCultureGUIDDto;
 import com.ticket.terminal.service.ProCultureService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

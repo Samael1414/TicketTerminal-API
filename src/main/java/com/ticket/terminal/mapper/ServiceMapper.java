@@ -1,7 +1,7 @@
 package com.ticket.terminal.mapper;
 
-import com.ticket.terminal.dto.ServiceDto;
-import com.ticket.terminal.dto.SimpleServiceDto;
+import com.ticket.terminal.dto.service.ServiceDto;
+import com.ticket.terminal.dto.simple.SimpleServiceDto;
 import com.ticket.terminal.entity.ServiceEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

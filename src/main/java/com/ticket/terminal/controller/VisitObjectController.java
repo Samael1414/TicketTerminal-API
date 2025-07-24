@@ -1,7 +1,7 @@
 package com.ticket.terminal.controller;
 
-import com.ticket.terminal.dto.VisitObjectCreateDto;
-import com.ticket.terminal.dto.VisitObjectDto;
+import com.ticket.terminal.dto.visit.VisitObjectCreateDto;
+import com.ticket.terminal.dto.visit.VisitObjectDto;
 import com.ticket.terminal.service.VisitObjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
