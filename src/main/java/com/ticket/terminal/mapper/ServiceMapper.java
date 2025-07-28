@@ -1,10 +1,13 @@
 package com.ticket.terminal.mapper;
 
+import com.ticket.terminal.dto.service.ServiceCreateDto;
 import com.ticket.terminal.dto.service.ServiceDto;
+import com.ticket.terminal.dto.service.ServiceUpdateDto;
 import com.ticket.terminal.dto.simple.SimpleServiceDto;
 import com.ticket.terminal.entity.ServiceEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,6 +28,10 @@ public interface ServiceMapper {
     @Mapping(source = "dtBegin", target = "dtBegin", qualifiedByName = "formatDateTime")
     @Mapping(source = "dtEnd", target = "dtEnd", qualifiedByName = "formatDateTime")
     SimpleServiceDto toSimpleDto(ServiceEntity entity);
+
+    ServiceEntity toEntity(ServiceCreateDto dto);
+
+    void updateEntity(@MappingTarget ServiceEntity entity, ServiceUpdateDto dto);
 
     @Named("formatDate")
     default String formatDate(LocalDateTime dt) {

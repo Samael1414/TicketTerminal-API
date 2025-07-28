@@ -133,7 +133,7 @@ public class ServiceService {
                 .orElseThrow(() -> new EntityNotFoundException("Услуга не найдена: " + id));
 
         // 2) Обновляем поля и сохраняем
-        applyDtoToEntity(dto, entity);
+        serviceMapper.updateEntity(entity, dto);
         serviceRepository.save(entity);
 
         // 3) Пересобираем связи: сначала чистим
@@ -181,26 +181,6 @@ public class ServiceService {
         dto.setSeanceGrid(loadAllSeanceGrid());
 
         return dto;
-    }
-
-
-    private void applyDtoToEntity(ServiceCreateDto dto, ServiceEntity entity) {
-        entity.setServiceName(dto.getServiceName());
-        entity.setDescription(dto.getDescription());
-        entity.setCost(dto.getCost());
-        entity.setActiveKindId(dto.getActiveKindId());
-        entity.setIsNeedVisitDate(dto.getIsNeedVisitDate());
-        entity.setIsNeedVisitTime(dto.getIsNeedVisitTime());
-        entity.setDtBegin(dto.getDtBegin());
-        entity.setDtEnd(dto.getDtEnd());
-        entity.setProCultureIdentifier(dto.getProCultureIdentifier());
-        entity.setIsPROCultureChecked(dto.getIsPROCultureChecked());
-        entity.setIsDisableEditVisitObject(dto.getIsDisableEditVisitObject());
-        entity.setIsDisableEditVisitor(dto.getIsDisableEditVisitor());
-        entity.setIsVisitObjectUseForCost(dto.getIsVisitObjectUseForCost());
-        entity.setIsCategoryVisitorUseForCost(dto.getIsCategoryVisitorUseForCost());
-        entity.setIsVisitorCountUseForCost(dto.getIsVisitorCountUseForCost());
-        entity.setUseOneCategory(dto.getIsUseOneCategory());
     }
 
     private EditableServiceDto buildEditableServiceDto(ServiceEntity service) {
@@ -274,10 +254,10 @@ public class ServiceService {
     }
 
     private ServiceEntity createAndSaveServiceEntity(ServiceCreateDto dto) {
-        ServiceEntity entity = new ServiceEntity();
-        applyDtoToEntity(dto, entity);
+        ServiceEntity entity = serviceMapper.toEntity(dto);
         return serviceRepository.save(entity);
     }
+
 
     private void bindVisitObjects(ServiceEntity service, List<VisitObjectDto> visitObjectDtos) {
         Optional.ofNullable(visitObjectDtos).orElse(List.of()).stream()
