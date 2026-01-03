@@ -1,9 +1,6 @@
-version: '3.8'
-
 services:
   postgres-db:
     image: postgres:15
-    container_name: ticket_terminal_db
     restart: always
     environment:
       POSTGRES_DB: ticket_terminal
@@ -19,13 +16,12 @@ services:
       test: ["CMD-SHELL", "pg_isready -U admin -d ticket_terminal"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   ticket-terminal-api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ticket_terminal_api
     restart: always
     depends_on:
       postgres-db:
@@ -38,6 +34,25 @@ services:
       SPRING_LIQUIBASE_CHANGE_LOG: classpath:db-changelog/db.changelog-master.yml
     ports:
       - "8181:8181"
+    networks:
+      - ticket_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8181/TLMuseumGate/REST/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    depends_on:
+      ticket-terminal-api:
+        condition: service_healthy
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html:ro
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - ticket_network
 

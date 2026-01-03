@@ -12,6 +12,15 @@ spring:
     password: pass
   liquibase:
     change-log: classpath:db-changelog/db.changelog-master.yml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
   jackson:
     serialization:
       write-dates-as-timestamps: false
@@ -30,13 +39,7 @@ application:
       password: Admin123
 logging:
   level:
-    com.ticket.terminal.client.MuseumClient: DEBUG
-    feign.Logger: DEBUG
-    feign: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    com.ticket.terminal: DEBUG
-    com.ticket.terminal.service.SoldOrderService: DEBUG
-    com.ticket.terminal.controller.OrderController: WARN
-
-
+    root: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+    com.ticket.terminal: INFO
