@@ -1,56 +1,146 @@
 # TicketTerminal-API
 
 ## Описание
-API для системы управления билетами и услугами через терминал.
 
-## Требования
-- Docker
-- Docker Compose
+**TicketTerminal-API** — система управления услугами и билетами (backend + frontend), разворачиваемая локально через Docker.
+Проект предназначен для запуска **без ручных команд**, с помощью готового `start.bat`.
 
-## Сборка и запуск в Docker
+В составе:
 
-### Запуск всего приложения с базой данных
+* Backend: Spring Boot API
+* Frontend: админ-панель (через nginx)
+* Database: PostgreSQL
+* Миграции: Liquibase
+
+---
+
+## Системные требования
+
+Для запуска **ничего, кроме Docker, не требуется**.
+
+### Обязательно
+
+* **Docker Desktop** (Windows / macOS)
+
+  * Docker должен быть **запущен** (статус *Running*)
+
+### Проверка (по желанию)
+
 ```bash
-docker-compose up -d
+docker --version
+docker compose version
 ```
 
-Это команда запустит:
-1. PostgreSQL базу данных на порту 5434
-2. API приложение на порту 8181
+---
 
-### Доступ к API
-После запуска API будет доступно по адресу:
+## Быстрый запуск (рекомендуемый способ)
+
+### 1. Скачать проект
+
+* Скачать архив проекта **или** клонировать репозиторий
+* Распаковать в любую папку (например `C:\TicketTerminal`)
+
+### 2. Запустить систему
+
+* Дважды кликнуть по файлу:
+
+```
+start.bat
+```
+
+### 3. Дождаться запуска
+
+* Скрипт автоматически:
+
+  * запустит Docker-контейнеры
+  * дождётся готовности backend
+  * **сам откроет браузер** с админ-панелью
+
+### 4. Открытие системы
+
+Админ-панель будет доступна по адресу:
+
+```
+http://localhost/
+```
+
+---
+
+## Остановка системы
+
+Для корректной остановки контейнеров:
+
+```
+stop.bat
+```
+
+---
+
+## Доступы и API
+
+### Backend API
+
 ```
 http://localhost:8181/TLMuseumGate/REST
 ```
 
-Swagger UI доступен по адресу:
+### Swagger UI
+
 ```
 http://localhost:8181/TLMuseumGate/REST/swagger-ui.html
 ```
 
-### Остановка контейнеров
-```bash
-docker-compose down
-```
-
-### Остановка контейнеров с удалением данных
-```bash
-docker-compose down -v
-```
+---
 
 ## Структура проекта
-- `src/` - исходный код приложения
-- `src/main/resources/db-changelog/` - миграции базы данных (Liquibase)
-- `Dockerfile` - инструкции для сборки Docker образа
-- `docker-compose.yml` - конфигурация для запуска приложения и базы данных
 
-## Технологии
-- Java 17
-- Spring Boot 3.4.3
-- Spring Data JPA
-- PostgreSQL
-- Liquibase
-- MapStruct
-- Swagger/OpenAPI
-- Docker
+```
+TicketTerminal-API
+│
+├─ frontend/              # frontend (dist используется nginx)
+├─ nginx/                 # конфигурация nginx
+│   └─ nginx.conf
+│
+├─ src/
+│   └─ main/
+│       ├─ java/          # backend (Spring Boot)
+│       └─ resources/
+│           ├─ db-changelog/   # Liquibase миграции
+│           └─ application.yml
+│
+├─ docker-compose.yml     # запуск всей системы
+├─ Dockerfile             # сборка backend
+│
+├─ start.bat              # запуск системы (для заказчика)
+├─ stop.bat               # остановка системы
+│
+├─ README.md
+└─ pom.xml
+```
+
+---
+
+## Используемые технологии
+
+* Java 17
+* Spring Boot 3.4.3
+* Spring Data JPA
+* Spring Security
+* PostgreSQL 15
+* Liquibase
+* MapStruct
+* Swagger / OpenAPI
+* Docker / Docker Compose
+* Nginx
+
+---
+
+## Примечания
+
+* Первый запуск может занять **до 1–2 минут** (инициализация БД и контейнеров)
+* Все данные БД хранятся в Docker volume
+* Для полного сброса данных можно выполнить:
+
+  ```bash
+  docker compose down -v
+  ```
